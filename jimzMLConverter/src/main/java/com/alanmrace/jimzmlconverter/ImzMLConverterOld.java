@@ -230,8 +230,8 @@ public class ImzMLConverterOld {
 				    			Binary binary = binaryDataArray.getBinary();
 				    			
 				    			if(binaryDataArray.getCVParam(BinaryDataArray.mzArrayID) != null) {
-				    				if(binary != null)
-					    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, mzArrayDataType);
+//				    				if(binary != null)
+//					    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, mzArrayDataType);
 				    							    				
 				    				CVParam externalArrayLength = binaryDataArray.getCVParam(BinaryDataArray.externalArrayLengthID);
 				    				
@@ -243,13 +243,13 @@ public class ImzMLConverterOld {
 				    				
 					    			externalArrayLength.setValueAsString("" + ((offset - prevOffset) / mzArrayDataTypeInBytes));
 				    			} else if(binaryDataArray.getCVParam(BinaryDataArray.intensityArrayID) != null) {
-				    				if(binary != null)
-					    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, intensityArrayDataType);
+//				    				if(binary != null)
+//					    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, intensityArrayDataType);
 				    				
 					    			CVParam externalArrayLength = binaryDataArray.getCVParam(BinaryDataArray.externalArrayLengthID);
 					    			externalArrayLength.setValueAsString("" + ((offset - prevOffset) / intensityArrayDataTypeInBytes));
-				    			} else if(binary != null)
-				    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress);	    			
+				    			}// else if(binary != null)
+//				    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress);	    			
 	
 				    			// Add binary data values to cvParams			
 				    			CVParam externalEncodedLength = binaryDataArray.getCVParam(BinaryDataArray.externalEncodedLengthID);
@@ -295,14 +295,14 @@ public class ImzMLConverterOld {
 					}
 				}
 				
-				if(progressBar != null) {
-					progressBar.setSelection(((y-1) * 100) / maxY);
+//				if(progressBar != null) {
+//					progressBar.setSelection(((y-1) * 100) / maxY);
 //					System.out.println((((y-1) * 100) / maxY) + "%");
-					progressBar.update();
-					progressBar.redraw();
-					
-					while(progressBar.getDisplay().readAndDispatch());
-				}
+//					progressBar.update();
+//					progressBar.redraw();
+//					
+//					while(progressBar.getDisplay().readAndDispatch());
+//				}
 				
 				x = 1;
 				y++;
@@ -929,23 +929,23 @@ public class ImzMLConverterOld {
 			    			
 			    			// Add the m/z  
 			    			if(binaryDataArray.getCVParam(BinaryDataArray.mzArrayID) != null) {
-			    				if(binary != null)
-				    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, mzArrayDataType);
+//			    				if(binary != null)
+//				    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, mzArrayDataType);
 	
 			    				binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
 			    				binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
 			    				
 			    				binaryDataArray.addCVParam(new StringCVParam(obo.getTerm(BinaryDataArray.externalArrayLengthID), "" + ((offset - prevOffset) / mzArrayDataTypeInBytes)));
 			    			} else if(binaryDataArray.getCVParam(BinaryDataArray.intensityArrayID) != null) {
-			    				if(binary != null)
-				    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, intensityArrayDataType);
+//			    				if(binary != null)
+//				    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, intensityArrayDataType);
 			    				
 			    				binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
 			    				binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
 			    				
 				    			binaryDataArray.addCVParam(new StringCVParam(obo.getTerm(BinaryDataArray.externalArrayLengthID), "" + ((offset - prevOffset) / intensityArrayDataTypeInBytes)));
-			    			} else if(binary != null)
-			    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress);	    			
+			    			}// else if(binary != null)
+//			    				offset = binary.copyDataToDataStream(binaryDataStream, offset, compress);	    			
 	
 		    				binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
 		    				binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
@@ -986,13 +986,13 @@ public class ImzMLConverterOld {
 //						System.out.println((((((y-1) * xPixels) + x) * 100) / (yPixels*xPixels)) + "%");
 		    		}
 		    		
-		    		if(progressBar != null) {
-						progressBar.setSelection(((((y-1) * xPixels) + x) * 100) / (yPixels*xPixels));
-						progressBar.update();
-						progressBar.redraw();
-						
-						while(progressBar.getDisplay().readAndDispatch());						
-					}
+//		    		if(progressBar != null) {
+//						progressBar.setSelection(((((y-1) * xPixels) + x) * 100) / (yPixels*xPixels));
+//						progressBar.update();
+//						progressBar.redraw();
+//						
+//						while(progressBar.getDisplay().readAndDispatch());						
+//					}
 		    			
 		    	}
 		    	
@@ -1040,15 +1040,15 @@ public class ImzMLConverterOld {
 		System.out.println("SHA-1 Hash: " + sha1Hash);
 		imzML.getFileDescription().getFileContent().addCVParam(new StringCVParam(obo.getTerm(FileContent.sha1ChecksumID), sha1Hash));
 
-		imzML.write(outputFilename + ".imzML");
+//		imzML.write(outputFilename + ".imzML");
 		
-		if(progressBar != null) {
-			progressBar.setSelection(100);
-			progressBar.update();
-			progressBar.redraw();
-			
-			while(progressBar.getDisplay().readAndDispatch());						
-		}
+//		if(progressBar != null) {
+///			progressBar.setSelection(100);
+//			progressBar.update();
+//			progressBar.redraw();
+//			
+//			while(progressBar.getDisplay().readAndDispatch());						
+//		}
 	}
 	
 	public static String calculateSHA1(String filename) throws ImzMLConversionException {

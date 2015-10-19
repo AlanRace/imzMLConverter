@@ -5,16 +5,21 @@
  */
 package com.alanmrace.jimzmlconverter;
 
+import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzML.CVParam;
+import com.alanmrace.jimzmlparser.mzML.ChromatogramList;
 import com.alanmrace.jimzmlparser.mzML.DataProcessing;
 import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzML.MzML;
 import com.alanmrace.jimzmlparser.mzML.ProcessingMethod;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzML.ScanSettings;
+import com.alanmrace.jimzmlparser.mzML.ScanSettingsList;
 import com.alanmrace.jimzmlparser.mzML.Software;
+import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.obo.OBOTerm;
@@ -74,6 +79,10 @@ public abstract class ImzMLConverter {
 	this.baseImzML = baseImzML;
     }
     
+    public void setFileStorage(FileStorage fileStorage) {
+        this.fileStorage = fileStorage;
+    }
+    
     public void setCompressionType(CVParam compressionType) {
 	this.compressionType = compressionType;
     }
@@ -96,10 +105,14 @@ public abstract class ImzMLConverter {
     
 //    public abstract void convert();
     
+    public void setBaseImzML(ImzML imzML) {
+        this.baseImzML = imzML;
+    }
+    
     protected abstract void generateBaseImzML();
     protected abstract String getConversionDescription();
     
-    private OBOTerm getOBOTerm(String cvParamID) {
+    protected OBOTerm getOBOTerm(String cvParamID) {
 	if(obo == null)
 	    return new OBOTerm(cvParamID);
 	
@@ -149,10 +162,30 @@ public abstract class ImzMLConverter {
         rpgintensityArray.addCVParam(compressionType);
     }
     
-    public void convert() {
+    protected void generatePixelLocations() {
+        if(baseImzML == null)
+	    generateBaseImzML();
+        
+        switch(fileStorage) {
+            case pixelPerFile:
+                break;
+            case oneFile:
+                break;
+            case rowPerFile:
+            default:
+//                pixelLocations = new PixelLocation[inputFilenames.length][baseImzML.getRun().getSpectrumList().size()];
+                break;
+                
+        }
+    }
+    
+    public void convert() throws ImzMLConversionException {
 	// Check if the baseimzML is null, if so then use the first (i)mzML file as the base
 	if(baseImzML == null)
 	    generateBaseImzML();
+        
+        if(pixelLocations == null)
+            generatePixelLocations();
 	
 	generateReferenceableParamArrays();
         
@@ -168,12 +201,37 @@ public abstract class ImzMLConverter {
         // Add processing description to DataProcessing list
         DataProcessing conversionToImzML = new DataProcessing("conversionToImzML");
 	conversionToImzML.addProcessingMethod(new ProcessingMethod(1, imzMLConverter));
-	conversionToImzML.getProcessingMethod(0).addCVParam(new StringCVParam(obo.getTerm(ProcessingMethod.fileFormatConversionID), getConversionDescription()));
+	conversionToImzML.getProcessingMethod(0).addCVParam(new StringCVParam(getOBOTerm(ProcessingMethod.fileFormatConversionID), getConversionDescription()));
         conversionToImzML.getProcessingMethod(0).setSoftwareRef(imzMLConverter);
 	
         baseImzML.getDataProcessingList().addDataProcessing(conversionToImzML);
 	 
-	
-        
+	baseImzML.getRun().setSpectrumList(new SpectrumList(0, conversionToImzML));
+	baseImzML.getRun().setChromatogramList(new ChromatogramList(0, conversionToImzML));
+
+    }
+    
+    protected void updateMaximumPixels(int xPixels, int yPixels) {
+        // Add in the maximum number of pixels in each dimension
+        ScanSettingsList scanSettingsList = baseImzML.getScanSettingsList();
+		
+	if(scanSettingsList == null) {
+            scanSettingsList = new ScanSettingsList(0);		
+            baseImzML.setScanSettingsList(scanSettingsList);
+	}
+		
+	// TODO: Should it be the first scanSettings? One for each experiment?
+	ScanSettings scanSettings = scanSettingsList.getScanSettings(0);
+		
+	if(scanSettings == null) {
+            scanSettings= new ScanSettings("scanSettings1");
+            scanSettingsList.addScanSettings(scanSettings);
+	}
+        scanSettings.removeChildOfCVParam(ScanSettings.maxCountPixelXID);
+	scanSettings.removeChildOfCVParam(ScanSettings.maxCountPixelYID);
+		
+	scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.maxCountPixelXID), ""+xPixels));
+	scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.maxCountPixelYID), ""+yPixels));
+	//scanSettings.addCVParam(new CVParam(obo.getTerm(ScanSettings.maxCountPixelZID), ""+zPixels));
     }
 }
