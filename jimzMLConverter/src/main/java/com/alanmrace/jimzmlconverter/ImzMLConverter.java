@@ -9,9 +9,12 @@ import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzML.CVParam;
+import com.alanmrace.jimzmlparser.mzML.DataProcessing;
 import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzML.MzML;
+import com.alanmrace.jimzmlparser.mzML.ProcessingMethod;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzML.Software;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.obo.OBOTerm;
@@ -21,6 +24,8 @@ import com.alanmrace.jimzmlparser.obo.OBOTerm;
  * @author Alan
  */
 public abstract class ImzMLConverter {
+    
+    public static final String version = "2.0.0";
     
     protected double progress;
     
@@ -92,6 +97,7 @@ public abstract class ImzMLConverter {
 //    public abstract void convert();
     
     protected abstract void generateBaseImzML();
+    protected abstract String getConversionDescription();
     
     private OBOTerm getOBOTerm(String cvParamID) {
 	if(obo == null)
@@ -135,6 +141,12 @@ public abstract class ImzMLConverter {
 	    rpgintensityArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
 	    rpgintensityArray.addCVParam(intensityArrayDataType);
 	}
+        
+        // Add in compression type
+        rpgmzArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
+        rpgmzArray.addCVParam(compressionType);
+        rpgintensityArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
+        rpgintensityArray.addCVParam(compressionType);
     }
     
     public void convert() {
@@ -143,5 +155,25 @@ public abstract class ImzMLConverter {
 	    generateBaseImzML();
 	
 	generateReferenceableParamArrays();
+        
+        // Add in the data processing describing the conversion
+        Software imzMLConverter = baseImzML.getSoftwareList().getSoftware("imzMLConverter");
+		
+	if(imzMLConverter == null || !imzMLConverter.getVersion().equals(ImzMLConverter.version)) {
+            imzMLConverter = new Software("imzMLConverter", ImzMLConverter.version);
+			
+            baseImzML.getSoftwareList().addSoftware(imzMLConverter);
+	} 
+        
+        // Add processing description to DataProcessing list
+        DataProcessing conversionToImzML = new DataProcessing("conversionToImzML");
+	conversionToImzML.addProcessingMethod(new ProcessingMethod(1, imzMLConverter));
+	conversionToImzML.getProcessingMethod(0).addCVParam(new StringCVParam(obo.getTerm(ProcessingMethod.fileFormatConversionID), getConversionDescription()));
+        conversionToImzML.getProcessingMethod(0).setSoftwareRef(imzMLConverter);
+	
+        baseImzML.getDataProcessingList().addDataProcessing(conversionToImzML);
+	 
+	
+        
     }
 }

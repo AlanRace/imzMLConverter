@@ -20,4 +20,9 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    protected String getConversionDescription() {
+        return "Conversion from mzML to imzML";
+    }
+
 }
