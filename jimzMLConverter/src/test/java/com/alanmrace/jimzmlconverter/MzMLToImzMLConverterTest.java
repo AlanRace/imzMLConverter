@@ -102,7 +102,14 @@ public class MzMLToImzMLConverterTest {
      * @throws com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException
      */
     @org.junit.Test
-    public void testConvert() throws ImzMLConversionException {
+    public void testConvert() throws ImzMLConversionException {        
+        System.out.println("convert");
+        converter.convert();
+        testImzMLOutput();
+    }
+    
+    @org.junit.Test
+    public void testzlibConvert() throws ImzMLConversionException {
         String ibdFilepath = outputPath + ".ibd";
         
         System.out.println("convert");
@@ -123,10 +130,59 @@ public class MzMLToImzMLConverterTest {
         System.out.println("Converted zlib compressed binary file size: " + convertedzlibLength);
         
         assertTrue("zlib compressed size < binary size", convertedzlibLength < convertedSize);
-        
+    }
+    
+    @org.junit.Test
+    public void testSinglePrecisionConvert() throws ImzMLConversionException {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
+        System.out.println("convert single precision");
         converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.singlePrecisionID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.singlePrecisionID)));
+        converter.convert();
+        testImzMLOutput();
+    }
+    
+    @org.junit.Test
+    public void testSigned64bitIntConvert() throws ImzMLConversionException {
+        // Test that the conversion can alter the data type used to store values
+        // Single precision for m/z array
+        System.out.println("convert signed 64 bit integer");
+        converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed64bitIntegerID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed64bitIntegerID)));
+        converter.convert();
+        testImzMLOutput();
+    }
+    
+    @org.junit.Test
+    public void testSigned32bitIntConvert() throws ImzMLConversionException {
+        // Test that the conversion can alter the data type used to store values
+        // Single precision for m/z array
+        System.out.println("convert signed 32 bit integer");
+        converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed32bitIntegerID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed32bitIntegerID)));
+        converter.convert();
+        testImzMLOutput();
+    }
+    
+    @org.junit.Test
+    public void testSigned16bitIntConvert() throws ImzMLConversionException {
+        // Test that the conversion can alter the data type used to store values
+        // Single precision for m/z array
+        System.out.println("convert signed 16 bit integer");
+        converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed16bitIntegerID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed16bitIntegerID)));
+        converter.convert();
+        testImzMLOutput();
+    }
+    
+    @org.junit.Ignore
+    @org.junit.Test
+    public void testSigned8bitIntConvert() throws ImzMLConversionException {
+        // Test that the conversion can alter the data type used to store values
+        // Single precision for m/z array
+        System.out.println("convert signed 8 bit integer");
+        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed8bitIntegerID)));
         converter.convert();
         testImzMLOutput();
     }
@@ -142,8 +198,15 @@ public class MzMLToImzMLConverterTest {
             double[] mzs = spectrum.getmzArray();
             assertNotNull(mzs);
             
+            System.out.println("m/z range: " + mzs[0] + " - " + mzs[mzs.length-1]);
+            
             assertEquals(50, mzs[0], 1);
             assertEquals(2000, mzs[mzs.length-1], 1);
+            
+            double[] intensities = spectrum.getIntensityArray();
+            
+            System.out.println("Intensity: " + intensities[0]);
+            assertEquals(2, intensities[0], 0.1);
         } catch (IOException ex) {
             Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             

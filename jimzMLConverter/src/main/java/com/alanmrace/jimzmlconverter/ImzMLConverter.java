@@ -9,6 +9,7 @@ import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
+import com.alanmrace.jimzmlparser.mzML.BinaryDataArrayList;
 import com.alanmrace.jimzmlparser.mzML.CVParam;
 import com.alanmrace.jimzmlparser.mzML.ChromatogramList;
 import com.alanmrace.jimzmlparser.mzML.DataProcessing;
@@ -117,9 +118,10 @@ public abstract class ImzMLConverter {
     protected abstract void generateBaseImzML();
     protected abstract String getConversionDescription();
     
-    protected OBOTerm getOBOTerm(String cvParamID) {
-	if(obo == null)
-	    return new OBOTerm(cvParamID);
+    
+    protected final OBOTerm getOBOTerm(String cvParamID) {
+	if(obo == null) 
+            obo = OBO.getOBO();
 	
 	return obo.getTerm(cvParamID);
     }
@@ -238,5 +240,27 @@ public abstract class ImzMLConverter {
 	scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.maxCountPixelXID), ""+xPixels));
 	scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.maxCountPixelYID), ""+yPixels));
 	//scanSettings.addCVParam(new CVParam(obo.getTerm(ScanSettings.maxCountPixelZID), ""+zPixels));
+    }
+    
+    protected BinaryDataArrayList createDefaultBinaryDataArrayList() {
+        BinaryDataArrayList binaryDataArrayList = new BinaryDataArrayList(2);
+        
+        // m/z
+        BinaryDataArray mzBinaryDataArray = new BinaryDataArray(0);
+        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.mzArrayID)));
+        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID)));
+        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID)));
+
+        binaryDataArrayList.addBinaryDataArray(mzBinaryDataArray);
+
+        // Counts
+        BinaryDataArray countsBinaryDataArray = new BinaryDataArray(0);
+        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.intensityArrayID)));
+        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID)));
+        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID)));
+
+        binaryDataArrayList.addBinaryDataArray(countsBinaryDataArray);
+
+        return binaryDataArrayList;
     }
 }

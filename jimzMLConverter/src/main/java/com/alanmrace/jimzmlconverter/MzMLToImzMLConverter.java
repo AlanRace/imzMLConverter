@@ -17,9 +17,11 @@ import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.Binary;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArrayList;
+import com.alanmrace.jimzmlparser.mzML.CVParam;
 import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzML.FileContent;
 import com.alanmrace.jimzmlparser.mzML.FileDescription;
+import com.alanmrace.jimzmlparser.mzML.LongCVParam;
 import com.alanmrace.jimzmlparser.mzML.MzML;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupRef;
@@ -74,16 +76,12 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         super.convert();
         
         // TODO: Remove these magic numbers
-        int mzArrayDataTypeInBytes = 8;
-        int intensityArrayDataTypeInBytes = 8;
         int xPixels = baseImzML.getRun().getSpectrumList().size();
         int yPixels = inputFilenames.length;
         String lineScanDirection = ScanSettings.lineScanDirectionLeftRightID;
         
         int x = 1;
         int y = 1;
-        
-        
         
         // Open the .ibd data stream
 	DataOutputStream binaryDataStream = null;
@@ -194,71 +192,46 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                         BinaryDataArrayList binaryDataArrayList = spectrum.getBinaryDataArrayList();
 
                         if (binaryDataArrayList == null) {
-                            binaryDataArrayList = new BinaryDataArrayList(2);
+                            binaryDataArrayList = createDefaultBinaryDataArrayList();
                             spectrum.setBinaryDataArrayList(binaryDataArrayList);
-
-                            // m/z
-                            BinaryDataArray mzBinaryDataArray = new BinaryDataArray(0);
-                            mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.mzArrayID)));
-                            mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID)));
-                            mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID)));
-
-                            binaryDataArrayList.addBinaryDataArray(mzBinaryDataArray);
-
-                            // Counts
-                            BinaryDataArray countsBinaryDataArray = new BinaryDataArray(0);
-                            countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.intensityArrayID)));
-                            countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID)));
-                            countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID)));
-
-                            binaryDataArrayList.addBinaryDataArray(countsBinaryDataArray);
                         }
 
-                        for (int j = 0; j < binaryDataArrayList.size(); j++) {
-                            BinaryDataArray binaryDataArray = binaryDataArrayList.getBinaryDataArray(j);
-                            Binary binary = binaryDataArray.getBinary();
-
-//			    			System.out.println("Binary: " + binary);
-                            // Add the m/z  
-                            if (binaryDataArray.getCVParam(BinaryDataArray.mzArrayID) != null) {
- //                               if (binary != null) {
-                                    //offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, mzArrayDataType);
-                                
-                                    byte[] dataToWrite = BinaryDataArray.compress(binaryDataArray.getDataAsByte(), this.compressionType);
-                                    binaryDataStream.write(dataToWrite);
-                                    offset += dataToWrite.length;
-//                                }
-
-                                binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
-                                binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
-
-                                binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalArrayLengthID), "" + ((offset - prevOffset) / mzArrayDataTypeInBytes)));
-                            } else if (binaryDataArray.getCVParam(BinaryDataArray.intensityArrayID) != null) {
-//                                if (binary != null) {
-                                    //offset = binary.copyDataToDataStream(binaryDataStream, offset, compress, intensityArrayDataType);
-                                    byte[] dataToWrite = BinaryDataArray.compress(binaryDataArray.getDataAsByte(), this.compressionType);
-                                    binaryDataStream.write(dataToWrite);
-                                    offset += dataToWrite.length;
- //                               }
-
-                                binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
-                                binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
-
-                                binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalArrayLengthID), "" + ((offset - prevOffset) / intensityArrayDataTypeInBytes)));
-                            } else if (binary != null) {
-                                //offset = binary.copyDataToDataStream(binaryDataStream, offset, compress);
-                                byte[] dataToWrite = BinaryDataArray.compress(binaryDataArray.getDataAsByte(), this.compressionType);
-                                binaryDataStream.write(dataToWrite);
-                                offset += dataToWrite.length;
+                        for(BinaryDataArray binaryDataArray : binaryDataArrayList) {
+                            byte[] dataToWrite = binaryDataArray.getDataAsByte();
+                            CVParam dataArrayType = binaryDataArray.getDataArrayType();
+                            
+                            switch(dataArrayType.getTerm().getID()) {
+                                case BinaryDataArray.mzArrayID:
+                                    dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);
+                                    
+                                    binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
+                                    binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
+                                    break;
+                                case BinaryDataArray.intensityArrayID:
+                                    dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.intensityArrayDataType);
+                                    
+                                    binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
+                                    binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
+                                    break;
+                                default:
+                                    throw new UnsupportedOperationException("Unsupported dataArrayType: " + dataArrayType);
                             }
-
+                            
+                            // Compress if necessary
+                            dataToWrite = BinaryDataArray.compress(dataToWrite, this.compressionType);
+                            
+                            // Write out data 
+                            binaryDataStream.write(dataToWrite);
+                            offset += dataToWrite.length;
+                            
+                            // Make sure that any previous settings are removed
                             binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
                             binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
-
+                            
                             // Add binary data values to cvParams
-                            binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalEncodedLengthID), "" + (offset - prevOffset)));
+                            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalEncodedLengthID), (offset - prevOffset)));
                             binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalDataID), "true"));
-                            binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalOffsetID), "" + prevOffset));
+                            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalOffsetID), prevOffset));
 
                             prevOffset = offset;
                         }
