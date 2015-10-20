@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -55,6 +56,7 @@ public class WiffTomzMLConverter {
                 // Locate the mzML files that were created
                 File directory = new File(fileToConvert.getParent());
                 
+                // Get a list of mzML files that include part of the original filename
                 mzMLFiles = directory.listFiles(new FileFilter() {
                     @Override
                     public boolean accept(File pathname) {
@@ -62,6 +64,15 @@ public class WiffTomzMLConverter {
                         
                         return name.contains(fileToConvert.getName().replace(".wiff", "")) && name.endsWith(".mzML");
                     }
+                });
+                
+                // Order the files by their modified date
+                Arrays.sort(mzMLFiles, new Comparator<File>(){
+                    @Override
+                    public int compare(File f1, File f2)
+                    {
+                        return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+                    } 
                 });
             } catch (InterruptedException ex) {
                 Logger.getLogger(WiffTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);

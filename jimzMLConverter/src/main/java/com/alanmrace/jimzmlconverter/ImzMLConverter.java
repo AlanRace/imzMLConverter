@@ -263,4 +263,12 @@ public abstract class ImzMLConverter {
 
         return binaryDataArrayList;
     }
+    
+    public synchronized double getProgress() {
+        return progress;
+    }
+    
+    public synchronized void updateProgress(double progress) {
+        this.progress = progress;
+    }
 }

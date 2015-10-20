@@ -83,6 +83,9 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         int x = 1;
         int y = 1;
         
+        int maxX = x;
+        int maxY = y;
+        
         // Open the .ibd data stream
 	DataOutputStream binaryDataStream = null;
 	try {
@@ -221,8 +224,10 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                             dataToWrite = BinaryDataArray.compress(dataToWrite, this.compressionType);
                             
                             // Write out data 
-                            binaryDataStream.write(dataToWrite);
-                            offset += dataToWrite.length;
+                            if(dataToWrite != null) {
+                                binaryDataStream.write(dataToWrite);
+                                offset += dataToWrite.length;
+                            }
                             
                             // Make sure that any previous settings are removed
                             binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
@@ -256,20 +261,24 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 //                        scan.addCVParam(new StringCVParam(getOBOTerm(Scan.positionXID), "" + location.getX()));
 //                        scan.addCVParam(new StringCVParam(getOBOTerm(Scan.positionYID), "" + location.getY()));
 //                        scan.addCVParam(new StringCVParam(getOBOTerm(Scan.positionZID), "" + location.getZ()));
-                    //}
-
-                    if(x > xPixels)
-                        xPixels = x;
-                    if(y > yPixels)
-                        yPixels = y;
                         
-                    x++;
-                    if (x > xPixels) {                        
+                        if(x > maxX)
+                            maxX = x;
+                        
+
+                        x++;
+                    }
+                
+                    if(y > maxY)
+                        maxY = y;
+                    
+//                    if (x > xPixels) {                        
                         x = 1;
                         y++;
+//                    }
 
 //						System.out.println((((((y-1) * xPixels) + x) * 100) / (yPixels*xPixels)) + "%");
-                    }
+//                    }
 
 //                    if (progressBar != null) {
 //                        progressBar.setSelection(((((y - 1) * xPixels) + x) * 100) / (yPixels * xPixels));
@@ -279,7 +288,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 //                        while (progressBar.getDisplay().readAndDispatch());
 //                    }
 
-                }
+//                }
 
                 currentmzML = null;
 //                handler.deleteTemporaryFile();
@@ -316,7 +325,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
             System.out.println("Number of spectra after removing: " + baseImzML.getRun().getSpectrumList().size());
         }
 
-        this.updateMaximumPixels(xPixels, yPixels);
+        this.updateMaximumPixels(maxX, maxY);
         
         String sha1Hash = calculateSHA1(outputFilename + ".ibd");
         baseImzML.getFileDescription().getFileContent().removeChildOfCVParam(FileContent.ibdChecksumID);
@@ -340,19 +349,27 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
     }
 
     
-//    public static void main(String args[]) throws IOException, ImzMLConversionException {
-//        String wiffFile = "D:\\Test\\Data7_1_2011-acc0.1_cyc10.wiff";
-//        wiffFile = "D:\\Rory\\2012_6_6_NITRO_Tcourse_3(120606,19h10m).wiff";
-//        
-//        File[] mzMLFiles = WiffTomzMLConverter.convert(wiffFile);
-//        String[] mzMLFilepaths = new String[mzMLFiles.length];
-//        
-//        for(int i = 0; i < mzMLFiles.length; i++)
-//            mzMLFilepaths[i] = mzMLFiles[i].getAbsolutePath();
-//        
-//        MzMLToImzMLConverter converter = new MzMLToImzMLConverter(wiffFile, mzMLFilepaths, FileStorage.rowPerFile);
-//        converter.setFileStorage(FileStorage.rowPerFile);
-//        
-//        converter.convert();
-//    }
+    public static void main(String args[]) throws IOException, ImzMLConversionException {
+        String wiffFile = "D:\\Test\\Data7_1_2011-acc0.1_cyc10.wiff";
+        wiffFile = "D:\\Rory\\SampleData\\2012_5_2_medium(120502,20h18m).wiff";
+
+        long startTime = System.currentTimeMillis();
+        File[] mzMLFiles = WiffTomzMLConverter.convert(wiffFile);
+        String[] mzMLFilepaths = new String[mzMLFiles.length];
+        
+        for(int i = 0; i < mzMLFiles.length; i++)
+            mzMLFilepaths[i] = mzMLFiles[i].getAbsolutePath();
+        
+        long end1Time = System.currentTimeMillis();
+        
+        MzMLToImzMLConverter converter = new MzMLToImzMLConverter(wiffFile, mzMLFilepaths, FileStorage.rowPerFile);
+        converter.setFileStorage(FileStorage.rowPerFile);
+        
+        converter.convert();
+        
+        long end2Time = System.currentTimeMillis();
+        
+        System.out.println("Conversion to mzML took: " + (end1Time - startTime) + " ms");
+        System.out.println("Conversion to imzML took: " + (end2Time - end1Time) + " ms");
+    }
 }
