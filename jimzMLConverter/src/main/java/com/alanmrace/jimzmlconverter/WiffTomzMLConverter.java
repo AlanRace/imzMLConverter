@@ -93,7 +93,7 @@ public class WiffTomzMLConverter {
         
                     
         for(File file : files) {
-            convert(file.getAbsolutePath());
+            File[] mzMLFiles = convert(file.getAbsolutePath());
         }
     }
 }

@@ -53,6 +53,8 @@ import org.xml.sax.SAXException;
  */
 public class MzMLToImzMLConverter extends ImzMLConverter {
 
+    
+    
     public MzMLToImzMLConverter(String outputFilename, String[] inputFilenames, FileStorage fileStorage) {
 	super(outputFilename, inputFilenames, fileStorage);
     }
@@ -365,19 +367,19 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
     }
 
     
-    public static void main(String args[]) throws IOException, ImzMLConversionException {
-        String wiffFile = "D:\\Test\\Data7_1_2011-acc0.1_cyc10.wiff";
-        wiffFile = "D:\\Rory\\2012_6_6_NITRO_Tcourse_3(120606,19h10m).wiff";
-        
-        File[] mzMLFiles = WiffTomzMLConverter.convert(wiffFile);
-        String[] mzMLFilepaths = new String[mzMLFiles.length];
-        
-        for(int i = 0; i < mzMLFiles.length; i++)
-            mzMLFilepaths[i] = mzMLFiles[i].getAbsolutePath();
-        
-        MzMLToImzMLConverter converter = new MzMLToImzMLConverter(wiffFile, mzMLFilepaths, FileStorage.rowPerFile);
-        converter.setFileStorage(FileStorage.rowPerFile);
-        
-        converter.convert();
-    }
+//    public static void main(String args[]) throws IOException, ImzMLConversionException {
+//        String wiffFile = "D:\\Test\\Data7_1_2011-acc0.1_cyc10.wiff";
+//        wiffFile = "D:\\Rory\\2012_6_6_NITRO_Tcourse_3(120606,19h10m).wiff";
+//        
+//        File[] mzMLFiles = WiffTomzMLConverter.convert(wiffFile);
+//        String[] mzMLFilepaths = new String[mzMLFiles.length];
+//        
+//        for(int i = 0; i < mzMLFiles.length; i++)
+//            mzMLFilepaths[i] = mzMLFiles[i].getAbsolutePath();
+//        
+//        MzMLToImzMLConverter converter = new MzMLToImzMLConverter(wiffFile, mzMLFilepaths, FileStorage.rowPerFile);
+//        converter.setFileStorage(FileStorage.rowPerFile);
+//        
+//        converter.convert();
+//    }
 }

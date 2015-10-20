@@ -23,6 +23,7 @@ import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.obo.OBOTerm;
+import java.io.File;
 
 /**
  *
@@ -58,7 +59,7 @@ public abstract class ImzMLConverter {
 	oneFile,
 	pixelPerFile
     }
-    
+        
     public ImzMLConverter(String outputFilename, String[] inputFilenames, FileStorage fileStorage) {
 	this.outputFilename = outputFilename;
 	this.inputFilenames = inputFilenames;
@@ -68,6 +69,10 @@ public abstract class ImzMLConverter {
 	compressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
 	mzArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
 	intensityArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
+    }
+    
+    public void setOutputFilename(String outputFilename) {
+        this.outputFilename = outputFilename;
     }
     
     public void setOBO(OBO obo) {
@@ -181,8 +186,8 @@ public abstract class ImzMLConverter {
     
     public void convert() throws ImzMLConversionException {
 	// Check if the baseimzML is null, if so then use the first (i)mzML file as the base
-	if(baseImzML == null)
-	    generateBaseImzML();
+//	if(baseImzML == null)
+        generateBaseImzML();
         
         if(pixelLocations == null)
             generatePixelLocations();
