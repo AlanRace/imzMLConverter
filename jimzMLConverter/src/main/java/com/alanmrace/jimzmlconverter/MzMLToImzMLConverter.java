@@ -7,18 +7,11 @@ package com.alanmrace.jimzmlconverter;
 
 import static com.alanmrace.jimzmlconverter.ImzMLConverterOld.calculateSHA1;
 import static com.alanmrace.jimzmlconverter.ImzMLConverterOld.hexStringToByteArray;
-import static com.alanmrace.jimzmlconverter.ImzMLConverterOld.oneFile;
-import static com.alanmrace.jimzmlconverter.ImzMLConverterOld.pixelPerFile;
-import static com.alanmrace.jimzmlconverter.ImzMLConverterOld.rowPerFile;
 import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
-import com.alanmrace.jimzmlparser.exceptions.InvalidMzML;
-import com.alanmrace.jimzmlparser.imzML.PixelLocation;
-import com.alanmrace.jimzmlparser.mzML.Binary;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArrayList;
 import com.alanmrace.jimzmlparser.mzML.CVParam;
-import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzML.FileContent;
 import com.alanmrace.jimzmlparser.mzML.FileDescription;
 import com.alanmrace.jimzmlparser.mzML.LongCVParam;
@@ -33,7 +26,6 @@ import com.alanmrace.jimzmlparser.mzML.SourceFileList;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
-import com.alanmrace.jimzmlparser.parser.MzMLHandler;
 import com.alanmrace.jimzmlparser.parser.MzMLHeaderHandler;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -44,10 +36,6 @@ import java.util.ArrayList;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -55,12 +43,43 @@ import org.xml.sax.SAXException;
  */
 public class MzMLToImzMLConverter extends ImzMLConverter {
 
+    FileStorage fileStorage;
     
+    public enum FileStorage {
+	rowPerFile,
+	oneFile,
+	pixelPerFile
+    }
     
     public MzMLToImzMLConverter(String outputFilename, String[] inputFilenames, FileStorage fileStorage) {
-	super(outputFilename, inputFilenames, fileStorage);
+	super(outputFilename, inputFilenames);
+        
+        this.fileStorage = fileStorage;
     }
 
+    
+    public void setFileStorage(FileStorage fileStorage) {
+        this.fileStorage = fileStorage;
+    }
+    
+    @Override
+    protected void generatePixelLocations() {
+        if(baseImzML == null)
+	    generateBaseImzML();
+        
+        switch(fileStorage) {
+            case pixelPerFile:
+                break;
+            case oneFile:
+                break;
+            case rowPerFile:
+            default:
+//                pixelLocations = new PixelLocation[inputFilenames.length][baseImzML.getRun().getSpectrumList().size()];
+                break;
+                
+        }
+    }
+    
     @Override
     protected void generateBaseImzML() {
 	baseImzML = ImzMLHandler.parseimzML(inputFilenames[0]);
@@ -125,7 +144,6 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
             int currentFileSpectrumIndex = 0;
 
 
-
             try {
                 MzML currentmzML = MzMLHeaderHandler.parsemzMLHeader(mzMLFilename);
                 //System.out.println(currentmzML.getRun().getSpectrumList().size());
@@ -152,27 +170,12 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpg);
                 }
 
-                // Add the sourceFile to the sourceFileList
-                File file = new File(mzMLFilename);
-                String filenameID = "mzML" + currentmzMLFile++;
-                SourceFile sourceFile = new SourceFile(filenameID, file.getParentFile().toURI().toString(), file.getName());
+                String filenameID = "mzML" + currentmzMLFile++;;
+                addSourceFileToImzML(baseImzML, mzMLFilename, filenameID, currentmzML.getFileDescription());
 
-                if (baseImzML.getFileDescription().getSourceFileList() == null) {
-                    baseImzML.getFileDescription().setSourceFileList(new SourceFileList(1));
-                }
+                
 
-                baseImzML.getFileDescription().getSourceFileList().addSourceFile(sourceFile);
-
-                sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.sha1FileChecksumType), ImzMLConverterOld.calculateSHA1(mzMLFilename)));
-
-                // Add the native spectrum format
-                FileDescription currentFileDescription = currentmzML.getFileDescription();
-
-                if (currentFileDescription.getSourceFileList() != null) {
-                    sourceFile.addCVParam(currentFileDescription.getSourceFileList().getSourceFile(0).getCVParamOrChild(SourceFile.nativeSpectrumIdentifierFormat));
-                    // TODO: Checksum					
-                }
-                sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.mzMLFileFormat), ""));
+                
 
                 long prevOffset = offset;
 
