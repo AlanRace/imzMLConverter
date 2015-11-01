@@ -91,6 +91,17 @@ public class MzMLToImzMLConverterTest {
      * Test of generateBaseImzML method, of class MzMLToImzMLConverter.
      */
     @org.junit.Test
+    public void testMain() {
+        System.out.println("main");
+	String[] args = {MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE).getPath()};
+	
+        ImzMLConverter.main(args);
+    }
+    
+    /**
+     * Test of generateBaseImzML method, of class MzMLToImzMLConverter.
+     */
+    @org.junit.Test
     public void testGenerateBaseImzML() {
         System.out.println("generateBaseImzML");
         converter.generateBaseImzML();
