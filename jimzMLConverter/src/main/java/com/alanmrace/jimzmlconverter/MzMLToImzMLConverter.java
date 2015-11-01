@@ -24,6 +24,7 @@ import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -83,7 +84,11 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
     @Override
     protected void generateBaseImzML() {
         try {
-            baseImzML = new ImzML(MzMLHeaderHandler.parsemzMLHeader(inputFilenames[0]));
+//	    System.out.println(Arrays.toString(inputFilenames));
+	    MzML mzML = MzMLHeaderHandler.parsemzMLHeader(inputFilenames[0]);
+	    mzML.close();	    
+	    
+            baseImzML = new ImzML(mzML);
             //baseImzML = new ImzML(ImzMLHandler.parseimzML(inputFilenames[0]));
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
@@ -181,7 +186,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                         y++;
                     }
                     
-        //            currentmzML.close();
+		    Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.INFO, "About to close mzML in convert()");
+                    currentmzML.close();
                 } catch (FileNotFoundException fnfe) {
                     throw new ImzMLConversionException("Could not find the file " + mzMLFilename);
                 }
@@ -189,6 +195,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
             binaryDataStream.close();
         } catch (IOException e) {
+	    System.out.println(Arrays.toString(e.getStackTrace()));
             throw new ImzMLConversionException("Error closing " + outputFilename + ".ibd");
         }
 
@@ -210,6 +217,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         } catch (ImzMLWriteException ex) {
             Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
+	
+	baseImzML.close();
     }
 
     /*    public static void main(String args[]) throws IOException, ImzMLConversionException {

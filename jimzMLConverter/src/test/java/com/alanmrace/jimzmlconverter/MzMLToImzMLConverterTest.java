@@ -96,17 +96,6 @@ public class MzMLToImzMLConverterTest {
     @After
     public void tearDown() {
     }
-
-    /**
-     * Test of generateBaseImzML method, of class MzMLToImzMLConverter.
-     */
-    @org.junit.Test
-    public void testMain() {
-        System.out.println("main");
-	String[] args = {MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE).getPath()};
-	
-        ImzMLConverter.main(args);
-    }
     
     /**
      * Test of generateBaseImzML method, of class MzMLToImzMLConverter.
@@ -234,6 +223,8 @@ public class MzMLToImzMLConverterTest {
                 
                 fail("IOException: " + ex);
             }
+	    
+	    imzML.close();
         } catch (FileNotFoundException ex) {
             Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             
