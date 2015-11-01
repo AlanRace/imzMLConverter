@@ -39,8 +39,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
@@ -53,6 +55,8 @@ import java.util.logging.SimpleFormatter;
  */
 public abstract class ImzMLConverter {
 
+    private static final Logger logger = Logger.getLogger(ImzMLConverter.class.getName());
+    
     public static final String version = "2.0.0";
 
     protected double progress;
@@ -219,14 +223,15 @@ public abstract class ImzMLConverter {
 	    }
 	}
 
-	System.out.println("Number of spectra before removing: " + imzML.getRun().getSpectrumList().size());
+        logger.log(Level.FINE, "Number of spectra before removing: {0}", imzML.getRun().getSpectrumList().size());
 
 	for (Spectrum spectrum : spectraToRemove) {
-	    System.out.println("Removing empty spectrum: " + spectrum);
+            logger.log(Level.FINEST, "Removing empty spectrum: {0}", spectrum);
+            
 	    imzML.getRun().getSpectrumList().removeSpectrum(spectrum);
 	}
 
-	System.out.println("Number of spectra after removing: " + imzML.getRun().getSpectrumList().size());
+        logger.log(Level.FINE, "Number of spectra after removing: {0}", imzML.getRun().getSpectrumList().size());
     }
 
     public void convert() throws ImzMLConversionException {
@@ -523,16 +528,20 @@ public abstract class ImzMLConverter {
 	
 	if(!arguments.combine) {
 	    for(String fileName : arguments.files) {
+                logger.log(Level.INFO, "Converting file {0}", fileName);
+                
 		File[] mzMLFiles = null;
 		String[] inputFilenames = null;
 		
 		String extension = getExtension(fileName);
 		
 		if(extension.equals("wiff")) {
+                    logger.log(Level.INFO, "Detected WIFF file");
+                    
 		    try {
 			mzMLFiles = WiffTomzMLConverter.convert(fileName);			
 		    } catch (IOException ex) {
-			Logger.getLogger(ImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+			logger.log(Level.SEVERE, null, ex);
 		    }
 		    
 		    if(outputPath == null || outputPath.isEmpty())
@@ -552,10 +561,22 @@ public abstract class ImzMLConverter {
 
 		    try {
 			converter.convert();
+                        
+                        logger.log(Level.INFO, MessageFormat.format("Converted {0}", outputPath));
 		    } catch (ImzMLConversionException ex) {
-			Logger.getLogger(ImzMLConverter.class.getName()).log(Level.SEVERE, "Failed to convert " + fileName, ex);
+			logger.log(Level.SEVERE, "Failed to convert " + fileName, ex);
 		    }
 		}
+                
+                // Cleanup
+                for(File mzMLFile : mzMLFiles) {
+                    try {
+                        Files.delete(mzMLFile.toPath());
+                        logger.log(Level.INFO, MessageFormat.format("Cleaned up {0}", mzMLFile));
+                    } catch (IOException ex) {
+                        logger.log(Level.SEVERE, MessageFormat.format("Failed to clean up {0}", mzMLFile), ex);
+                    }
+                }
 	    }
 	}
     }
