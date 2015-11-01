@@ -11,8 +11,8 @@ package com.alanmrace.jimzmlconverter;
  */
 public class ImzMLToImzMLConverter extends ImzMLConverter {
 
-    public ImzMLToImzMLConverter(String outputFilename, String[] inputFilenames, FileStorage fileStorage) {
-	super(outputFilename, inputFilenames, fileStorage);
+    public ImzMLToImzMLConverter(String outputFilename, String[] inputFilenames) {
+	super(outputFilename, inputFilenames);
     }
 
     @Override
@@ -23,6 +23,11 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
     @Override
     protected String getConversionDescription() {
         return "Conversion of imzML to imzML";
+    }
+
+    @Override
+    protected void generatePixelLocations() {
+	throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
