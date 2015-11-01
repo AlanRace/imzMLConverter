@@ -13,12 +13,15 @@ import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import com.alanmrace.jimzmlparser.obo.OBOTerm;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -31,6 +34,8 @@ import static org.junit.Assert.*;
  * @author amr1
  */
 public class MzMLToImzMLConverterTest {
+    
+    private static final Logger logger = Logger.getLogger(MzMLToImzMLConverterTest.class.getName());
     
     public static final String TEST_RESOURCE = "/MatrixTests_N2.wiff"; // "/2012_5_2_medium(120502,20h18m).wiff"; 
     
@@ -75,6 +80,11 @@ public class MzMLToImzMLConverterTest {
     
     @Before
     public void setUp() {
+        logger.setLevel(Level.ALL);
+        ConsoleHandler handler = new ConsoleHandler();
+        handler.setFormatter(new SimpleFormatter());
+        logger.addHandler(handler);
+        
         String[] inputFilenames = new String[mzMLFiles.length];
         
         for(int i = 0; i < mzMLFiles.length; i++)
@@ -198,30 +208,36 @@ public class MzMLToImzMLConverterTest {
         testImzMLOutput();
     }
     
-    protected void testImzMLOutput() {
-        ImzML imzML = ImzMLHandler.parseimzML(outputPath + ".imzML");
-        assertNotNull(imzML);
+    protected void testImzMLOutput() throws ImzMLConversionException {
+        try {
+            ImzML imzML = ImzMLHandler.parseimzML(outputPath + ".imzML");
+            assertNotNull(imzML);
             
-        Spectrum spectrum = imzML.getSpectrum(1, 1);
-        assertNotNull(spectrum);
-         
-        try {    
-            double[] mzs = spectrum.getmzArray();
-            assertNotNull(mzs);
+            Spectrum spectrum = imzML.getSpectrum(1, 1);
+            assertNotNull(spectrum);
             
-            System.out.println("m/z range: " + mzs[0] + " - " + mzs[mzs.length-1]);
-            
-            assertEquals(50, mzs[0], 1);
-            assertEquals(2000, mzs[mzs.length-1], 1);
-            
-            double[] intensities = spectrum.getIntensityArray();
-            
-            System.out.println("Intensity: " + intensities[0]);
-            assertEquals(2, intensities[0], 0.1);
-        } catch (IOException ex) {
+            try {
+                double[] mzs = spectrum.getmzArray();
+                assertNotNull(mzs);
+                
+                System.out.println("m/z range: " + mzs[0] + " - " + mzs[mzs.length-1]);
+                
+                assertEquals(50, mzs[0], 1);
+                assertEquals(2000, mzs[mzs.length-1], 1);
+                
+                double[] intensities = spectrum.getIntensityArray();
+                
+                System.out.println("Intensity: " + intensities[0]);
+                assertEquals(2, intensities[0], 0.1);
+            } catch (IOException ex) {
+                Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+                
+                fail("IOException: " + ex);
+            }
+        } catch (FileNotFoundException ex) {
             Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             
-            fail("IOException: " + ex);
+            throw new ImzMLConversionException("File not found " + ex.getLocalizedMessage());
         }
     }
     
