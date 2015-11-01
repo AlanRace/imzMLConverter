@@ -66,14 +66,16 @@ public class WiffTomzMLConverter {
                     }
                 });
                 
-                // Order the files by their modified date
-                Arrays.sort(mzMLFiles, new Comparator<File>(){
-                    @Override
-                    public int compare(File f1, File f2)
-                    {
-                        return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
-                    } 
-                });
+                if(mzMLFiles != null) {
+                    // Order the files by their modified date
+                    Arrays.sort(mzMLFiles, new Comparator<File>(){
+                        @Override
+                        public int compare(File f1, File f2)
+                        {
+                            return Long.valueOf(f1.lastModified()).compareTo(f2.lastModified());
+                        } 
+                    });
+                }
             } catch (InterruptedException ex) {
                 Logger.getLogger(WiffTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }

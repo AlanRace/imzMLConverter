@@ -569,12 +569,14 @@ public abstract class ImzMLConverter {
 		}
                 
                 // Cleanup
-                for(File mzMLFile : mzMLFiles) {
-                    try {
-                        Files.delete(mzMLFile.toPath());
-                        logger.log(Level.INFO, MessageFormat.format("Cleaned up {0}", mzMLFile));
-                    } catch (IOException ex) {
-                        logger.log(Level.SEVERE, MessageFormat.format("Failed to clean up {0}", mzMLFile), ex);
+                if(mzMLFiles != null) {
+                    for(File mzMLFile : mzMLFiles) {
+                        try {
+                            Files.delete(mzMLFile.toPath());
+                            logger.log(Level.INFO, MessageFormat.format("Cleaned up {0}", mzMLFile));
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, MessageFormat.format("Failed to clean up {0}", mzMLFile), ex);
+                        }
                     }
                 }
 	    }
