@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="200" prefWidth="320" xmlns:fx="http://javafx.com/fxml" fx:controller="com.alanmrace.jimzmlconverter.gui.FXMLController">
+    <children>
+        <Button layoutX="10" layoutY="10" text="Browse" onAction="#browseButtonAction" fx:id="browseButton" />
+        <Button layoutX="120" layoutY="10" text="Convert" onAction="#convertButtonAction" fx:id="convertButton" />
+        <Label layoutX="10" layoutY="40" minHeight="16" minWidth="300" fx:id="label" />
+        <TextArea layoutX="10" layoutY="60" minHeight="300" minWidth="120" editable="false"  fx:id="logTextArea" />
+    </children>
+</AnchorPane>
