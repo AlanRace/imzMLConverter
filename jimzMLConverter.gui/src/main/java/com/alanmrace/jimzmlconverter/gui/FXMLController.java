@@ -6,28 +6,38 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.web.HTMLEditor;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class FXMLController implements Initializable {
 
-    private static final Logger log = Logger.getLogger(FXMLController.class.getName());
+    private static final Logger logger = Logger.getLogger(FXMLController.class.getName());
 
     final FileChooser fileChooser = new FileChooser();
+    
+    String displayLog = "";
 
     @FXML
     private Label label;
 
     @FXML
-    private TextArea logTextArea;
+    private WebView logTextArea;
 
     @FXML
     private void browseButtonAction(ActionEvent event) {
@@ -63,12 +73,14 @@ public class FXMLController implements Initializable {
                 StringBuilder sb = new StringBuilder();
                 sb.append(String.format("%1$tY/%1$tm/%1$td %1$tH:%1$tM:%1$tS", new java.util.Date(record.getMillis())));
                 sb.append(" [").append(record.getLevel()).append("]");
-                sb.append(" ").append(record.getMessage()).append('\n');
+                sb.append(" ").append(record.getMessage());
                 return sb.toString();
             }
             
         };
 
+        logTextArea.getEngine().load(FXMLController.class.getResource("/html/logview.html").toExternalForm());
+        
         // Output all log based information to the text area
         Logger.getLogger("com.alanmrace").addHandler(new Handler() {
 
@@ -77,7 +89,29 @@ public class FXMLController implements Initializable {
                 Platform.runLater(new Runnable() {
                     @Override
                     public void run() {
-                        logTextArea.appendText(formatter.format(record));
+                        String colour;
+                
+                        if(record.getLevel().equals(Level.SEVERE)) {
+                            colour = "red";
+                        } else if(record.getLevel().equals(Level.WARNING)) {
+                            colour = "orange";
+                        } else {
+                            colour = "black";
+                        }   
+                        
+                        Document document = logTextArea.getEngine().getDocument();
+                        Element logElement = document.getElementById("log");
+                        
+                        Element font = document.createElement("font");
+                        logElement.appendChild(font);
+                        font.setAttribute("color", colour);
+                        
+                        font.appendChild(document.createTextNode(formatter.format(record)));
+                        
+                        logElement.appendChild(document.createElement("br"));
+                        
+                        // Auto Scroll as the log is updated
+                        logTextArea.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
                     }
                 });
             }
@@ -88,6 +122,16 @@ public class FXMLController implements Initializable {
 
             @Override
             public void close() {
+            }
+        });
+        
+        // When the logging page has been loaded add 
+        logTextArea.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+            @Override
+            public void changed(ObservableValue observableValue, State state, State newState) {
+                if (newState.equals(State.SUCCEEDED)) {
+                    logger.log(Level.INFO, "imzMLConverter " + ImzMLConverter.version);
+                }
             }
         });
     }

@@ -85,8 +85,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
     protected void generateBaseImzML() {
         try {
 //	    System.out.println(Arrays.toString(inputFilenames));
-	    MzML mzML = MzMLHeaderHandler.parsemzMLHeader(inputFilenames[0]);
-	    mzML.close();	    
+	    MzML mzML = MzMLHeaderHandler.parsemzMLHeader(inputFilenames[0], false);
+	    //mzML.close();	    
 	    
             baseImzML = new ImzML(mzML);
             //baseImzML = new ImzML(ImzMLHandler.parseimzML(inputFilenames[0]));

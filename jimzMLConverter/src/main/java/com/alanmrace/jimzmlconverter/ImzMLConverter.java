@@ -528,7 +528,7 @@ public abstract class ImzMLConverter {
 	
 	if(!arguments.combine) {
 	    for(String fileName : arguments.files) {
-                logger.log(Level.INFO, "Converting file {0}", fileName);
+                logger.log(Level.INFO, MessageFormat.format("Converting file {0}", fileName));
                 
 		File[] mzMLFiles = null;
 		String[] inputFilenames = null;
