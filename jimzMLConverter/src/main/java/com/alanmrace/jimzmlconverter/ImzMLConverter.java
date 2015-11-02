@@ -562,7 +562,7 @@ public abstract class ImzMLConverter {
 		    try {
 			converter.convert();
                         
-                        logger.log(Level.INFO, MessageFormat.format("Converted {0}", outputPath));
+                        logger.log(Level.INFO, MessageFormat.format("Converted {0} to {1}{2}", fileName, outputPath, ".imzML"));
 		    } catch (ImzMLConversionException ex) {
 			logger.log(Level.SEVERE, "Failed to convert " + fileName, ex);
 		    }
@@ -573,9 +573,9 @@ public abstract class ImzMLConverter {
                     for(File mzMLFile : mzMLFiles) {
                         try {
                             Files.delete(mzMLFile.toPath());
-                            logger.log(Level.INFO, MessageFormat.format("Cleaned up {0}", mzMLFile));
+                            logger.log(Level.FINER, MessageFormat.format("Cleaned up {0}", mzMLFile));
                         } catch (IOException ex) {
-                            logger.log(Level.SEVERE, MessageFormat.format("Failed to clean up {0}", mzMLFile), ex);
+                            logger.log(Level.WARNING, MessageFormat.format("Failed to clean up {0}", mzMLFile), ex);
                         }
                     }
                 }

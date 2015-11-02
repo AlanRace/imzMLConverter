@@ -17,8 +17,6 @@ import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
 import com.alanmrace.jimzmlparser.mzML.ScanSettings;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
-import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
-import com.alanmrace.jimzmlparser.parser.MzMLHandler;
 import com.alanmrace.jimzmlparser.parser.MzMLHeaderHandler;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
@@ -111,7 +109,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         int maxY = y;
 
         // Open the .ibd data stream
-        DataOutputStream binaryDataStream = null;
+        DataOutputStream binaryDataStream;
 
         try {
             binaryDataStream = new DataOutputStream(new FileOutputStream(outputFilename + ".ibd"));
@@ -147,7 +145,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                         baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpg);
                     }
 
-                    String filenameID = "mzML" + currentmzMLFile++;;
+                    String filenameID = "mzML" + currentmzMLFile++;
                     addSourceFileToImzML(baseImzML, mzMLFilename, filenameID, currentmzML.getFileDescription());
 
                     if (fileStorage == FileStorage.rowPerFile) {
@@ -186,7 +184,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                         y++;
                     }
                     
-		    Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.INFO, "About to close mzML in convert()");
+		    Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.FINEST, "About to close mzML in convert()");
                     currentmzML.close();
                 } catch (FileNotFoundException fnfe) {
                     throw new ImzMLConversionException("Could not find the file " + mzMLFilename);
