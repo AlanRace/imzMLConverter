@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.input.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.alanmrace.jimzmlconverter.gui.DragAndDropSceneController">
+    <stylesheets>
+        <URL value="@/styles/draganddropscene.css"/>
+    </stylesheets>
+    <HBox fx:id="fileListBox" layoutX="50" layoutY="120">
+        <ListView fx:id="fileListView" prefWidth="500" prefHeight="200"></ListView>
+    </HBox>
+    <HBox layoutX="100" layoutY="100"  onDragOver="#fileBoxDragOver" onDragDropped="#fileBoxDragDropped"  fx:id="dropBox" >
+        <TextField  onDragOver="#fileBoxDragOver" onDragDropped="#fileBoxDragDropped"  editable="false" alignment="CENTER"   minHeight="100" minWidth="400" id="dropLocation" disable="true" >Drop here!</TextField>  
+    </HBox>
+    <Button layoutX="550" layoutY="350" text="Convert" onAction="#startAction" fx:id="convertButton" />
+</AnchorPane>

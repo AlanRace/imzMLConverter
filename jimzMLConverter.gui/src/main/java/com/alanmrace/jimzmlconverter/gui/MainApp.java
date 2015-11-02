@@ -1,5 +1,6 @@
 package com.alanmrace.jimzmlconverter.gui;
 
+import com.alanmrace.jimzmlconverter.ImzMLConverter;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
@@ -12,12 +13,12 @@ public class MainApp extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/Scene.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/DragAndDropScene.fxml"));
         
         Scene scene = new Scene(root);
-        scene.getStylesheets().add("/styles/Styles.css");
+//        scene.getStylesheets().add("/styles/Styles.css");
         
-        stage.setTitle("JavaFX and Maven");
+        stage.setTitle("imzMLConverter " + ImzMLConverter.version);
         stage.setScene(scene);
         stage.show();
     }

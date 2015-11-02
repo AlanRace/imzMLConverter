@@ -1,0 +1,20 @@
+/*
+ * Empty Stylesheet file.
+ */
+
+.mainFxmlClass {
+
+}
+
+#dropBox {
+}
+
+#dropLocation {
+    -fx-background-color: cornflowerblue;
+    -fx-text-fill: white;
+    -fx-opacity: 1.0;
+}
+
+#fileListView {
+    -fx-opacity: 0.0;
+}
