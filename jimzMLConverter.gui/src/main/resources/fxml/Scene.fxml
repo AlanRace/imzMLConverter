@@ -12,6 +12,6 @@
         <Button layoutX="10" layoutY="10" text="Browse" onAction="#browseButtonAction" fx:id="browseButton" />
         <Button layoutX="120" layoutY="10" text="Convert" onAction="#convertButtonAction" fx:id="convertButton" />
         <Label layoutX="10" layoutY="40" minHeight="16" minWidth="300" fx:id="label" />
-        <WebView layoutX="10" layoutY="60" prefHeight="400" prefWidth="900" fx:id="logTextArea" />
+        <WebView layoutX="10" layoutY="60" prefHeight="400" prefWidth="900" fx:id="logWebView" />
     </children>
 </AnchorPane>

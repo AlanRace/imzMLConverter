@@ -9,7 +9,6 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -18,8 +17,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.web.HTMLEditor;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import org.w3c.dom.Document;
@@ -37,7 +34,7 @@ public class FXMLController implements Initializable {
     private Label label;
 
     @FXML
-    private WebView logTextArea;
+    private WebView logWebView;
 
     @FXML
     private void browseButtonAction(ActionEvent event) {
@@ -79,7 +76,7 @@ public class FXMLController implements Initializable {
             
         };
 
-        logTextArea.getEngine().load(FXMLController.class.getResource("/html/logview.html").toExternalForm());
+        logWebView.getEngine().load(FXMLController.class.getResource("/html/logview.html").toExternalForm());
         
         // Output all log based information to the text area
         Logger.getLogger("com.alanmrace").addHandler(new Handler() {
@@ -99,7 +96,7 @@ public class FXMLController implements Initializable {
                             colour = "black";
                         }   
                         
-                        Document document = logTextArea.getEngine().getDocument();
+                        Document document = logWebView.getEngine().getDocument();
                         Element logElement = document.getElementById("log");
                         
                         Element font = document.createElement("font");
@@ -111,7 +108,7 @@ public class FXMLController implements Initializable {
                         logElement.appendChild(document.createElement("br"));
                         
                         // Auto Scroll as the log is updated
-                        logTextArea.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
+                        logWebView.getEngine().executeScript("window.scrollTo(0, document.body.scrollHeight);");
                     }
                 });
             }
@@ -126,7 +123,7 @@ public class FXMLController implements Initializable {
         });
         
         // When the logging page has been loaded add 
-        logTextArea.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
+        logWebView.getEngine().getLoadWorker().stateProperty().addListener(new ChangeListener<State>() {
             @Override
             public void changed(ObservableValue observableValue, State state, State newState) {
                 if (newState.equals(State.SUCCEEDED)) {
