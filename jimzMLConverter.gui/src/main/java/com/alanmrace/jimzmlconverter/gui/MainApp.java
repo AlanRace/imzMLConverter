@@ -4,21 +4,36 @@ import com.alanmrace.jimzmlconverter.ImzMLConverter;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
 public class MainApp extends Application {
+    
+    // Need to store a list of Scenes and Controllers so that it is possible to swap back and forward between them
 
+    public static String DRAG_AND_DROP_SCREEN = "dragAndDrop";
+    public static String DRAG_AND_DROP_SCREEN_FXML = "/fxml/DragAndDropScene.fxml";
+    
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/DragAndDropScene.fxml"));
+        stage.setTitle("imzMLConverter " + ImzMLConverter.version);
+        
+        ScreenManager manager = new ScreenManager();
+        manager.loadScreen(DRAG_AND_DROP_SCREEN, DRAG_AND_DROP_SCREEN_FXML);
+        manager.setScreen(DRAG_AND_DROP_SCREEN);
+        
+        // Load the initial drag and drop scene
+        //FXMLLoader rootLoader = new FXMLLoader(getClass().getResource("/fxml/DragAndDropScene.fxml"));
+        //Parent root = rootLoader.load();
+        //DragAndDropSceneController rootController = rootLoader.getController();
+        
+        Group root = new Group();
+        root.getChildren().addAll(manager);
         
         Scene scene = new Scene(root);
-//        scene.getStylesheets().add("/styles/Styles.css");
-        
-        stage.setTitle("imzMLConverter " + ImzMLConverter.version);
         stage.setScene(scene);
         stage.show();
     }

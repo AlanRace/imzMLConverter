@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.alanmrace.jimzmlconverter.gui.FileCombinationOptionsController">
+    <stylesheets>
+        <URL value="@/styles/filecombinationoptions.css"/>
+    </stylesheets>
+    <Button fx:id="nextButton" layoutX="500" layoutY="350" text="Back" onAction="#backAction" />
+</AnchorPane>
