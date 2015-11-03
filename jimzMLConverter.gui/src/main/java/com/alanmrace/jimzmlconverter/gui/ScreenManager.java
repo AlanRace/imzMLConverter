@@ -6,6 +6,7 @@
 package com.alanmrace.jimzmlconverter.gui;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,6 +28,7 @@ public class ScreenManager extends StackPane {
     private static final Logger logger = Logger.getLogger(ScreenManager.class.getName());
 
     private final HashMap<String, Node> screens;
+    private final HashMap<String, ManagedScreenController> screenControllers;
     private Node currentScreen;
 
     private double fadeInTime;
@@ -36,22 +38,36 @@ public class ScreenManager extends StackPane {
 //        private Scene screen;
 //        private double fadeInTime;
 //    } 
+    
+    public enum TransitionDirection {
+        LEFT_TO_RIGHT,
+        RIGHT_TO_LEFT
+    }
+
+    
     public ScreenManager() {
         super();
 
         this.screens = new HashMap<>();
+        this.screenControllers = new HashMap<>();
         this.fadeInTime = 1000;
         this.fadeOutTime = 1000;
     }
 
-    public void addScreen(String name, Node screen) {
+    protected void addScreen(String name, Node screen, ManagedScreenController screenController) {
         screens.put(name, screen);
+        
+        screenControllers.put(name, screenController);
     }
 
     public Node getScreen(String screenName) {
         return screens.get(screenName);
     }
 
+    public ManagedScreenController getScreenController(String screenName) {
+        return screenControllers.get(screenName);
+    }
+    
     public Node getCurrentScreen() {
         return currentScreen;
     }
@@ -74,8 +90,8 @@ public class ScreenManager extends StackPane {
                 ManagedScreenController screenController = ((ManagedScreenController) loader.getController());
 
                 screenController.setScreenManager(this);
-                addScreen(name, root);
-
+                addScreen(name, root, screenController);
+                
                 return true;
             } else {
                 logger.log(Level.SEVERE, "Incompatible screen controller used, must extend ManagedScreenController");
@@ -86,12 +102,25 @@ public class ScreenManager extends StackPane {
 
         return false;
     }
-
-    public enum TransitionDirection {
-        LEFT_TO_RIGHT,
-        RIGHT_TO_LEFT
+    
+    public boolean unloadScreen(String name) {
+        boolean removal;
+        
+        if(screens.remove(name) != null) {
+            if(screenControllers.remove(name) != null) {
+                removal = true;
+            } else {
+                logger.log(Level.SEVERE, MessageFormat.format("No such screen controller to remove {0}", name));
+                removal = false;
+            }
+        } else {
+            logger.log(Level.SEVERE, MessageFormat.format("No such screen to remove {0}", name));
+            removal = false;
+        }
+            
+        return removal;    
     }
-
+    
     public boolean setScreen(final String name) {
         return setScreen(name, TransitionDirection.LEFT_TO_RIGHT);
     }
