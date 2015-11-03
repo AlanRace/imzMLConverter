@@ -1,0 +1,48 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 03-Nov-2015, 17:17:05
+    Author     : Alan Race
+*/
+
+.titleLabel {
+    -fx-font-weight: bold; 
+}
+
+.titleLabel, .bodyLabel {
+    -fx-text-fill: white;   
+}
+
+.descriptiveButtonOn {
+    //-fx-background-color: linear-gradient(#4169E1, #6495ED);
+    
+    /*-fx-background-color: 
+        #000000,
+        linear-gradient(#7ebcea, #2f4b8f),
+        linear-gradient(#426ab7, #263e75),
+        linear-gradient(#395cab, #223768);
+    -fx-background-insets: 0,1,2,3;
+    -fx-background-radius: 3,2,2,2;
+    -fx-padding: 12 30 12 30;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;*/
+}
+
+.descriptiveButtonOff {
+    //-fx-background-color: linear-gradient(#FF6347, #CD5C5C);
+    
+    -fx-opacity: 0.4;
+}
+
+.descriptiveButtonOn, .descriptiveButtonOff {
+  -fx-border-radius: 10 10 10 10;
+  -fx-background-radius: 10 10 10 10;
+  
+  -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+  
+  //-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.8) , 0, 0.0 , 0 , 1);
+  -fx-background-color: cornflowerblue;
+}

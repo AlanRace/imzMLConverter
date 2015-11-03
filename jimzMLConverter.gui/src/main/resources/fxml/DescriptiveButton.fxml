@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="VBox" xmlns:fx="http://javafx.com/fxml" alignment="CENTER">
+    <Label fx:id="titleLabel" styleClass="titleLabel"></Label>
+    <Label fx:id="bodyLabel" styleClass="bodyLabel" wrapText="true" textAlignment="CENTER"  ></Label>
+    <stylesheets>
+        <URL value="@/styles/descriptiveButtonDefaults.css"/>
+    </stylesheets>
+</fx:root>
