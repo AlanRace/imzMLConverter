@@ -35,6 +35,7 @@ and open the template in the editor.
     //-fx-background-color: linear-gradient(#FF6347, #CD5C5C);
     
     -fx-background-color: #e3e3e1;
+    //-fx-background-color: #589ba4;
 }
 
 .descriptiveButtonOn {
@@ -45,7 +46,7 @@ and open the template in the editor.
   -fx-border-radius: 10 10 10 10;
   -fx-background-radius: 10 10 10 10;
   
-//  -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+  -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
   
   //-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.8) , 0, 0.0 , 0 , 1);
   
@@ -57,4 +58,5 @@ and open the template in the editor.
 
 .textOff {
     -fx-text-fill: #6e6f71; 
+    //-fx-text-fill: #24454c;
 }
