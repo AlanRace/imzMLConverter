@@ -84,18 +84,26 @@ public class DescriptiveButton extends VBox {
     }
 
     private final String[] STYLE_CLASSES = {"descriptiveButtonOn", "descriptiveButtonOff"};
+    private final String[] TEXT_STYLE_CLASSES = {"textOn", "textOff"};
     
     private void updateText() {
         ObservableList<String> styleClasses = this.getStyleClass();
         styleClasses.removeAll(STYLE_CLASSES);
         
+        titleLabel.getStyleClass().removeAll(TEXT_STYLE_CLASSES);
+        bodyLabel.getStyleClass().removeAll(TEXT_STYLE_CLASSES);
+        
         if(isOn.get()) {
             styleClasses.add("descriptiveButtonOn");
+            titleLabel.getStyleClass().add(TEXT_STYLE_CLASSES[0]);
             titleLabel.setText(titleOn.get());
+            bodyLabel.getStyleClass().add(TEXT_STYLE_CLASSES[0]);
             bodyLabel.setText(bodyOn.get());
         } else {
             styleClasses.add("descriptiveButtonOff");
+            titleLabel.getStyleClass().add(TEXT_STYLE_CLASSES[1]);
             titleLabel.setText(titleOff.get());
+            bodyLabel.getStyleClass().add(TEXT_STYLE_CLASSES[1]);
             bodyLabel.setText(bodyOff.get());
         }
     }

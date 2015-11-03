@@ -13,7 +13,7 @@ and open the template in the editor.
 }
 
 .titleLabel, .bodyLabel {
-    -fx-text-fill: white;   
+    //-fx-text-fill: white;   
 }
 
 .descriptiveButtonOn {
@@ -34,15 +34,27 @@ and open the template in the editor.
 .descriptiveButtonOff {
     //-fx-background-color: linear-gradient(#FF6347, #CD5C5C);
     
-    -fx-opacity: 0.4;
+    -fx-background-color: #e3e3e1;
+}
+
+.descriptiveButtonOn {
+    -fx-background-color: cornflowerblue;
 }
 
 .descriptiveButtonOn, .descriptiveButtonOff {
   -fx-border-radius: 10 10 10 10;
   -fx-background-radius: 10 10 10 10;
   
-  -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+//  -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
   
   //-fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.8) , 0, 0.0 , 0 , 1);
-  -fx-background-color: cornflowerblue;
+  
+}
+
+.textOn {
+    -fx-text-fill: white;   
+}
+
+.textOff {
+    -fx-text-fill: #6e6f71; 
 }
