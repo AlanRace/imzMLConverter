@@ -5,3 +5,13 @@
 .mainFxmlClass {
 
 }
+
+
+
+.headerLabel {
+    -fx-font-weight: bold;
+}
+
+.bodyLabel, .headerLabel {
+    -fx-text-fill: white;
+}

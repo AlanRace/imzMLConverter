@@ -94,8 +94,8 @@ public class DragAndDropSceneController extends ManagedScreenController {
 
     @FXML
     private void nextAction() {
-        getScreenManager().loadScreen("test", "/fxml/FileCombinationOptions.fxml");
-        getScreenManager().setScreen("test");
+        // Move onto the next screen
+        getScreenManager().setScreen(MainApp.FILE_COMBINATION_SCREEN);
     }
 
     private void performTransition() {

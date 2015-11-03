@@ -6,10 +6,37 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import com.alanmrace.jimzmlconverter.gui.DescriptiveButton ?>
 
 <AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.alanmrace.jimzmlconverter.gui.FileCombinationOptionsController">
     <stylesheets>
         <URL value="@/styles/filecombinationoptions.css"/>
     </stylesheets>
-    <Button fx:id="nextButton" layoutX="500" layoutY="350" text="Back" onAction="#backAction" />
+    <!-- This could be made into a custom control -->
+    <!--<VBox styleClass="toggleButtonOn" layoutX="100" layoutY="50" prefHeight="75" prefWidth="400" alignment="CENTER" onMouseClicked="#toggleButton" >
+        <Label fx:id="separateHeaderLabel" styleClass="labelHeader">Generating an .imzML for each file</Label>
+        <Label fx:id="separateBodyLabel" styleClass="labelBody"></Label>
+    </VBox>
+    <VBox styleClass="toggleButtonOff" layoutX="100" layoutY="150" prefHeight="75" prefWidth="400" alignment="CENTER" onMouseClicked="#toggleButton">
+        <Label fx:id="combineHeaderLabel" styleClass="labelHeader">Not combining into a single .imzML</Label>
+        <Label fx:id="combineBodyLabel" styleClass="labelBody"></Label>
+    </VBox>
+    <VBox styleClass="toggleButtonOn" layoutX="100" layoutY="250" prefHeight="75" prefWidth="400"  alignment="CENTER" onMouseClicked="#toggleButton">
+        <Label fx:id="parallelHeaderLabel" styleClass="labelHeader" >Converting in parallel</Label>
+        <Label fx:id="parallelBodyLabel" styleClass="labelBody">This option uses more disk space to speed up the conversion process</Label>
+    </VBox>-->
+    <HBox alignment="CENTER" layoutY="20"  prefWidth="600">
+        <Label text="Select conversion options" textAlignment="CENTER" />
+    </HBox>
+    <DescriptiveButton fx:id="uniqueButton" layoutX="100" layoutY="50" prefHeight="75" prefWidth="400" isOn="true"
+                       titleOn="Generating an .imzML for each file" titleOff="Not generating an .imzML for each file" 
+                       bodyOn="A separate imzML file will be generated for each file selected on the previous page" bodyOff="" />
+    <DescriptiveButton fx:id="combineButton" layoutX="100" layoutY="150" prefHeight="75" prefWidth="400" isOn="false" 
+                       titleOn="Combining into a single .imzML" titleOff="Not combining into a single .imzML"
+                       bodyOn="" bodyOff="" />
+    <DescriptiveButton fx:id="parallelButton" layoutX="100" layoutY="250" prefHeight="75" prefWidth="400" isOn="true" 
+                       titleOn="Converting in parallel" titleOff="Converting one after another"
+                       bodyOn="Processing in parallel uses more disk space to speed up the conversion process" bodyOff="Processing sequentially uses less disk space at the cost of speed"  />
+    <Button fx:id="nextButton" layoutX="50" layoutY="350" text="Back" onAction="#backAction" />
+    <Button fx:id="nextButton" layoutX="500" layoutY="350" text="Next" onAction="#nextAction" />
 </AnchorPane>
