@@ -429,6 +429,7 @@ public class ImzMLConverterTest {
         System.out.println("main");
 	//String[] args = {MzMLToImzMLConverterTest.class.getResource(MzMLToImzMLConverterTest.TEST_RESOURCE).getPath()};
 	String[] args = {"C:\\Users\\Alan\\Documents\\Work\\CHCA_MaleRatBrain_N2_Raster(110112,14h27m).wiff"};
+        //String[] args = {"D:\\Rory\\SampleData\\2012_5_2_medium(120502,20h18m).wiff"};
 	
         ImzMLConverter.main(args);
     }

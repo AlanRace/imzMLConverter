@@ -24,6 +24,7 @@ public class PatternDefinitionHandler extends DefaultHandler {
 		stringBuffer = new StringBuffer();
 	}
 	
+        @Override
 	public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
 		
 		// Most common attribute at the start to reduce the number of comparisons needed
@@ -84,10 +85,12 @@ public class PatternDefinitionHandler extends DefaultHandler {
 		}
 	}
 	
+        @Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
 		stringBuffer.append(ch, start, length);
 	}
 	
+        @Override
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if(processingDouble) {
 			float value = Float.parseFloat(stringBuffer.toString());
