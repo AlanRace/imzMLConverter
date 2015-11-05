@@ -181,11 +181,13 @@ public class PatternDefinition implements Iterable<Region> {
             }
         }
 
-        int[] numPixelsOnLines = new int[numLines];
+        //int[] numPixelsOnLines = new int[numLines];
+        ArrayList<Integer> numPixelsOnLines = new ArrayList<>(numLines);
         int currentLineNum = 0;
 
         // Account for the final pixel
-        numPixelsOnLines[currentLineNum]++;
+        
+        numPixelsOnLines.add(currentLineNum, 1);
 
         System.out.println("Number of Lines in pattern file: " + numLines);
         System.out.println("Mean time delay: " + meanTimeDelay);
@@ -196,7 +198,15 @@ public class PatternDefinition implements Iterable<Region> {
                 currentLineNum++;
             }
 
-            numPixelsOnLines[currentLineNum]++;
+            int curValue = 0;
+            
+            if(numPixelsOnLines.size() > currentLineNum)
+                curValue = numPixelsOnLines.get(currentLineNum);
+            else {
+                numPixelsOnLines.add(currentLineNum, 0);
+            }
+            
+            numPixelsOnLines.set(currentLineNum, curValue + 1);
         }
 
 //		System.out.println("-----");
@@ -210,7 +220,7 @@ public class PatternDefinition implements Iterable<Region> {
 
         currentLineNum = 0;
 
-        try {
+       // try {
             for (Region region : regions) {
                 for (int lineNum = 0; lineNum < region.numLines(); lineNum++) {
                     Line line = region.getLine(lineNum);
@@ -219,14 +229,14 @@ public class PatternDefinition implements Iterable<Region> {
 
                     int xCoordOffset = (int) Math.round(((line.getX1() - minX) / laserSizeX) + 1);
 
-                    if (currentLineNum >= numPixelsOnLines.length) {
+                    if (currentLineNum >= numPixelsOnLines.size()) {
                         System.out.println("NUMBER OF LINES DETERMINED EXCEEDS NUMBER OF LINES RECORDED");
 
                         break;
                     }
 
                     // Do Waters use ceil rather than round here?
-                    int numPixelsOnCurrentLine = numPixelsOnLines[currentLineNum]; // ((int) Math.round(line.getLength() / laserSizeX)) + 1;
+                    int numPixelsOnCurrentLine = numPixelsOnLines.get(currentLineNum); // ((int) Math.round(line.getLength() / laserSizeX)) + 1;
                     int expectedNumberOfPixels = ((int) Math.round(line.getLength() / laserSizeX)) + 1;
 
                     // Compare with the chromatogram to see if we have a believable number of pixels
@@ -236,56 +246,61 @@ public class PatternDefinition implements Iterable<Region> {
 
                             currentLineNum++;
 
-                            System.out.println("[" + currentLineNum + "] " + "Merging lines. Changing number of pixels on line from " + numPixelsOnLines[currentLineNum] + " to " + (numPixelsOnCurrentLine + numPixelsOnLines[currentLineNum]));
-                            numPixelsOnCurrentLine = numPixelsOnCurrentLine + numPixelsOnLines[currentLineNum];
+                            System.out.println("[" + currentLineNum + "] " + "Merging lines. Changing number of pixels on line from " + numPixelsOnLines.get(currentLineNum) + " to " + (numPixelsOnCurrentLine + numPixelsOnLines.get(currentLineNum)));
+                            numPixelsOnCurrentLine = numPixelsOnCurrentLine + numPixelsOnLines.get(currentLineNum);
                         } else {
                             System.out.println("[" + currentLineNum + "] " + "More on line: " + currentLineNum + ". Found " + numPixelsOnCurrentLine + ". Expected " + expectedNumberOfPixels);
 
                             if (expectedNumberOfPixels == 1) {
                                 currentLineNum -= 1;
-                                numPixelsOnLines[currentLineNum] = 0;
-                                numPixelsOnLines[currentLineNum + 1]++;
+                                numPixelsOnLines.set(currentLineNum, 0);
+                                numPixelsOnLines.set(currentLineNum + 1, numPixelsOnLines.get(currentLineNum + 1) + 1);//[currentLineNum + 1]++;
 
 								// Could try increasing num pixels on next line by 1, incrementing the current line num and then continue to next line - skipping the addition to pixelLocations
                             } else {
-                                int expectedNumberOfPixelsOnNextLine = ((int) Math.round(region.getLine(lineNum + 1).getLength() / laserSizeX)) + 1;
+                                if(lineNum + 1 < region.numLines()) {
+                                    int expectedNumberOfPixelsOnNextLine = ((int) Math.round(region.getLine(lineNum + 1).getLength() / laserSizeX)) + 1;
 
-                                int remainder = numPixelsOnLines[currentLineNum] - expectedNumberOfPixels - expectedNumberOfPixelsOnNextLine;
+                                    int remainder = numPixelsOnLines.get(currentLineNum) - expectedNumberOfPixels - expectedNumberOfPixelsOnNextLine;
 
-                                currentLineNum -= 1;
+                                    currentLineNum -= 1;
 
-                                // Depending on the remainder, adjust the number of pixels that exist on the current line
-                                switch (remainder) {
-                                    case -2:
-                                        numPixelsOnLines[currentLineNum] = expectedNumberOfPixels - 1;
-                                        numPixelsOnLines[currentLineNum + 1] = expectedNumberOfPixelsOnNextLine - 1;
-                                        break;
-                                    case -1:
-                                        numPixelsOnLines[currentLineNum] = expectedNumberOfPixels - 1;
-                                        numPixelsOnLines[currentLineNum + 1] = expectedNumberOfPixelsOnNextLine;
-                                        break;
-                                    case 0:
-                                        numPixelsOnLines[currentLineNum] = expectedNumberOfPixels;
-                                        numPixelsOnLines[currentLineNum + 1] = expectedNumberOfPixelsOnNextLine;
-                                        break;
-                                    case 1:
-                                        numPixelsOnLines[currentLineNum] = expectedNumberOfPixels + 1;
-                                        numPixelsOnLines[currentLineNum + 1] = expectedNumberOfPixelsOnNextLine;
-                                        break;
-                                    case 2:
-                                        numPixelsOnLines[currentLineNum] = expectedNumberOfPixels + 1;
-                                        numPixelsOnLines[currentLineNum + 1] = expectedNumberOfPixelsOnNextLine + 1;
-                                        break;
-                                    default:
-                                        System.out.println("[" + currentLineNum + "] " + "Remainder not a common one: " + remainder);
-                                        numPixelsOnLines[currentLineNum] = expectedNumberOfPixels;
+                                    if(currentLineNum < 0)
+                                        currentLineNum = 0;
 
-                                        System.out.println("[" + currentLineNum + "] " + "Changing next line from: " + numPixelsOnLines[currentLineNum + 1] + " to: " + (expectedNumberOfPixelsOnNextLine + remainder) + " (expected next line was: " + expectedNumberOfPixelsOnNextLine + ")");
-                                        numPixelsOnLines[currentLineNum + 1] = expectedNumberOfPixelsOnNextLine + remainder;
+                                    // Depending on the remainder, adjust the number of pixels that exist on the current line
+                                    switch (remainder) {
+                                        case -2:
+                                            numPixelsOnLines.set(currentLineNum, expectedNumberOfPixels - 1);
+                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine - 1);
+                                            break;
+                                        case -1:
+                                            numPixelsOnLines.set(currentLineNum, expectedNumberOfPixels - 1);
+                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine);
+                                            break;
+                                        case 0:
+                                            numPixelsOnLines.set(currentLineNum, expectedNumberOfPixels);
+                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine);
+                                            break;
+                                        case 1:
+                                            numPixelsOnLines.set(currentLineNum, expectedNumberOfPixels + 1);
+                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine);
+                                            break;
+                                        case 2:
+                                            numPixelsOnLines.set(currentLineNum, expectedNumberOfPixels + 1);
+                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine + 1);
+                                            break;
+                                        default:
+                                            System.out.println("[" + currentLineNum + "] " + "Remainder not a common one: " + remainder);
+                                            numPixelsOnLines.set(currentLineNum, expectedNumberOfPixels);
+
+                                            System.out.println("[" + currentLineNum + "] " + "Changing next line from: " + numPixelsOnLines.get(currentLineNum + 1) + " to: " + (expectedNumberOfPixelsOnNextLine + remainder) + " (expected next line was: " + expectedNumberOfPixelsOnNextLine + ")");
+                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine + remainder);
+                                    }
                                 }
                             }
 
-                            numPixelsOnCurrentLine = numPixelsOnLines[currentLineNum];
+                            numPixelsOnCurrentLine = numPixelsOnLines.get(currentLineNum);
 
                         }
                     }
@@ -303,9 +318,9 @@ public class PatternDefinition implements Iterable<Region> {
                     currentLineNum++;
                 }
             }
-        } catch (ArrayIndexOutOfBoundsException aiob) {
-            throw new ImzMLConversionException("Invalid Waters pattern file for this dataset");
-        }
+        //} catch (ArrayIndexOutOfBoundsException aiob) {
+         //   throw new ImzMLConversionException("Invalid Waters pattern file for this dataset");
+        //}
 
 		//Collections.reverse(pixelLocations);
         return pixelLocations.toArray(new PixelLocation[0]);
