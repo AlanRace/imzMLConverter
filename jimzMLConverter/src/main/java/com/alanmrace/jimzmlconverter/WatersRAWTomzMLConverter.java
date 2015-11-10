@@ -116,8 +116,8 @@ public class WatersRAWTomzMLConverter {
         
         final long startTime = System.currentTimeMillis();
         
-        //int i = 1;
-        for(int i = 2; i < filePaths.length; i++) {
+        int i = 1;
+//        for(int i = 2; i < filePaths.length; i++) {
             final int index = i;
             
             new Thread() {
@@ -147,7 +147,7 @@ public class WatersRAWTomzMLConverter {
                     }
                 }
             }.start();
-        }
+ //       }
         
         System.out.println("Total conversion of " + filePaths.length + " files to imzML took " + ((System.currentTimeMillis() - startTime) / 1000) + " s");
     }

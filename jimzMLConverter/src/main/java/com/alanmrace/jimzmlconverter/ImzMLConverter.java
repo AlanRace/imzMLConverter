@@ -312,6 +312,8 @@ public abstract class ImzMLConverter {
         for (BinaryDataArray binaryDataArray : binaryDataArrayList) {
             byte[] dataToWrite = binaryDataArray.getDataAsByte();
             CVParam dataArrayType = binaryDataArray.getDataArrayType();
+            
+            CVParam dataType;
 
             switch (dataArrayType.getTerm().getID()) {
                 case BinaryDataArray.mzArrayID:
@@ -319,12 +321,16 @@ public abstract class ImzMLConverter {
 
                     binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
                     binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
+                    
+                    dataType = mzArrayDataType;
                     break;
                 case BinaryDataArray.intensityArrayID:
                     dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.intensityArrayDataType);
 
                     binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
                     binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
+                    
+                    dataType = intensityArrayDataType;
                     break;
                 default:
                     throw new UnsupportedOperationException("Unsupported dataArrayType: " + dataArrayType);
@@ -344,9 +350,17 @@ public abstract class ImzMLConverter {
             binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
 
             // Add binary data values to cvParams
+            binaryDataArray.removeCVParam(BinaryDataArray.externalEncodedLengthID);
             binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalEncodedLengthID), (offset - prevOffset)));
+            
+            binaryDataArray.removeCVParam(BinaryDataArray.externalDataID);
             binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalDataID), "true"));
+            
+            binaryDataArray.removeCVParam(BinaryDataArray.externalOffsetID);
             binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalOffsetID), prevOffset));
+            
+            binaryDataArray.removeCVParam(BinaryDataArray.externalArrayLengthID);
+            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalArrayLengthID), dataToWrite.length / BinaryDataArray.getDataTypeInBytes(dataType)));
 
             prevOffset = offset;
         }
@@ -370,7 +384,9 @@ public abstract class ImzMLConverter {
         }
 
         Scan scan = scanList.getScan(0);
+        scan.removeCVParam(Scan.positionXID);
         scan.addCVParam(new StringCVParam(getOBOTerm(Scan.positionXID), "" + x));
+        scan.removeCVParam(Scan.positionYID);
         scan.addCVParam(new StringCVParam(getOBOTerm(Scan.positionYID), "" + y));
     }
 
