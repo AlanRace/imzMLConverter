@@ -246,8 +246,12 @@ public class PatternDefinition implements Iterable<Region> {
 
                             currentLineNum++;
 
-                            System.out.println("[" + currentLineNum + "] " + "Merging lines. Changing number of pixels on line from " + numPixelsOnLines.get(currentLineNum) + " to " + (numPixelsOnCurrentLine + numPixelsOnLines.get(currentLineNum)));
-                            numPixelsOnCurrentLine = numPixelsOnCurrentLine + numPixelsOnLines.get(currentLineNum);
+                            if(numPixelsOnLines.size() <= currentLineNum) {
+                                System.out.println("[" + currentLineNum + "] " + "Needed to merge but couldn't. Setting number of pixels on line to " + (numPixelsOnCurrentLine));
+                            } else {
+                                System.out.println("[" + currentLineNum + "] " + "Merging lines. Changing number of pixels on line from " + numPixelsOnLines.get(currentLineNum) + " to " + (numPixelsOnCurrentLine + numPixelsOnLines.get(currentLineNum)));
+                                numPixelsOnCurrentLine = numPixelsOnCurrentLine + numPixelsOnLines.get(currentLineNum);
+                            }
                         } else {
                             System.out.println("[" + currentLineNum + "] " + "More on line: " + currentLineNum + ". Found " + numPixelsOnCurrentLine + ". Expected " + expectedNumberOfPixels);
 

@@ -103,21 +103,19 @@ public class WatersRAWTomzMLConverter {
     public static void main(String[] args) throws IOException, ImzMLConversionException {
         //System.out.println(WatersRAWTomzMLConverter.class.getResource("/DAN.wiff"));
         
-        final String[] filePaths = {"F:\\AstraZeneca\\MALDIData\\05_Sept_2014_AZ13708229_Day_1_2_Recovery.raw",
-                            "F:\\AstraZeneca\\MALDIData\\18_Sept_2014_AZ13647935_Day_1_2_7.raw",
-                            "F:\\AstraZeneca\\MALDIData\\22_Sept_2014_AZ13708229_Day_1_2_7_Recovery.raw",
-                            "F:\\AstraZeneca\\MALDIData\\26_June_2014_PMB_AZ11983219_D22_AZ13719017_D3.raw",
-                            "F:\\AstraZeneca\\MALDIData\\29_Aug_2014_PMB_AZ13719017_Day_1_2_7.raw"};
-        final String[] patternFiles = {"F:\\AstraZeneca\\MALDIData\\PatternFiles\\05_Sept_2014_AZ13708229_Day_1_2_Recovery\\05_Sept_2014_AZ13708229_Day_1_2_Recovery.pat",
-                            "F:\\AstraZeneca\\MALDIData\\PatternFiles\\18_Sept_2014_AZ13647935_Day_1_2_7\\18_Sept_2014_AZ13647935_Day_1_2_7.pat",
-                            "F:\\AstraZeneca\\MALDIData\\PatternFiles\\22_Sept_2014_AZ13708229_Day_1_2_7_Recovery\\22_Sept_2014_AZ13708229_Day_1_2_7_Recovery.pat",
-                            "F:\\AstraZeneca\\MALDIData\\PatternFiles\\26_June_2014_PMB_AZ11983219_D22_AZ13719017_D3\\26_June_2014_PMB_AZ11983219_D22_AZ13719017_D3.pat",
-                            "F:\\AstraZeneca\\MALDIData\\PatternFiles\\29_Aug_2014_PMB_AZ13719017_Day_1_2_7\\29_Aug_2014_PMB_AZ13719017_Day_1_2_7.pat"};
+        final String[] filePaths = {"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw",
+                            "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.raw",
+                            "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.raw",
+                            "F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.raw"};
+        final String[] patternFiles = {"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.pat",
+                            "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.pat",
+                            "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.pat",
+                            "F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.pat"};
         
         final long startTime = System.currentTimeMillis();
         
-        int i = 1;
-//        for(int i = 2; i < filePaths.length; i++) {
+//        int i = 1;
+        for(int i = 0; i < filePaths.length; i++) {
             final int index = i;
             
             new Thread() {
@@ -125,9 +123,9 @@ public class WatersRAWTomzMLConverter {
                 public void run() {
                     try {
 //                        File[] mzMLFiles = WatersRAWTomzMLConverter.convert(filePaths[index]);
-                        
+//                        
 //                        System.out.println("Conversion of " + filePaths[index] + " to mzML took " + ((System.currentTimeMillis() - startTime) / 1000) + " s");
-                        
+//                        
 //                        for(File file : mzMLFiles) {
 //                            System.out.println("Found : " + file.getAbsolutePath());
 //                        }
@@ -144,10 +142,12 @@ public class WatersRAWTomzMLConverter {
                         System.out.println("Conversion of " + filePaths[index] + " to imzML took " + ((System.currentTimeMillis() - startTime) / 1000) + " s");
                     } catch (ImzMLConversionException ex) {
                         Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+//                    } catch (IOException ex) {
+//                        Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }.start();
- //       }
+        }
         
         System.out.println("Total conversion of " + filePaths.length + " files to imzML took " + ((System.currentTimeMillis() - startTime) / 1000) + " s");
     }

@@ -229,13 +229,19 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
     public static void main(String[] args) {
         try {
             // todo
-            String[] inputFiles = {"F:\\AstraZeneca\\MALDIData\\05_Sept_2014_AZ13708229_Day_1_2_Recovery.raw_Processed.imzML",
-                "F:\\AstraZeneca\\MALDIData\\18_Sept_2014_AZ13647935_Day_1_2_7.raw_Processed.imzML",
-                "F:\\AstraZeneca\\MALDIData\\22_Sept_2014_AZ13708229_Day_1_2_7_Recovery.raw_Processed.imzML",
-                "F:\\AstraZeneca\\MALDIData\\26_June_2014_PMB_AZ11983219_D22_AZ13719017_D3.raw_Processed.imzML",
-                "F:\\AstraZeneca\\MALDIData\\29_Aug_2014_PMB_AZ13719017_Day_1_2_7.raw_Processed.imzML"};
+            String[] inputFiles = {
+            //"F:\\AstraZeneca\\MALDIData\\05_Sept_2014_AZ13708229_Day_1_2_Recovery.raw_Processed.imzML",
+            //    "F:\\AstraZeneca\\MALDIData\\18_Sept_2014_AZ13647935_Day_1_2_7.raw_Processed.imzML",
+            //    "F:\\AstraZeneca\\MALDIData\\22_Sept_2014_AZ13708229_Day_1_2_7_Recovery.raw_Processed.imzML",
+            //    "F:\\AstraZeneca\\MALDIData\\26_June_2014_PMB_AZ11983219_D22_AZ13719017_D3.raw_Processed.imzML",
+            //    "F:\\AstraZeneca\\MALDIData\\29_Aug_2014_PMB_AZ13719017_Day_1_2_7.raw_Processed.imzML"
+                "F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw.imzML",
+                "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.raw.imzML",
+                "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.raw.imzML",
+                "F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.raw.imzML"
+            };
             
-            String outputFile = "F:\\AstraZeneca\\MALDIData\\AZ_Kidney_All_Processed.imzML";
+            String outputFile = "F:\\AstraZeneca\\Lung\\AZ_Lung_All.imzML";
             
             
             ImzMLToImzMLConverter converter = new ImzMLToImzMLConverter(outputFile, inputFiles);
