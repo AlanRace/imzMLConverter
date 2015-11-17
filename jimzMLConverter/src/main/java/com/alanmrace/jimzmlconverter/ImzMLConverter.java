@@ -5,7 +5,6 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.Waters.PatternDefinitionHandler;
 import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
@@ -45,14 +44,14 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -80,9 +79,13 @@ public abstract class ImzMLConverter {
     protected CVParam intensityArrayDataType;
 
     protected boolean removeEmptySpectra;
+    
+    protected Software imzMLConverter;
 
     protected ReferenceableParamGroup rpgmzArray;
     protected ReferenceableParamGroup rpgintensityArray;
+    
+    protected HashSet<Double> fullmzList;
 
     public ImzMLConverter(String outputFilename, String[] inputFilenames) {
         this.outputFilename = outputFilename;
@@ -92,6 +95,8 @@ public abstract class ImzMLConverter {
         compressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
         mzArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
         intensityArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
+        
+        fullmzList = new HashSet<>();
     }
 
     public void setOutputFilename(String outputFilename) {
@@ -251,7 +256,7 @@ public abstract class ImzMLConverter {
         generateReferenceableParamArrays();
 
         // Add in the data processing describing the conversion
-        Software imzMLConverter = baseImzML.getSoftwareList().getSoftware("imzMLConverter");
+        imzMLConverter = baseImzML.getSoftwareList().getSoftware("imzMLConverter");
 
         if (imzMLConverter == null || !imzMLConverter.getVersion().equals(ImzMLConverter.version)) {
             imzMLConverter = new Software("imzMLConverter", ImzMLConverter.version);
@@ -317,6 +322,14 @@ public abstract class ImzMLConverter {
 
             switch (dataArrayType.getTerm().getID()) {
                 case BinaryDataArray.mzArrayID:
+                    // Get the data as a double to populate the full m/z list
+                    if(fullmzList != null) {
+                        double[] mzList = binaryDataArray.getDataAsDouble();
+                        
+                        for(int i = 0; i < mzList.length; i++) 
+                            fullmzList.add(mzList[i]);
+                    }
+                    
                     dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);
 
                     binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
@@ -366,6 +379,20 @@ public abstract class ImzMLConverter {
         }
 
         return offset;
+    }
+    
+    protected void outputFullmzList(DataOutputStream binaryDataStream, long offset) throws IOException {
+        //System.out.println("Full m/z list size: " + fullmzList.size());
+        
+        List<Double> sortedmzList = new ArrayList(fullmzList);
+        Collections.sort(sortedmzList);
+        
+        imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalOffsetID), offset));
+        imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalArrayLengthID), sortedmzList.size()));
+        imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalEncodedLengthID), sortedmzList.size() * Double.BYTES));
+        
+        for(Double mz : sortedmzList)
+            binaryDataStream.writeDouble(mz);
     }
 
     protected static void setCoordinatesOfSpectrum(Spectrum spectrum, int x, int y) {

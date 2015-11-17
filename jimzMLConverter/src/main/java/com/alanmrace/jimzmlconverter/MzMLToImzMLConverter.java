@@ -206,6 +206,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 }
             }
 
+            outputFullmzList(binaryDataStream, offset);
+            
             binaryDataStream.close();
         } catch (IOException e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
