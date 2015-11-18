@@ -574,13 +574,18 @@ public abstract class ImzMLConverter {
         String outputPath = arguments.output;
 
         if (!arguments.combine) {
-            for (String fileName : arguments.files) {
+            for (int fileIndex = 0; fileIndex < arguments.files.size(); fileIndex++) {
+                String fileName = arguments.files.get(fileIndex);
+                
                 logger.log(Level.INFO, MessageFormat.format("Converting file {0}", fileName));
 
+                File currentFile = new File(fileName);
                 File[] mzMLFiles = null;
                 String[] inputFilenames = null;
 
                 String extension = getExtension(fileName);
+                
+                ImzMLConverter converter = null;
 
                 if (extension.equals("wiff")) {
                     logger.log(Level.INFO, "Detected WIFF file");
@@ -594,6 +599,24 @@ public abstract class ImzMLConverter {
                     if (outputPath == null || outputPath.isEmpty()) {
                         outputPath = fileName.replace(".wiff", "");
                     }
+                    
+                    converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+                } else if(extension.equalsIgnoreCase("raw") && currentFile.isDirectory()) {
+                    logger.log(Level.INFO, "Detected Waters RAW file");
+                    
+                    if(arguments.pixelLocationFile == null || arguments.pixelLocationFile.size() <= fileIndex || 
+                           arguments.pixelLocationFile.get(fileIndex) == null || !arguments.pixelLocationFile.get(fileIndex).contains(".pat")) {
+                        logger.log(Level.SEVERE, "No .pat file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
+                    } else {
+                        try {
+                            mzMLFiles = WatersRAWTomzMLConverter.convert(fileName);
+                        } catch (IOException ex) {
+                            logger.log(Level.SEVERE, null, ex);
+                        }
+                        
+                        converter = new WatersMzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
+                        ((WatersMzMLToImzMLConverter)converter).setPatternFile(arguments.pixelLocationFile.get(fileIndex));
+                    }
                 }
 
                 if (mzMLFiles != null) {
@@ -604,9 +627,7 @@ public abstract class ImzMLConverter {
                     }
                 }
 
-                if (inputFilenames != null) {
-                    ImzMLConverter converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
-
+                if (inputFilenames != null && converter != null) {
                     try {
                         converter.convert();
 

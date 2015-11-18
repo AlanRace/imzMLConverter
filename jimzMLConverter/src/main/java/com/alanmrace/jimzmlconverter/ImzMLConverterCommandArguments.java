@@ -14,11 +14,11 @@ import java.util.List;
  * @author Alan
  */
 public class ImzMLConverterCommandArguments {
-    @Parameter(description = "The list of files to convert")
+    @Parameter(description = "The list of files to convert", required = true)
     protected List<String> files;
 
     
-    @Parameter(names = "-debug", description = "Debug mode")
+    @Parameter(names = "--debug", description = "Debug mode")
     protected boolean debug = false;
     
     @Parameter(names = {"--help", "-h"}, help = true)
@@ -29,4 +29,7 @@ public class ImzMLConverterCommandArguments {
     
     @Parameter(names = {"--output", "-o"}, description = "Output filepath")
     protected String output;
+    
+    @Parameter(names = {"--pixel-location-file", "-p"}, description = "Pixel location file. (*.pat) for Waters images")
+    protected List<String> pixelLocationFile;
 }
