@@ -1,0 +1,79 @@
+Analysis.AcquisitionTime	1311	1310.7199668884277	1310.72 s
+Analysis.CountsPerSecond	0	0	0cnts/s
+Analysis.MassIntervalList.DebugProperties	0	0	off
+Analysis.MassIntervalList.NumberMassIntervals	2	2	2
+Analysis.PIShots	6553600	6553600	6553600
+Analysis.PauseTime	0	0	0.00 s
+Analysis.PropertyTrendDescription	0	0	Stream Filter
+Analysis.PropertyTrendId	0	0	0
+Analysis.PropertyTrendSource	0	0	0
+Analysis.PropertyTrendStarted	0	0	false
+Analysis.PropertyTrendType	0	0	PropertyTrend
+Analysis.Raster.Roi.Coverage	1	1	100.00 %
+Analysis.Raster.Roi.CoveredPixels	1	1	1
+Analysis.SICount	90308150	90308150	90308150
+Analysis.ScanNumber	100	100	100
+Analysis.SputterTime	1311	1310.7199668884277	1310.72 s
+Analysis.Timestamp	1385638453	1385638453	Thu Nov 28 11:34:13 2013
+Analysis.TotalScans	100	100	100
+Analysis.TotalTime	30	29.764	29.76 s
+Context.InfiniteTimeouts	0	0	false
+Context.MassScale.K0	-2128	-2129.247002858151	-2129.247 
+Context.MassScale.Polarity	1	1	Positive
+Context.MassScale.SF	68915	68914.58265738007	68914.583 
+Context.MediatorPath	0	0	C:\Program Files (x86)\ION-TOF\SurfaceLab 6\bin
+Context.Mode	0	0	LegacyRetrospectiveAnalysis
+Context.Mode.Description	0	0	Do retrospective measurements from legacy raw data files (.raw) created with TOF-SIMS Software up to version 4
+Context.Mode.LegacyRetrospectiveAnalysis.FileName	0	0	D:\ToFSIMS Data\PTFE Images\PTFE4.RAW
+Context.Mode.Name	0	0	Retrospective Analysis (Legacy)
+Context.State	0	0	stopped
+Context.StateChange	0	0	stopped
+Context.Storage	1	1	on
+Context.Storage.Compression	1	1	on
+Context.Storage.DiskSpace	45989	45989	45989
+Context.Storage.File.FinalName	0	0	C:\Users\bjt\AppData\Local\Temp\~temp5.itm
+Context.Storage.File.Name	0	0	C:\Users\bjt\AppData\Local\Temp\~temp5.itm
+Context.Storage.File.Prefix	0	0	Temp
+Context.Storage.MinDiskSpace.Action	2	2	Pause
+Context.Storage.Path	0	0	C:\Users\bjt\Documents\My Tofdata
+Context.Storage.WarnMinDiskSpace	1000	1000	1000
+Instrument.Analyzer.Polarity	1	1	Positive
+Instrument.Id	0	0	00000000
+Instrument.PrimaryGun.MaxFieldOfView	0	0.0005	500 µm
+Legacy	0	0	legacy data converted from raw
+MassSpectrum.PeakSearcher2.AutoWidePeaks	1	1	True
+MassSpectrum.PeakSearcher2.WidePeaks	0	0	False
+MassSpectrum.PeakSearcher2.WindowSizeInc	0	0.00004720976238759347	4.72097623876e-05
+MassSpectrum.PeakSearcher2.WindowSizeStart	10	10.000000000418687	10.0000000004
+Measurement.AcquisitionTime	1311	1310.7199668884277	1310.72 s
+Measurement.BurstMode	0	0	Off
+Measurement.CycleTime	200	0.00019999999494757503	2e+002 µs
+Measurement.Id	0	0	{7B85671A-6EC9-4B58-9408-587462083306}
+Measurement.PIShots	6553600	6553600	6553600
+Measurement.PauseTime	0	0	0.00 s
+Measurement.SICount	90308150	90308150	90308150
+Measurement.ScanNumber	100	100	100
+Measurement.SputterTime	1311	1310.7199668884277	1310.72 s
+Measurement.StopCondition.AcquisitionTime	0	NaN	
+Measurement.StopCondition.MinDiskSpace	200	200	200
+Measurement.StopCondition.Scans	0	NaN	
+Measurement.StopCondition.TotalDose	0	NaN	
+Measurement.StopCondition.TotalShots	0	NaN	
+Measurement.StopCondition.TotalTime	0	NaN	
+Measurement.StopConditionMaster	0	0	
+PropertyCollection.Version	2	2	2
+Registration.Raster.FieldOfView	199	0.0001992065372178331	199.207 µm
+Registration.Raster.Mode	0	0	sawtooth
+Registration.Raster.NonInterlaced	0	0	Off
+Registration.Raster.Resolution	256	256	256
+Registration.Raster.ShotsPerPixel	1	1	1
+Registration.Raster.StageRaster	0	0	false
+Registration.Raster.TotalFieldOfView.X	199	0.0001992065372178331	199.207 µm
+Registration.Raster.TotalFieldOfView.Y	199	0.0001992065372178331	199.207 µm
+Registration.Raster.Zoom.Center.X	0	0	0 
+Registration.Raster.Zoom.Center.Y	0	0	0 
+Registration.Raster.Zoom.Factor	1	1	1 
+Registration.TimeResolution	0	5e-11	50ps
+Storage.File.Extension	0	0	.itm
+Storage.File.Name	0	0	ptfe4
+Storage.File.Path	0	0	d:\tofsims data\ptfe images\ptfe4.itm

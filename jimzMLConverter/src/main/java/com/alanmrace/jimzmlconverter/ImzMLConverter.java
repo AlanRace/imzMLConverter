@@ -57,7 +57,7 @@ import java.util.logging.SimpleFormatter;
  *
  * @author Alan
  */
-public abstract class ImzMLConverter {
+public abstract class ImzMLConverter implements Converter {
 
     private static final Logger logger = Logger.getLogger(ImzMLConverter.class.getName());
 
@@ -244,6 +244,7 @@ public abstract class ImzMLConverter {
         logger.log(Level.FINE, "Number of spectra after removing: {0}", imzML.getRun().getSpectrumList().size());
     }
 
+    @Override
     public void convert() throws ImzMLConversionException {
         // Check if the baseimzML is null, if so then use the first (i)mzML file as the base
 //	if(baseImzML == null)
