@@ -30,6 +30,6 @@ public class ImzMLConverterCommandArguments {
     @Parameter(names = {"--output", "-o"}, description = "Output filepath")
     protected String output;
     
-    @Parameter(names = {"--pixel-location-file", "-p"}, description = "Pixel location file. (*.pat) for Waters images")
+    @Parameter(names = {"--pixel-location-file", "-p"}, description = "Pixel location file. (*.pat) for Waters data. (*.properties.txt) for ION-TOF data.")
     protected List<String> pixelLocationFile;
 }

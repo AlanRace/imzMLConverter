@@ -79,12 +79,12 @@ public abstract class ImzMLConverter implements Converter {
     protected CVParam intensityArrayDataType;
 
     protected boolean removeEmptySpectra;
-    
+
     protected Software imzMLConverter;
 
     protected ReferenceableParamGroup rpgmzArray;
     protected ReferenceableParamGroup rpgintensityArray;
-    
+
     protected HashSet<Double> fullmzList;
 
     public ImzMLConverter(String outputFilename, String[] inputFilenames) {
@@ -95,7 +95,7 @@ public abstract class ImzMLConverter implements Converter {
         compressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
         mzArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
         intensityArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
-        
+
         fullmzList = new HashSet<>();
     }
 
@@ -318,24 +318,25 @@ public abstract class ImzMLConverter implements Converter {
         for (BinaryDataArray binaryDataArray : binaryDataArrayList) {
             byte[] dataToWrite = binaryDataArray.getDataAsByte();
             CVParam dataArrayType = binaryDataArray.getDataArrayType();
-            
+
             CVParam dataType;
 
             switch (dataArrayType.getTerm().getID()) {
                 case BinaryDataArray.mzArrayID:
                     // Get the data as a double to populate the full m/z list
-                    if(fullmzList != null) {
+                    if (fullmzList != null) {
                         double[] mzList = binaryDataArray.getDataAsDouble();
-                        
-                        for(int i = 0; i < mzList.length; i++) 
+
+                        for (int i = 0; i < mzList.length; i++) {
                             fullmzList.add(mzList[i]);
+                        }
                     }
-                    
+
                     dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);
 
                     binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
                     binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
-                    
+
                     dataType = mzArrayDataType;
                     break;
                 case BinaryDataArray.intensityArrayID:
@@ -343,7 +344,7 @@ public abstract class ImzMLConverter implements Converter {
 
                     binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
                     binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
-                    
+
                     dataType = intensityArrayDataType;
                     break;
                 default:
@@ -366,13 +367,13 @@ public abstract class ImzMLConverter implements Converter {
             // Add binary data values to cvParams
             binaryDataArray.removeCVParam(BinaryDataArray.externalEncodedLengthID);
             binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalEncodedLengthID), (offset - prevOffset)));
-            
+
             binaryDataArray.removeCVParam(BinaryDataArray.externalDataID);
             binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalDataID), "true"));
-            
+
             binaryDataArray.removeCVParam(BinaryDataArray.externalOffsetID);
             binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalOffsetID), prevOffset));
-            
+
             binaryDataArray.removeCVParam(BinaryDataArray.externalArrayLengthID);
             binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalArrayLengthID), dataToWrite.length / BinaryDataArray.getDataTypeInBytes(dataType)));
 
@@ -381,19 +382,20 @@ public abstract class ImzMLConverter implements Converter {
 
         return offset;
     }
-    
+
     protected void outputFullmzList(DataOutputStream binaryDataStream, long offset) throws IOException {
         //System.out.println("Full m/z list size: " + fullmzList.size());
-        
+
         List<Double> sortedmzList = new ArrayList(fullmzList);
         Collections.sort(sortedmzList);
-        
+
         imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalOffsetID), offset));
         imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalArrayLengthID), sortedmzList.size()));
         imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalEncodedLengthID), sortedmzList.size() * Double.BYTES));
-        
-        for(Double mz : sortedmzList)
+
+        for (Double mz : sortedmzList) {
             binaryDataStream.writeDouble(mz);
+        }
     }
 
     protected static void setCoordinatesOfSpectrum(Spectrum spectrum, int x, int y) {
@@ -577,7 +579,7 @@ public abstract class ImzMLConverter implements Converter {
         if (!arguments.combine) {
             for (int fileIndex = 0; fileIndex < arguments.files.size(); fileIndex++) {
                 String fileName = arguments.files.get(fileIndex);
-                
+
                 logger.log(Level.INFO, MessageFormat.format("Converting file {0}", fileName));
 
                 File currentFile = new File(fileName);
@@ -585,7 +587,7 @@ public abstract class ImzMLConverter implements Converter {
                 String[] inputFilenames = null;
 
                 String extension = getExtension(fileName);
-                
+
                 ImzMLConverter converter = null;
 
                 if (extension.equals("wiff")) {
@@ -600,13 +602,22 @@ public abstract class ImzMLConverter implements Converter {
                     if (outputPath == null || outputPath.isEmpty()) {
                         outputPath = fileName.replace(".wiff", "");
                     }
-                    
+
+                    // TODO: Remove duplicate code (appears again below)
+                    if (mzMLFiles != null) {
+                        inputFilenames = new String[mzMLFiles.length];
+
+                        for (int i = 0; i < mzMLFiles.length; i++) {
+                            inputFilenames[i] = mzMLFiles[i].getAbsolutePath();
+                        }
+                    }
+
                     converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
-                } else if(extension.equalsIgnoreCase("raw") && currentFile.isDirectory()) {
+                } else if (extension.equalsIgnoreCase("raw") && currentFile.isDirectory()) {
                     logger.log(Level.INFO, "Detected Waters RAW file");
-                    
-                    if(arguments.pixelLocationFile == null || arguments.pixelLocationFile.size() <= fileIndex || 
-                           arguments.pixelLocationFile.get(fileIndex) == null || !arguments.pixelLocationFile.get(fileIndex).contains(".pat")) {
+
+                    if (arguments.pixelLocationFile == null || arguments.pixelLocationFile.size() <= fileIndex
+                            || arguments.pixelLocationFile.get(fileIndex) == null || !arguments.pixelLocationFile.get(fileIndex).contains(".pat")) {
                         logger.log(Level.SEVERE, "No .pat file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
                     } else {
                         try {
@@ -614,17 +625,45 @@ public abstract class ImzMLConverter implements Converter {
                         } catch (IOException ex) {
                             logger.log(Level.SEVERE, null, ex);
                         }
+
+                        if (outputPath == null || outputPath.isEmpty()) {
+                            outputPath = fileName.replace(".raw", "");
+                        }
                         
+                        // TODO: Remove duplicate code (appears again above)
+                        if (mzMLFiles != null) {
+                            inputFilenames = new String[mzMLFiles.length];
+
+                            for (int i = 0; i < mzMLFiles.length; i++) {
+                                inputFilenames[i] = mzMLFiles[i].getAbsolutePath();
+                            }
+                        }
+
                         converter = new WatersMzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
-                        ((WatersMzMLToImzMLConverter)converter).setPatternFile(arguments.pixelLocationFile.get(fileIndex));
+                        ((WatersMzMLToImzMLConverter) converter).setPatternFile(arguments.pixelLocationFile.get(fileIndex));
                     }
-                }
+                } else if (extension.equals("grd")) {
+                    logger.log(Level.INFO, "Detected ION-TOF GRD file");
 
-                if (mzMLFiles != null) {
-                    inputFilenames = new String[mzMLFiles.length];
+                    if (arguments.pixelLocationFile == null || arguments.pixelLocationFile.size() <= fileIndex
+                            || arguments.pixelLocationFile.get(fileIndex) == null || !arguments.pixelLocationFile.get(fileIndex).contains(".properties.txt")) {
+                        logger.log(Level.SEVERE, "No .properties.txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
+                    } else {
+                        try {
+                            inputFilenames = new String[]{fileName};
+                            
+                            if (outputPath == null || outputPath.isEmpty()) {
+                                outputPath = fileName.replace(".grd", "");
+                            }
 
-                    for (int i = 0; i < mzMLFiles.length; i++) {
-                        inputFilenames[i] = mzMLFiles[i].getAbsolutePath();
+                            converter = new GRDToImzMLConverter(outputPath, inputFilenames);
+                            ((GRDToImzMLConverter) converter).setPropertiesFile(arguments.pixelLocationFile.get(fileIndex));
+                        } catch (IOException ex) {
+                            Logger.getLogger(ImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+
+                            // Failed so just exit
+                            converter = null;
+                        }
                     }
                 }
 
@@ -653,5 +692,4 @@ public abstract class ImzMLConverter implements Converter {
         }
     }
 
-    
 }
