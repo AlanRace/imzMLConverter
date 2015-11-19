@@ -5,6 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter;
 
+import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupRef;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
@@ -144,6 +145,10 @@ public class GRDToImzMLConverterTest {
             logger.log(Level.FINE, "intensities array length {0}", intensities.length);
             
             assertEquals("Intensity of first pixel", 3, intensities[0], 0.1);
+        } catch (ImzMLParseException ex) {
+            Logger.getLogger(GRDToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+            
+            fail("ImzMLParseException " + ex);
         } catch (IOException ex) {
             Logger.getLogger(GRDToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             

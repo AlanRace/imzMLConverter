@@ -8,6 +8,7 @@ package com.alanmrace.jimzmlconverter;
 import static com.alanmrace.jimzmlconverter.ImzMLConverter.getOBOTerm;
 import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
+import com.alanmrace.jimzmlparser.exceptions.MzMLParseException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.CVParam;
@@ -90,7 +91,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
             baseImzML = new ImzML(mzML);
             //baseImzML = new ImzML(ImzMLHandler.parseimzML(inputFilenames[0]));
-        } catch (FileNotFoundException ex) {
+        } catch (MzMLParseException ex) {
             Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -201,16 +202,19 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
                     Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.FINEST, "About to close mzML in convert()");
                     currentmzML.close();
-                } catch (FileNotFoundException fnfe) {
-                    throw new ImzMLConversionException("Could not find the file " + mzMLFilename);
+                } catch (MzMLParseException ex) {
+                    Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                    throw new ImzMLConversionException("MzMLParseException: " + ex);
                 }
             }
 
             outputFullmzList(binaryDataStream, offset);
             
             binaryDataStream.close();
-        } catch (IOException e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
+        } catch (IOException ex) {
+            Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            
             throw new ImzMLConversionException("Error closing " + outputFilename + ".ibd");
         }
 

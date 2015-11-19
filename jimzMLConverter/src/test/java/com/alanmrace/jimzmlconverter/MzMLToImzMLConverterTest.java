@@ -6,6 +6,7 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
@@ -225,11 +226,11 @@ public class MzMLToImzMLConverterTest {
             }
 	    
 	    imzML.close();
-        } catch (FileNotFoundException ex) {
+        } catch (ImzMLParseException ex) {
             Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             
-            throw new ImzMLConversionException("File not found " + ex.getLocalizedMessage());
-        }
+            throw new ImzMLConversionException("ImzMLParseException: " + ex.getLocalizedMessage());
+        } 
     }
     
 }

@@ -5,20 +5,17 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.MzMLToImzMLConverter.FileStorage;
 import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.FileContent;
-import com.alanmrace.jimzmlparser.mzML.MzML;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
-import com.alanmrace.jimzmlparser.mzML.ScanSettings;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
-import com.alanmrace.jimzmlparser.parser.MzMLHeaderHandler;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -52,7 +49,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
     protected void generateBaseImzML() {
         try {
             baseImzML = ImzMLHandler.parseimzML(inputFilenames[0], false);
-        } catch (FileNotFoundException ex) {
+        } catch (ImzMLParseException ex) {
             Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -78,9 +75,9 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                     ImzML imzML = ImzMLHandler.parseimzML(inputFilenames[i], false);
                     
                     imageSizes.add(i, new PixelLocation(imzML.getWidth(), imzML.getHeight(), imzML.getDepth()));
-                } catch (FileNotFoundException ex) {
+                } catch (ImzMLParseException ex) {
                     Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                } 
             }
         }
         
@@ -189,16 +186,19 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
 
                     Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.FINEST, "About to close mzML in convert()");
                     currentimzML.close();
-                } catch (FileNotFoundException fnfe) {
-                    throw new ImzMLConversionException("Could not find the file " + imzMLFilename);
+                } catch (ImzMLParseException ex) {
+                    Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                    
+                    throw new ImzMLConversionException("ImzMLParseException: " + ex);
                 }
             }
 
             outputFullmzList(binaryDataStream, offset);
             
             binaryDataStream.close();
-        } catch (IOException e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
+        } catch (IOException ex) {
+            Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            
             throw new ImzMLConversionException("Error closing " + outputFilename + ".ibd");
         }
 
