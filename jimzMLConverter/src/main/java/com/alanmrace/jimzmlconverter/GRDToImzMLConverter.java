@@ -58,7 +58,7 @@ import java.util.logging.Logger;
  */
 public class GRDToImzMLConverter extends ImzMLConverter {
 
-    private static final Logger logger = Logger.getLogger(ImzMLConverter.class.getName());
+    private static final Logger logger = Logger.getLogger(GRDToImzMLConverter.class.getName());
 
     private IONTOFProperties properties;
 
@@ -92,8 +92,12 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         numPixelsX = xDimension.getIntegerValue();
         numPixelsY = yDimension.getIntegerValue();
 
+        logger.log(Level.FINE, "Image size: {0}, {1}", new Object[]{numPixelsX, numPixelsY});
+
         k0 = properties.getProperty("Context.MassScale.K0").getDoubleValue();
         sf = properties.getProperty("Context.MassScale.SF").getDoubleValue();
+
+        logger.log(Level.FINE, "Calibration parameters, k0 = {0}, sf = {1}", new Object[]{k0, sf});
     }
 
     @Override
@@ -184,6 +188,7 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         Set<Long> fullmzList = new HashSet<>();
 
         int[][] totalIonCountImage = new int[numPixelsY][numPixelsX];
+        long totalEvents = 0;
 
         FileInputStream dis = null;
 
@@ -222,22 +227,22 @@ public class GRDToImzMLConverter extends ImzMLConverter {
                     y = byteBuffer.getInt();
                     long tof = byteBuffer.getInt() & 0xFFFFFFFFL;
 
+                    logger.log(Level.FINE, "TOF Event [1st] {0}, {1}, {2}, {3}, {4}", new Object[]{scanNumber, shotNumber, x, y, tof});
+
                     totalIonCountImage[y][x]++;
 
                     fullmzList.add(tof);
+                    
+                    totalEvents++;
                 }
             }
 
             dis.close();
-        } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+        } catch (IOException ex) {
+            Logger.getLogger(GRDToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        System.out.println("Found # m/z: " + fullmzList.size());
+        logger.log(Level.FINE, "Found # m/z: {0}", fullmzList.size());
 
         // Calculate the offset in bytes for each pixel
         long[][] pixelOffset = new long[numPixelsY][numPixelsX];
@@ -271,6 +276,8 @@ public class GRDToImzMLConverter extends ImzMLConverter {
             raf = new RandomAccessFile(new File(outputFilename + ".ibdtmp"), "rw");
             dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(raf.getFD())));
 
+            raf.setLength(totalEvents * 4);
+            
             int numEventsToProcessAtOnce = 1024;
 
             ByteBuffer byteBuffer = ByteBuffer.allocate(20 * numEventsToProcessAtOnce);
@@ -304,6 +311,8 @@ public class GRDToImzMLConverter extends ImzMLConverter {
                     int tof = byteBuffer.getInt();
                     long tofL = tof & 0xFFFFFFFFL;
 
+                    logger.log(Level.FINE, "TOF Event [2nd] {0}, {1}, {2}, {3}, {4} ({5})", new Object[]{scanNumber, shotNumber, x, y, tof, tofL});
+                    
                     if (totalSpectrum.containsKey(tofL)) {
                         totalSpectrum.put(tofL, totalSpectrum.get(tofL) + 1);
                     } else {
@@ -311,10 +320,13 @@ public class GRDToImzMLConverter extends ImzMLConverter {
                     }
 
                     long outputLocation = (pixelOffset[y][x] + pixelEventsProcessed[y][x]) * 4;
+                    
+                    logger.log(Level.FINE, "Writing {0} to {1}", new Object[] {tof, outputLocation});
 
                     raf.seek(outputLocation);
-                    dos.writeInt(tof);
-
+                    raf.writeInt(tof);
+                    //dos.writeInt(tof);
+                    
                     pixelEventsProcessed[y][x]++;
                 }
             }
@@ -323,15 +335,11 @@ public class GRDToImzMLConverter extends ImzMLConverter {
             raf.close();
             dis.close();
 
-        } catch (FileNotFoundException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
+        } catch (IOException ex) {
+            Logger.getLogger(GRDToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        } 
 
-        System.out.println("Written temp");
+        logger.log(Level.FINE, "Written temp");
 
         // Third pass
         // Go through the new temporary file to organise into spectra 
@@ -341,6 +349,8 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 
             for (int y = 0; y < numPixelsY; y++) {
                 for (int x = 0; x < numPixelsX; x++) {
+                    logger.log(Level.FINE, "Pixel ({0}, {1}) has {2} events", new Object[]{x, y, pixelEventsProcessed[y][x]});
+                    
                     ByteBuffer byteBuffer = ByteBuffer.allocate(pixelEventsProcessed[y][x] * 4);
                     byte[] buffer = new byte[pixelEventsProcessed[y][x] * 4];
 
@@ -354,6 +364,8 @@ public class GRDToImzMLConverter extends ImzMLConverter {
                     for (int val = 0; val < pixelEventsProcessed[y][x]; val++) {
                         long tof = byteBuffer.getInt() & 0xFFFFFFFFL;
 
+                        logger.log(Level.FINE, "TOF Event [3rd] {0}, {1}, {2}", new Object[]{x, y, tof});
+                        
                         if (spectrumData.containsKey(tof)) {
                             spectrumData.put(tof, spectrumData.get(tof) + 1);
                         } else {
@@ -369,18 +381,17 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 
             dis.close();
             dos.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (IOException ex) {
+            Logger.getLogger(GRDToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        } 
 
-        System.out.println("Outputting " + spectrumList.size() + " spectra");
+        logger.log(Level.FINE, "Outputting {0} spectra", spectrumList.size());
 
         try {
             baseImzML.write(outputFilename + ".imzML");
-        } catch (ImzMLWriteException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        } catch (ImzMLWriteException ex) {
+            Logger.getLogger(GRDToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        } 
     }
 
     public static void outputSpectrum(HashMap<Long, Integer> spectrumData, int x, int y, double k0, double sf,
@@ -411,11 +422,11 @@ public class GRDToImzMLConverter extends ImzMLConverter {
             }
 
             int index = (y * numxPixels + x);
-            
-            if(index == 1) {
-                logger.log(Level.INFO, "m/z {0}", mzs[0]);
-                logger.log(Level.INFO, "counts {0}", counts[0]);
-            }
+
+//            if (index == 1) {
+//                logger.log(Level.INFO, "m/z {0}", mzs[0]);
+//                logger.log(Level.INFO, "counts {0}", counts[0]);
+//            }
 
             Spectrum spectrum = new Spectrum("index=" + index, 0, index);
             // MS1 spectrum

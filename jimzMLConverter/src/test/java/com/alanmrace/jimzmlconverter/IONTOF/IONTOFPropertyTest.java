@@ -5,6 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter.IONTOF;
 
+import java.util.logging.Logger;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -17,6 +18,8 @@ import static org.junit.Assert.*;
  * @author amr1
  */
 public class IONTOFPropertyTest {
+    
+    private static final Logger logger = Logger.getLogger(IONTOFPropertyTest.class.getName());
     
     public IONTOFPropertyTest() {
     }

@@ -28,7 +28,7 @@ import org.xml.sax.SAXException;
  */
 public class WatersMzMLToImzMLConverter extends MzMLToImzMLConverter {
     
-    private static final Logger logger = Logger.getLogger(ImzMLConverter.class.getName());
+    private static final Logger logger = Logger.getLogger(WatersMzMLToImzMLConverter.class.getName());
     
     String patternFile;
     

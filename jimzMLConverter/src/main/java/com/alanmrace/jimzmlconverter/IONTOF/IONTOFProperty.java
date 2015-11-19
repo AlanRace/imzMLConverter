@@ -5,11 +5,16 @@
  */
 package com.alanmrace.jimzmlconverter.IONTOF;
 
+import java.util.logging.Logger;
+
 /**
  *
  * @author amr1
  */
 public class IONTOFProperty {
+    
+    private static final Logger logger = Logger.getLogger(IONTOFProperty.class.getName());
+    
     private final String name;
     private final int integerValue;
     private final double doubleValue;

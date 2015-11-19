@@ -20,6 +20,9 @@ import java.util.logging.Logger;
  * @author amr1
  */
 public class WatersRAWTomzMLConverter {
+    
+    private static final Logger logger = Logger.getLogger(WatersRAWTomzMLConverter.class.getName());
+    
     public static final String CONVERTER_FILENAME = "msconvert.exe";
     //public static final String CONVERTER_x64_LOCATION = "C:\\Program Files\\ProteoWizard";
     public static final String CONVERTER_LOCATION = "C:\\Program Files\\ProteoWizard";

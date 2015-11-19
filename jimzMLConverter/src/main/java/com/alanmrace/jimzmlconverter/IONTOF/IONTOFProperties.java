@@ -9,12 +9,15 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  *
  * @author amr1
  */
 public class IONTOFProperties {
+    private static final Logger logger = Logger.getLogger(IONTOFProperties.class.getName());
+    
     private final HashMap<String, IONTOFProperty> properties;
     
     public IONTOFProperties() {

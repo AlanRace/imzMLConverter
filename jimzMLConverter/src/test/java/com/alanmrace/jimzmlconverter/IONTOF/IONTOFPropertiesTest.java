@@ -5,6 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter.IONTOF;
 
+import com.alanmrace.jimzmlconverter.WatersRAWTomzMLConverter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +21,8 @@ import static org.junit.Assert.*;
  * @author amr1
  */
 public class IONTOFPropertiesTest {
+    
+    private static final Logger logger = Logger.getLogger(IONTOFPropertiesTest.class.getName());
     
     private final static String PROPERTIES_RESOURCE = "/PTFE4.raw.properties.txt";
     
