@@ -7,36 +7,48 @@
     <packaging>jar</packaging>
     
     <build>
-	<plugins>
-	    <plugin>
-		<artifactId>maven-dependency-plugin</artifactId>
-		<executions>
-		    <execution>
-			<phase>install</phase>
-			<goals>
-			    <goal>copy-dependencies</goal>
-			</goals>
-			<configuration>
-			    <outputDirectory>${project.build.directory}/lib</outputDirectory>
-			    <excludeArtifactIds>junit,hamcrest-core</excludeArtifactIds>
-			</configuration>
-		    </execution>
-		</executions>
-	    </plugin>
-	    <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-jar-plugin</artifactId>
-		<version>2.3.2</version>
-		<configuration>
-		    <archive>
-			<manifest>
-			    <addClasspath>true</addClasspath>
-			    <classpathPrefix>lib/</classpathPrefix>
-			    <mainClass>${mainClass}</mainClass>
-			</manifest>
-		    </archive>
-		</configuration>
-	    </plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <excludeArtifactIds>junit,hamcrest-core</excludeArtifactIds>
+                        </configuration>
+                    </execution>
+                    
+                    <execution>
+                        <id>copy-hdf5-dll</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <includeScope>system</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>${mainClass}</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <version>2.10</version>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -47,50 +59,72 @@
                             <value>src/test/resources/logging.properties</value>
                         </property>
                     </systemProperties>
+                    
+                    <argLine>-Djava.library.path=target/lib/</argLine>
                 </configuration>
             </plugin>
-	</plugins>
+        </plugins>
     </build>
     
     <dependencies>
-	<dependency>
-	    <groupId>${project.groupId}</groupId>
-	    <artifactId>jimzMLParser</artifactId>
-	    <version>${project.version}</version>
-	</dependency>
-	<dependency>
-	    <groupId>junit</groupId>
-	    <artifactId>junit</artifactId>
-	    <version>4.10</version>
-	    <scope>test</scope>
-	</dependency>
-	<dependency>
-	    <groupId>com.beust</groupId>
-	    <artifactId>jcommander</artifactId>
-	    <version>1.48</version>
-	</dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>jimzMLParser</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.beust</groupId>
+            <artifactId>jcommander</artifactId>
+            <version>1.48</version>
+        </dependency>
+        
+        <!-- FOR HDF5 -->
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>hdf-java</artifactId>
-            <version>2.6.1</version>
+            <version>2.11.1</version>
+            <scope>system</scope>
+            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>
         </dependency>
-	<!--	<dependency>
-	    <groupId>commons-lang</groupId>
-	    <artifactId>commons-lang</artifactId>
-	    <version>2.1</version>
-	</dependency>
-	<dependency>
-	    <groupId>org.codehaus.plexus</groupId>
-	    <artifactId>plexus-utils</artifactId>
-	    <version>1.1</version>
-	</dependency>
-	-->
+        <dependency>
+            <groupId>org.hdfgroup</groupId>
+            <artifactId>hdf-java-dll</artifactId>
+            <version>2.11.1</version>
+            <scope>system</scope>
+            <type>dll</type>
+            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jhdf5.dll</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.13</version>
+        </dependency>
+
+        <!-- END FOR HDF5 -->
+
+        <!--	<dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>1.1</version>
+        </dependency>
+        -->
     </dependencies>
     <properties>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<maven.compiler.source>1.7</maven.compiler.source>
-	<maven.compiler.target>1.7</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
 	
-	<mainClass>com.alanmrace.jimzmlconverter.ImzMLConverter</mainClass>
+        <mainClass>com.alanmrace.jimzmlconverter.ImzMLConverter</mainClass>
     </properties>
 </project>

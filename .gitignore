@@ -1,2 +1,6 @@
 /jimzMLConverter/target/
 /jimzMLConverter.gui/target/
+jimzMLConverter/src/test/resources/2013_12_11_MatrixAndResolutionTest_25um.raw/_FUNC001.DAT
+*2013_12_11_MatrixAndResolutionTest_25um*
+jimzMLConverter/src/test/resources/2013_12_11_ResolutionAndMatrixTest_25um.pat
+*.log.*
