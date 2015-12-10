@@ -5,12 +5,12 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 
 /**
  *
  * @author amr1
  */
 public interface Converter  {
-    public void convert() throws ImzMLConversionException;
+    public void convert() throws ConversionException;
 }

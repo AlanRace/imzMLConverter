@@ -5,7 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
@@ -102,7 +102,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
     
     
     @Override
-    public void convert() throws ImzMLConversionException {
+    public void convert() throws ConversionException {
         super.convert();
 
         int x = 1;
@@ -132,9 +132,9 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                 try {
                     binaryDataStream.close();
 
-                    throw new ImzMLConversionException("Error writing UUID " + e2.getLocalizedMessage());
+                    throw new ConversionException("Error writing UUID " + e2.getLocalizedMessage());
                 } catch (IOException e) {
-                    throw new ImzMLConversionException("Error closing .ibd file after failing writing UUID " + e.getLocalizedMessage());
+                    throw new ConversionException("Error closing .ibd file after failing writing UUID " + e.getLocalizedMessage());
                 }
             }
 
@@ -189,7 +189,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                 } catch (ImzMLParseException ex) {
                     Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     
-                    throw new ImzMLConversionException("ImzMLParseException: " + ex);
+                    throw new ConversionException("ImzMLParseException: " + ex);
                 }
             }
 
@@ -199,7 +199,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
         } catch (IOException ex) {
             Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
             
-            throw new ImzMLConversionException("Error closing " + outputFilename + ".ibd");
+            throw new ConversionException("Error closing " + outputFilename + ".ibd");
         }
 
         if (removeEmptySpectra) {
@@ -249,7 +249,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
             ImzMLToImzMLConverter converter = new ImzMLToImzMLConverter(outputFile, inputFiles);
             
             converter.convert();
-        } catch (ImzMLConversionException ex) {
+        } catch (ConversionException ex) {
             Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -5,7 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
@@ -44,7 +44,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -208,7 +207,7 @@ public abstract class ImzMLConverter implements Converter {
 
         try {
             sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.sha1FileChecksumType), calculateSHA1(filename)));
-        } catch (ImzMLConversionException ex) {
+        } catch (ConversionException ex) {
             Logger.getLogger(ImzMLConverter.class.getName()).log(Level.SEVERE, "Failed to generate SHA1 for " + filename, ex);
         }
 
@@ -245,7 +244,7 @@ public abstract class ImzMLConverter implements Converter {
     }
 
     @Override
-    public void convert() throws ImzMLConversionException {
+    public void convert() throws ConversionException {
         // Check if the baseimzML is null, if so then use the first (i)mzML file as the base
 //	if(baseImzML == null)
         generateBaseImzML();
@@ -450,7 +449,7 @@ public abstract class ImzMLConverter implements Converter {
         this.progress = progress;
     }
 
-    public static String calculateSHA1(String filename) throws ImzMLConversionException {
+    public static String calculateSHA1(String filename) throws ConversionException {
         // Open the .ibd data stream
         DataInputStream dataStream = null;
         byte[] hash;
@@ -458,7 +457,7 @@ public abstract class ImzMLConverter implements Converter {
         try {
             dataStream = new DataInputStream(new FileInputStream(filename));
         } catch (FileNotFoundException e2) {
-            throw new ImzMLConversionException("Could not open file " + filename);
+            throw new ConversionException("Could not open file " + filename);
         }
 
         try {
@@ -482,18 +481,18 @@ public abstract class ImzMLConverter implements Converter {
             try {
                 dataStream.close();
             } catch (IOException e1) {
-                throw new ImzMLConversionException("Failed to close ibd file after trying to generate SHA-1 hash");
+                throw new ConversionException("Failed to close ibd file after trying to generate SHA-1 hash");
             }
 
-            throw new ImzMLConversionException("Generation of SHA-1 hash failed. No SHA-1 algorithm. " + e.getLocalizedMessage());
+            throw new ConversionException("Generation of SHA-1 hash failed. No SHA-1 algorithm. " + e.getLocalizedMessage());
         } catch (IOException e) {
-            throw new ImzMLConversionException("Failed generating SHA-1 hash. Failed to read data from " + filename + e.getMessage());
+            throw new ConversionException("Failed generating SHA-1 hash. Failed to read data from " + filename + e.getMessage());
         }
 
         try {
             dataStream.close();
         } catch (IOException e) {
-            throw new ImzMLConversionException("Failed to close ibd file after generating SHA-1 hash");
+            throw new ConversionException("Failed to close ibd file after generating SHA-1 hash");
         }
 
         return byteArrayToHexString(hash);
@@ -672,7 +671,7 @@ public abstract class ImzMLConverter implements Converter {
                         converter.convert();
 
                         logger.log(Level.INFO, MessageFormat.format("Converted {0} to {1}{2}", fileName, outputPath, ".imzML"));
-                    } catch (ImzMLConversionException ex) {
+                    } catch (ConversionException ex) {
                         logger.log(Level.SEVERE, "Failed to convert " + fileName, ex);
                     }
                 }

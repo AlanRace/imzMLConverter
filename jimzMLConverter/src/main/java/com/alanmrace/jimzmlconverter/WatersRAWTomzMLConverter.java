@@ -5,7 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
@@ -103,7 +103,7 @@ public class WatersRAWTomzMLConverter {
     }
     
     
-    public static void main(String[] args) throws IOException, ImzMLConversionException {
+    public static void main(String[] args) throws IOException, ConversionException {
         //System.out.println(WatersRAWTomzMLConverter.class.getResource("/DAN.wiff"));
         
         final String[] filePaths = {"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw",
@@ -143,7 +143,7 @@ public class WatersRAWTomzMLConverter {
                         converter.convert();
                         
                         System.out.println("Conversion of " + filePaths[index] + " to imzML took " + ((System.currentTimeMillis() - startTime) / 1000) + " s");
-                    } catch (ImzMLConversionException ex) {
+                    } catch (ConversionException ex) {
                         Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
 //                    } catch (IOException ex) {
 //                        Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);

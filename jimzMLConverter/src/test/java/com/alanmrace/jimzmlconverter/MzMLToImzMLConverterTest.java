@@ -5,7 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
@@ -110,17 +110,17 @@ public class MzMLToImzMLConverterTest {
 
     /**
      * Test of convert method, of class MzMLToImzMLConverter.
-     * @throws com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException
+     * @throws com.alanmrace.jimzmlconverter.exceptions.ConversionException
      */
     @org.junit.Test
-    public void testConvert() throws ImzMLConversionException {        
+    public void testConvert() throws ConversionException {        
         System.out.println("convert");
         converter.convert();
         testImzMLOutput();
     }
     
     @org.junit.Test
-    public void testzlibConvert() throws ImzMLConversionException {
+    public void testzlibConvert() throws ConversionException {
         String ibdFilepath = outputPath + ".ibd";
         
         System.out.println("convert");
@@ -144,7 +144,7 @@ public class MzMLToImzMLConverterTest {
     }
     
     @org.junit.Test
-    public void testSinglePrecisionConvert() throws ImzMLConversionException {
+    public void testSinglePrecisionConvert() throws ConversionException {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert single precision");
@@ -155,7 +155,7 @@ public class MzMLToImzMLConverterTest {
     }
     
     @org.junit.Test
-    public void testSigned64bitIntConvert() throws ImzMLConversionException {
+    public void testSigned64bitIntConvert() throws ConversionException {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 64 bit integer");
@@ -166,7 +166,7 @@ public class MzMLToImzMLConverterTest {
     }
     
     @org.junit.Test
-    public void testSigned32bitIntConvert() throws ImzMLConversionException {
+    public void testSigned32bitIntConvert() throws ConversionException {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 32 bit integer");
@@ -177,7 +177,7 @@ public class MzMLToImzMLConverterTest {
     }
     
     @org.junit.Test
-    public void testSigned16bitIntConvert() throws ImzMLConversionException {
+    public void testSigned16bitIntConvert() throws ConversionException {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 16 bit integer");
@@ -189,7 +189,7 @@ public class MzMLToImzMLConverterTest {
     
     @org.junit.Ignore
     @org.junit.Test
-    public void testSigned8bitIntConvert() throws ImzMLConversionException {
+    public void testSigned8bitIntConvert() throws ConversionException {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 8 bit integer");
@@ -198,7 +198,7 @@ public class MzMLToImzMLConverterTest {
         testImzMLOutput();
     }
     
-    protected void testImzMLOutput() throws ImzMLConversionException {
+    protected void testImzMLOutput() throws ConversionException {
         try {
             ImzML imzML = ImzMLHandler.parseimzML(outputPath + ".imzML");
             assertNotNull(imzML);
@@ -229,7 +229,7 @@ public class MzMLToImzMLConverterTest {
         } catch (ImzMLParseException ex) {
             Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             
-            throw new ImzMLConversionException("ImzMLParseException: " + ex.getLocalizedMessage());
+            throw new ConversionException("ImzMLParseException: " + ex.getLocalizedMessage());
         } 
     }
     

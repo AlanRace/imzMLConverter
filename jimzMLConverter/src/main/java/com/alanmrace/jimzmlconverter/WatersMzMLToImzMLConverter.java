@@ -6,7 +6,7 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.Waters.PatternDefinitionHandler;
-import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.CVParam;
 import com.alanmrace.jimzmlparser.mzML.Scan;
@@ -45,7 +45,7 @@ public class WatersMzMLToImzMLConverter extends MzMLToImzMLConverter {
         if(patternFile != null) {
             try {
                 this.pixelLocations = WatersMzMLToImzMLConverter.getPixelLocationFromWatersFile(patternFile, baseImzML.getRun().getSpectrumList());
-            } catch (ImzMLConversionException ex) {
+            } catch (ConversionException ex) {
                 logger.log(Level.SEVERE, null, ex); 
             }
         } else {
@@ -53,7 +53,7 @@ public class WatersMzMLToImzMLConverter extends MzMLToImzMLConverter {
         }
     }
     
-    public static PixelLocation[] getPixelLocationFromWatersFile(String patternFile, SpectrumList oldSpectrumList) throws ImzMLConversionException {
+    public static PixelLocation[] getPixelLocationFromWatersFile(String patternFile, SpectrumList oldSpectrumList) throws ConversionException {
         int xPixels = 0;
         int yPixels = 0;
         int zPixels = 0;

@@ -1,7 +1,7 @@
 package com.alanmrace.jimzmlconverter.Waters;
 
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
-import com.alanmrace.jimzmlconverter.exceptions.ImzMLConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -120,7 +120,7 @@ public class PatternDefinition implements Iterable<Region> {
         return validAreaY2;
     }
 
-    public PixelLocation[] convertToPixelLocations(SpectrumList spectrumList, int numSpectraPerPixel) throws ImzMLConversionException {
+    public PixelLocation[] convertToPixelLocations(SpectrumList spectrumList, int numSpectraPerPixel) throws ConversionException {
         double minX = Double.MAX_VALUE;
         double maxX = Double.MIN_VALUE;
         double minY = Double.MAX_VALUE;
