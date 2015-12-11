@@ -457,7 +457,7 @@ public abstract class ImzMLConverter implements Converter {
         try {
             dataStream = new DataInputStream(new FileInputStream(filename));
         } catch (FileNotFoundException e2) {
-            throw new ConversionException("Could not open file " + filename);
+            throw new ConversionException("Could not open file " + filename, e2);
         }
 
         try {
@@ -481,18 +481,18 @@ public abstract class ImzMLConverter implements Converter {
             try {
                 dataStream.close();
             } catch (IOException e1) {
-                throw new ConversionException("Failed to close ibd file after trying to generate SHA-1 hash");
+                throw new ConversionException("Failed to close ibd file after trying to generate SHA-1 hash", e1);
             }
 
-            throw new ConversionException("Generation of SHA-1 hash failed. No SHA-1 algorithm. " + e.getLocalizedMessage());
+            throw new ConversionException("Generation of SHA-1 hash failed. No SHA-1 algorithm. " + e.getLocalizedMessage(), e);
         } catch (IOException e) {
-            throw new ConversionException("Failed generating SHA-1 hash. Failed to read data from " + filename + e.getMessage());
+            throw new ConversionException("Failed generating SHA-1 hash. Failed to read data from " + filename + e.getMessage(), e);
         }
 
         try {
             dataStream.close();
         } catch (IOException e) {
-            throw new ConversionException("Failed to close ibd file after generating SHA-1 hash");
+            throw new ConversionException("Failed to close ibd file after generating SHA-1 hash", e);
         }
 
         return byteArrayToHexString(hash);

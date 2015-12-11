@@ -132,9 +132,9 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 try {
                     binaryDataStream.close();
 
-                    throw new ConversionException("Error writing UUID " + e2.getLocalizedMessage());
+                    throw new ConversionException("Error writing UUID " + e2.getLocalizedMessage(), e2);
                 } catch (IOException e) {
-                    throw new ConversionException("Error closing .ibd file after failing writing UUID " + e.getLocalizedMessage());
+                    throw new ConversionException("Error closing .ibd file after failing writing UUID " + e.getLocalizedMessage(), e);
                 }
             }
 
@@ -205,7 +205,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 } catch (MzMLParseException ex) {
                     Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     
-                    throw new ConversionException("MzMLParseException: " + ex);
+                    throw new ConversionException("MzMLParseException: " + ex, ex);
                 }
             }
 
@@ -215,7 +215,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         } catch (IOException ex) {
             Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
             
-            throw new ConversionException("Error closing " + outputFilename + ".ibd");
+            throw new ConversionException("Error closing " + outputFilename + ".ibd", ex);
         }
 
         if (removeEmptySpectra) {

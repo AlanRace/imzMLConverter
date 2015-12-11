@@ -17,11 +17,9 @@ import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.io.DataOutputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -132,9 +130,9 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                 try {
                     binaryDataStream.close();
 
-                    throw new ConversionException("Error writing UUID " + e2.getLocalizedMessage());
+                    throw new ConversionException("Error writing UUID " + e2.getLocalizedMessage(), e2);
                 } catch (IOException e) {
-                    throw new ConversionException("Error closing .ibd file after failing writing UUID " + e.getLocalizedMessage());
+                    throw new ConversionException("Error closing .ibd file after failing writing UUID " + e.getLocalizedMessage(), e);
                 }
             }
 
@@ -189,7 +187,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                 } catch (ImzMLParseException ex) {
                     Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     
-                    throw new ConversionException("ImzMLParseException: " + ex);
+                    throw new ConversionException("ImzMLParseException: " + ex, ex);
                 }
             }
 
@@ -199,7 +197,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
         } catch (IOException ex) {
             Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
             
-            throw new ConversionException("Error closing " + outputFilename + ".ibd");
+            throw new ConversionException("Error closing " + outputFilename + ".ibd", ex);
         }
 
         if (removeEmptySpectra) {

@@ -229,7 +229,7 @@ public class MzMLToImzMLConverterTest {
         } catch (ImzMLParseException ex) {
             Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             
-            throw new ConversionException("ImzMLParseException: " + ex.getLocalizedMessage());
+            throw new ConversionException("ImzMLParseException: " + ex.getLocalizedMessage(), ex);
         } 
     }
     
