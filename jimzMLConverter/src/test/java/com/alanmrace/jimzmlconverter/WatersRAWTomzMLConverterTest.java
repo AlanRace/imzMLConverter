@@ -6,7 +6,6 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.MzMLToImzMLConverter.FileStorage;
-import static com.alanmrace.jimzmlconverter.MzMLToImzMLConverterTest.TEST_RESOURCE;
 import java.io.File;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -22,7 +21,7 @@ import org.junit.Ignore;
  */
 public class WatersRAWTomzMLConverterTest {
     
-    public static final String TEST_RESOURCE = "/2013_12_11_MatrixAndResolutionTest_25um.raw";
+    public static final String TEST_RESOURCE = "/IM_500_IM_S.raw"; // "/141024_HM_02.raw"; // "/2013_12_11_MatrixAndResolutionTest_25um.raw";
     
     public WatersRAWTomzMLConverterTest() {
     }
@@ -58,10 +57,12 @@ public class WatersRAWTomzMLConverterTest {
         System.out.println("convert");
         File[] result = WatersRAWTomzMLConverter.convert(resourcePath);
         
+        assertTrue("No mzML files produced", result.length > 0);
+        
         String[] inputFiles = new String[]{result[0].getAbsolutePath()};
         
         WatersMzMLToImzMLConverter converter = new WatersMzMLToImzMLConverter(resourcePath, inputFiles, FileStorage.oneFile);
-        converter.setPatternFile(resourcePath.replace(".raw", ".pat"));
+        //converter.setPatternFile(resourcePath.replace(".raw", ".pat"));
         converter.convert();
     }
 

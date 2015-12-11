@@ -21,7 +21,7 @@ import static org.junit.Assert.*;
  */
 public class ImzMLToHDF5ConverterTest {
 
-    public static final String TEST_RESOURCE = "/2013_12_11_MatrixAndResolutionTest_25um.raw.imzML"; // "/2012_5_2_medium(120502,20h18m).wiff"; 
+    public static final String TEST_RESOURCE = "/IM_500_IM_S.raw.imzML"; // "/2012_5_2_medium(120502,20h18m).wiff"; 
 
     public ImzMLToHDF5ConverterTest() {
     }

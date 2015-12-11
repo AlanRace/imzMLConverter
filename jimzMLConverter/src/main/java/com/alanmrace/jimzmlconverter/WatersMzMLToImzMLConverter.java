@@ -48,9 +48,44 @@ public class WatersMzMLToImzMLConverter extends MzMLToImzMLConverter {
             } catch (ConversionException ex) {
                 logger.log(Level.SEVERE, null, ex); 
             }
-        } else {
-            super.generatePixelLocations();
+        } 
+        
+        // If a pattern file has not been supplied then it is likely that the data is not imaging
+        if(pixelLocations == null) {
+//            super.generatePixelLocations();
+            
+            int numSpectraPerPixel = getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList());
+            int numSpectra = baseImzML.getRun().getSpectrumList().size();
+            
+            pixelLocations = new PixelLocation[numSpectra];
+            
+            for(int i = 0; i < numSpectra; i++) {
+                pixelLocations[i] = new PixelLocation(i / numSpectraPerPixel + 1, 1, 1);
+            }
         }
+    }
+    
+    private static int getNumberSpectraPerPixel(SpectrumList spectrumList) {
+        // Check the number of spectra that have the same scan start time. This is
+        double originalScanStartTime = -1;
+        int numSpectraPerPixel = 0;
+
+        for (Spectrum spectrum : spectrumList) {
+            CVParam scanStartTimeParam = spectrum.getScanList().getScan(0).getCVParam(Scan.scanStartTimeID);
+            double scanStartTime = scanStartTimeParam.getValueAsDouble();
+
+            if (originalScanStartTime == -1) {
+                originalScanStartTime = scanStartTime;
+            }
+
+            if (originalScanStartTime == scanStartTime) {
+                numSpectraPerPixel++;
+            } else {
+                break;
+            }
+        }
+        
+        return numSpectraPerPixel;
     }
     
     public static PixelLocation[] getPixelLocationFromWatersFile(String patternFile, SpectrumList oldSpectrumList) throws ConversionException {
@@ -74,24 +109,7 @@ public class WatersMzMLToImzMLConverter extends MzMLToImzMLConverter {
             logger.log(Level.SEVERE, null, ex);
         }
 
-        // Check the number of spectra that have the same scan start time. This is
-        double originalScanStartTime = -1;
-        int numSpectraPerPixel = 0;
-
-        for (Spectrum spectrum : oldSpectrumList) {
-            CVParam scanStartTimeParam = spectrum.getScanList().getScan(0).getCVParam(Scan.scanStartTimeID);
-            double scanStartTime = scanStartTimeParam.getValueAsDouble();
-
-            if (originalScanStartTime == -1) {
-                originalScanStartTime = scanStartTime;
-            }
-
-            if (originalScanStartTime == scanStartTime) {
-                numSpectraPerPixel++;
-            } else {
-                break;
-            }
-        }
+        int numSpectraPerPixel = getNumberSpectraPerPixel(oldSpectrumList);
         
         logger.log(Level.INFO, MessageFormat.format("Found {0} spectra per pixel", numSpectraPerPixel));
 
