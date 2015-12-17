@@ -29,6 +29,10 @@ public class ImzMLToHDF5Converter implements Converter {
     private int gzipCompression = 9;
     private boolean shuffle = false;
 
+    long[] chunkSizes;
+    
+    int numberOfSpectraPerBlock = 20;
+    
     /**
      *
      * @param imzML
@@ -57,6 +61,18 @@ public class ImzMLToHDF5Converter implements Converter {
         }
 
         return zeroFilled;
+    }
+    
+    public void setCompressionLevel(int compressionLevel) {
+        this.gzipCompression = compressionLevel;
+    }
+    
+    public void setShuffle(boolean shuffle) {
+        this.shuffle = shuffle;
+    }
+    
+    public void setChunkSizes(long[] chunkSizes) {
+        this.chunkSizes = chunkSizes;
     }
 
     /**
@@ -94,7 +110,6 @@ public class ImzMLToHDF5Converter implements Converter {
 
             // Create the necessary 
             long[] dimensionSizes = new long[storedDimensionality];
-            long[] chunkSizes = new long[storedDimensionality];
 
             int numPixels = imzML.getWidth() * imzML.getHeight() * imzML.getDepth();
 
@@ -107,19 +122,30 @@ public class ImzMLToHDF5Converter implements Converter {
                 logger.log(Level.FINE, "Dimenion sizes [2] {0}", dimensionSizes[2]);
             }
 
-            // TODO: Optimise these and allow use setting
-            chunkSizes[0] = 50;
-            chunkSizes[1] = 50;
-            chunkSizes[2] = 50;
-
-            // Make conversion faster for testing
-            gzipCompression = 3;
+            if(chunkSizes == null) {
+                chunkSizes = new long[storedDimensionality];
+                
+                // TODO: Optimise these and allow use setting
+                chunkSizes[0] = 50;
+                chunkSizes[1] = 50;
+                
+                if(storedDimensionality > 2)
+                    chunkSizes[2] = 50;
+            }
+            
+            logger.log(Level.FINE, "Starting conversion to HDF5");
+            
             HDF5DataIDs dataset = createDataset(file_id, "data", dimensionSizes, HDF5Constants.H5T_NATIVE_DOUBLE, chunkSizes);
 
             long[] start = {0, 0, 0};
             long[] stride = {1, 1, 1};
             long[] count = {1, 1, 1};
-            long[] block = {10, dimensionSizes[1], dimensionSizes[2]};
+            long[] block;
+            
+            if(storedDimensionality > 2)
+                block = new long[]{numberOfSpectraPerBlock, dimensionSizes[1], dimensionSizes[2]};
+            else
+                block = new long[]{numberOfSpectraPerBlock, dimensionSizes[1]};
 
             int memspace = H5.H5Screate_simple(dimensionSizes.length, block, null);
 
@@ -129,7 +155,7 @@ public class ImzMLToHDF5Converter implements Converter {
             int spectrumIndex = 0;
 
             double[][][] mobilogram = new double[(int) block[0]][(int) dimensionSizes[1]][(int) dimensionSizes[2]];
-
+            
             for (Spectrum spectrum_ : imzML.getRun().getSpectrumList()) {
                 double[] mzs = spectrum_.getmzArray();
                 double[] intensities = spectrum_.getIntensityArray();
@@ -186,6 +212,8 @@ public class ImzMLToHDF5Converter implements Converter {
             }
 
             closeDataset(dataset);
+            
+            logger.log(Level.FINE, "Finished conversion to HDF5");
 
             H5.H5Fclose(file_id);
         } catch (HDF5Exception ex) {
