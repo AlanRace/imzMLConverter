@@ -206,6 +206,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     
                     throw new ConversionException("MzMLParseException: " + ex, ex);
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
 

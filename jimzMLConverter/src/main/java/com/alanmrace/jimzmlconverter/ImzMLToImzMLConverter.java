@@ -63,7 +63,8 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
             generateBaseImzML();
         }
         
-        setImageGrid(1, inputFilenames.length);
+        if(imageStartCoordinate.isEmpty())
+            setImageGrid(1, inputFilenames.length);
     }
     
     public List<PixelLocation> getImageSizes() {
@@ -87,14 +88,36 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
         // Make sure that image sizes have been generated
         getImageSizes();
         
-        int sizeInY = 1;
+        int startY = 1;
+        int nextStartY = 1;
         
-        for(int image = 0; image < imageSizes.size(); image++) {
-            PixelLocation imageSize = imageSizes.get(image);
+        int startX = 1;
+        
+        int image = 0;
+        
+        for(int y = 0; y < imagesInY; y++) {
+            if(image >= imageSizes.size())
+                break;
             
-            imageStartCoordinate.add(image, new PixelLocation(1, sizeInY, 1));
+            for(int x = 0; x < imagesInX; x++) {
+                if(image >= imageSizes.size())
+                    break;
+                
+                PixelLocation imageSize = imageSizes.get(image);
+                
+                imageStartCoordinate.add(image, new PixelLocation(startX, startY, 1));
+                
+                // Make sure that we record the largest height in the row
+                if((startY + imageSize.getY()) > nextStartY)
+                    nextStartY = (startY + imageSize.getY());
+                
+                startX += imageSize.getX();
+                
+                image++;
+            }
             
-            sizeInY += imageSize.getY();
+            startX = 1;            
+            startY = nextStartY;
         }
     }
     
@@ -235,16 +258,77 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
             //    "F:\\AstraZeneca\\MALDIData\\22_Sept_2014_AZ13708229_Day_1_2_7_Recovery.raw_Processed.imzML",
             //    "F:\\AstraZeneca\\MALDIData\\26_June_2014_PMB_AZ11983219_D22_AZ13719017_D3.raw_Processed.imzML",
             //    "F:\\AstraZeneca\\MALDIData\\29_Aug_2014_PMB_AZ13719017_Day_1_2_7.raw_Processed.imzML"
-                "F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw.imzML",
-                "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.raw.imzML",
-                "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.raw.imzML",
-                "F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.raw.imzML"
+            //    "F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw.imzML",
+            //    "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.raw.imzML",
+            //    "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.raw.imzML",
+            //    "F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.raw.imzML"
+//"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R1_saline_S1(151209,15h20m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R1_saline_S4(151209,08h51m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R1_saline_S7(151209,18h37m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R1_saline_S10(151209,15h50m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R1_saline_S13(151209,09h22m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R1_saline_S16(151209,19h06m).wiff.imzML",
+//
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R6_saline_S19(151216,16h15m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R6_saline_S22(151216,12h15m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R6_saline_S25(151216,09h05m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R6_saline_S28(151216,15h55m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R6_saline_S31(151216,12h32m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R6_saline_S34(151216,09h24m).wiff.imzML",
+//                
+//"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R7_saline_S1(151217,11h32m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R7_salinei_S4(151217,09h32m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R7_saline_S7(151217,14h35m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R7_saline_S10(151217,15h00m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R7_saline_S13(151217,11h57m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R7_salinei_S16(151217,09h54m).wiff.imzML",
+
+
+"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R2_Ami_S19(151209,16h15m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R2_Ami_S22(151209,09h45m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R2_Ami_S25(151209,19h30m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R2_Ami_S28(151209,16h43m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R2_Ami_S31(151209,10h09m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_09_lung_R2_Ami_S34(151209,19h56m).wiff.imzML",
+
+
+"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R3_Ami_S19(151210,14h38m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R3_Ami_S22(151210,08h10m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R3_Ami_S28(151210,14h54m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R3_Ami_S31(151210,11h18m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R3_Ami_S31(151210,08h27m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R3_Ami_S34(151210,11h03m).wiff.imzML",
+
+
+"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R8_Ami_S19(151217,12h21m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R8_Ami_S22(151217,10h17m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R8_Ami_S25(151217,15h24m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R8_Ami_S28(151217,12h38m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R8_Ami_S31(151217,10h32m).wiff.imzML",
+"F:\\Projects\\CRACK-IT\\2015_12_17_lung_R8_Ami_S34(151217,15h41m).wiff.imzML",
+
+//"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R4_LPVA_S1(151210,14h04m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R4_LPVA_S4(151210,07h36m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R4_LPVA_S7(151210,10h27m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R4_LPVA_S10(151210,10h39m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R4_LPVA_S13(151210,14h15m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_10_lung_R4_LPVA_S16(151210,07h46m).wiff.imzML",
+//
+//
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R5_LPVA_S1(151216,15h30m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R5_LPVA_S4(151216,11h47m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R5_LPVA_S7(151216,08h41m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R5_LPVA_S10(151216,15h44m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R5_LPVA_S13(151216,12h03m).wiff.imzML",
+//"F:\\Projects\\CRACK-IT\\2015_12_16_lung_R5_LPVA_S16(151216,08h53m).wiff.imzML"
             };
             
-            String outputFile = "F:\\AstraZeneca\\Lung\\AZ_Lung_All.imzML";
+            String outputFile = "F:\\Projects\\CRACK-IT\\CRACKIT_Lung_Ami_6x3.imzML";
             
             
             ImzMLToImzMLConverter converter = new ImzMLToImzMLConverter(outputFile, inputFiles);
+            
+            converter.setImageGrid(6, 3);
             
             converter.convert();
         } catch (ConversionException ex) {
