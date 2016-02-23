@@ -31,7 +31,7 @@ public class ImzMLToHDF5Converter implements Converter {
 
     long[] chunkSizes;
     
-    int numberOfSpectraPerBlock = 20;
+    int numberOfSpectraPerBlock = 10;
     
     /**
      *
