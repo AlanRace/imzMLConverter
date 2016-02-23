@@ -33,6 +33,21 @@
                             <includeScope>system</includeScope>
                         </configuration>
                     </execution>
+                    
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeArtifactIds>junit,hamcrest-core</excludeArtifactIds>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -89,16 +104,18 @@
             <groupId>org.hdfgroup</groupId>
             <artifactId>hdf-java</artifactId>
             <version>2.11.1</version>
-            <scope>system</scope>
-            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>
+<!--            <scope>system</scope>
+            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>hdf-java-dll</artifactId>
             <version>2.11.1</version>
-            <scope>system</scope>
+            <scope>runtime</scope>
             <type>dll</type>
-            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jhdf5.dll</systemPath>
+<!--           <scope>system</scope>
+            <type>dll</type>
+            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jhdf5.dll</systemPath>-->
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
