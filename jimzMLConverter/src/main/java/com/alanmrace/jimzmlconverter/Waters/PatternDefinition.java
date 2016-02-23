@@ -129,6 +129,7 @@ public class PatternDefinition implements Iterable<Region> {
         double[] chromatogram = new double[spectrumList.size() / numSpectraPerPixel];
         double[] chromatogramDiff = new double[chromatogram.length - 1];
         double meanTimeDelay = 0;
+        double maxTimeDelay = 0;
 
         int spectrumIndex = 0;
 
@@ -144,6 +145,9 @@ public class PatternDefinition implements Iterable<Region> {
         for (int i = 0; i < chromatogramDiff.length; i++) {
             chromatogramDiff[i] = (chromatogram[i + 1] - chromatogram[i]);
             meanTimeDelay = meanTimeDelay + chromatogramDiff[i];
+            
+            if(chromatogramDiff[i] > maxTimeDelay)
+                maxTimeDelay = chromatogramDiff[i];
         }
 
         meanTimeDelay /= chromatogramDiff.length;
@@ -191,9 +195,10 @@ public class PatternDefinition implements Iterable<Region> {
 
         System.out.println("Number of Lines in pattern file: " + numLines);
         System.out.println("Mean time delay: " + meanTimeDelay);
+        System.out.println("Max time delay: " + maxTimeDelay);
 
         for (int i = 0; i < chromatogramDiff.length; i++) {
-            if (chromatogramDiff[i] > meanTimeDelay * 1.0120) // Was 1.0120
+            if (chromatogramDiff[i] > meanTimeDelay * 1.2) // Was 1.0120
             {
                 currentLineNum++;
             }

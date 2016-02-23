@@ -5,6 +5,8 @@
  */
 package com.alanmrace.jimzmlconverter;
 
+import com.alanmrace.jimzmlconverter.MzMLToImzMLConverter.FileStorage;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
@@ -97,8 +99,8 @@ public class WiffTomzMLConverter {
         return command;
     }
     
-    public static void main(String args[]) throws IOException {
-        String folder = "D:\\Ryan";
+    public static void main(String args[]) throws IOException, ConversionException {
+        String folder = "F:\\Projects\\CRACK-IT";
         
         File folderLocation = new File(folder);
         ArrayList<File> files = new ArrayList<File>(Arrays.asList(folderLocation.listFiles()));
@@ -106,7 +108,18 @@ public class WiffTomzMLConverter {
         
                     
         for(File file : files) {
-            File[] mzMLFiles = convert(file.getAbsolutePath());
+            if(file.getAbsolutePath().endsWith(".wiff")) {
+            
+                File[] mzMLFiles = convert(file.getAbsolutePath());
+                String[] filenames = new String[mzMLFiles.length];
+                
+                for(int i = 0; i < mzMLFiles.length; i++)
+                    filenames[i] = mzMLFiles[i].getAbsolutePath();
+            
+                MzMLToImzMLConverter converter = new MzMLToImzMLConverter(file.getAbsolutePath(), filenames, FileStorage.rowPerFile);
+                
+                converter.convert();
+            }
         }
     }
 }
