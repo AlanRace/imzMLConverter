@@ -4,3 +4,6 @@ jimzMLConverter/src/test/resources/2013_12_11_MatrixAndResolutionTest_25um.raw/_
 *2013_12_11_MatrixAndResolutionTest_25um*
 jimzMLConverter/src/test/resources/2013_12_11_ResolutionAndMatrixTest_25um.pat
 *.log.*
+*.raw/*
+jimzMLConverter/src/test/resources/*.raw*
+*.mzML

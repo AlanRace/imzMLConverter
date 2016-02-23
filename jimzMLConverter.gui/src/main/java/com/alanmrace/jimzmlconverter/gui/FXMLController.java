@@ -1,6 +1,7 @@
 package com.alanmrace.jimzmlconverter.gui;
 
 import com.alanmrace.jimzmlconverter.ImzMLConverter;
+import com.alanmrace.jimzmlconverter.MainCommand;
 import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -53,7 +54,7 @@ public class FXMLController implements Initializable {
             @Override
             public void run() {
                 // code goes here.
-                ImzMLConverter.main(args);
+                MainCommand.main(args);
             }
         });
         t1.start();
