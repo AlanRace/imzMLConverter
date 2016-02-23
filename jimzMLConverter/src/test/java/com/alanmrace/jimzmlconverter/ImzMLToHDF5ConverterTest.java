@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -46,6 +47,7 @@ public class ImzMLToHDF5ConverterTest {
      * Test of convert method, of class ImzMLToHDF5Converter.
      */
     @Test
+    @Ignore
     public void testConvert() throws Exception {
         System.out.println("convert");
         assertNotNull("Test file missing", ImzMLToHDF5ConverterTest.class.getResource(TEST_RESOURCE));

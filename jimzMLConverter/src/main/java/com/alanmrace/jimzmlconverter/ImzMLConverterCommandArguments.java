@@ -45,7 +45,7 @@ public class ImzMLConverterCommandArguments {
     @Parameters(separators = "=", commandDescription = "Convert to HDF5")
     public class CommandHDF5 extends CommonCommands {         
         @Parameter(names = {"--chunk"}, arity = 3, description = "Chunk size. Requires 3 values for spatial, m/z and mobility (-1 = ALL, 0 = ignore dimension)")
-        protected List<Integer> hdf5Chunk;
+        protected List<Long> hdf5Chunk;
 
         @Parameter(names = {"--compression-level"}, description = "gzip compression level")
         protected Integer compressionLevel;

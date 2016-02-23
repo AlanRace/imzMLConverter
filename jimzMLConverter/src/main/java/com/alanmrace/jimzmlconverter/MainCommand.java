@@ -6,6 +6,9 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
+import com.alanmrace.jimzmlparser.imzML.ImzML;
+import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import java.io.File;
@@ -66,7 +69,7 @@ public class MainCommand {
             System.out.println(pex.getMessage());
         }
         
-        if (arguments.help) {
+        if (arguments.help || jc.getParsedCommand() == null) {
             System.out.println("imzMLConverter version " + ImzMLConverter.version);
             jc.usage();
             System.exit(0);
@@ -165,10 +168,48 @@ public class MainCommand {
                             converter = new GRDToImzMLConverter(outputPath, inputFilenames);
                             ((GRDToImzMLConverter) converter).setPropertiesFile(commandimzML.pixelLocationFile.get(fileIndex));
                         } catch (IOException ex) {
-                            Logger.getLogger(ImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                            Logger.getLogger(MainCommand.class.getName()).log(Level.SEVERE, null, ex);
 
                             // Failed so just exit
                             converter = null;
+                        }
+                    }
+                } else if (extension.equals("imzML")) {
+                    
+                    if(jc.getParsedCommand().equals("hdf5")) {
+                        try {
+                            inputFilenames = new String[] {fileName};
+                            
+                            if (outputPath == null || outputPath.isEmpty()) {
+                                outputPath = fileName.replace(".imzML", ".h5");
+                            }
+                            
+                            logger.log(Level.INFO, "Parsing {0}", fileName);
+                            ImzML imzML = ImzMLHandler.parseimzML(fileName);
+                            logger.log(Level.INFO, "Parsed {0}", fileName);
+                            converter = new ImzMLToHDF5Converter(imzML, outputPath);
+                            logger.log(Level.INFO, "Set up converter");
+                        } catch (ImzMLParseException ex) {
+                            Logger.getLogger(MainCommand.class.getName()).log(Level.SEVERE, null, ex);
+
+                            converter = null;
+                        }
+                    }
+                }
+                
+                if(jc.getParsedCommand().equals("hdf5")) {
+                    HDF5Converter hdf5Converter = (HDF5Converter) converter;
+                    
+                    if(hdf5Converter != null) {
+                        if(commandHDF5.compressionLevel != null)
+                            hdf5Converter.setCompressionLevel(commandHDF5.compressionLevel);
+
+                        if(commandHDF5.hdf5Chunk != null) {
+                            long[] chunk = new long[commandHDF5.hdf5Chunk.size()];
+                            for(int i = 0; i < chunk.length; i++)
+                                chunk[i] = commandHDF5.hdf5Chunk.get(i);
+                            
+                            hdf5Converter.setChunkSizes(chunk);
                         }
                     }
                 }

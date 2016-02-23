@@ -6,8 +6,10 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
+import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,19 +21,12 @@ import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
  *
  * @author amr1
  */
-public class ImzMLToHDF5Converter implements Converter {
+public class ImzMLToHDF5Converter extends HDF5Converter {
 
     private static final Logger logger = Logger.getLogger(ImzMLToHDF5Converter.class.getName());
 
     private ImzML imzML;
-    private String outputFilename;
-
-    private int gzipCompression = 9;
-    private boolean shuffle = false;
-
-    long[] chunkSizes;
     
-    int numberOfSpectraPerBlock = 10;
     
     /**
      *
@@ -43,37 +38,7 @@ public class ImzMLToHDF5Converter implements Converter {
         this.outputFilename = outputFilename;
     }
 
-    private double[] putOnFullmzAxis(double[] fullmzAxis, double[] mzs, double[] intensities) {
-        double[] zeroFilled = new double[fullmzAxis.length];
-
-        if (mzs != null && intensities != null) {
-            int j = 0;
-
-            for (int i = 0; i < mzs.length; i++) {
-                while (j < zeroFilled.length && mzs[i] != fullmzAxis[j]) {
-                    j++;
-                }
-
-                if (j < zeroFilled.length && mzs[i] == fullmzAxis[j]) {
-                    zeroFilled[j] += intensities[i];
-                }
-            }
-        }
-
-        return zeroFilled;
-    }
     
-    public void setCompressionLevel(int compressionLevel) {
-        this.gzipCompression = compressionLevel;
-    }
-    
-    public void setShuffle(boolean shuffle) {
-        this.shuffle = shuffle;
-    }
-    
-    public void setChunkSizes(long[] chunkSizes) {
-        this.chunkSizes = chunkSizes;
-    }
 
     /**
      *
@@ -81,6 +46,8 @@ public class ImzMLToHDF5Converter implements Converter {
      */
     @Override
     public void convert() throws ConversionException {
+        logger.setLevel(Level.ALL);
+        
         try {
             double[] fullmzList = imzML.getFullmzList();
 
@@ -126,8 +93,8 @@ public class ImzMLToHDF5Converter implements Converter {
                 chunkSizes = new long[storedDimensionality];
                 
                 // TODO: Optimise these and allow use setting
-                chunkSizes[0] = 50;
-                chunkSizes[1] = 50;
+                chunkSizes[0] = numberOfSpectraPerBlock;
+                chunkSizes[1] = 5000;
                 
                 if(storedDimensionality > 2)
                     chunkSizes[2] = 50;
@@ -205,6 +172,8 @@ public class ImzMLToHDF5Converter implements Converter {
                             memspace, dataset.filespace_id, HDF5Constants.H5P_DEFAULT,
                             mobilogram);
 
+                    logger.log(Level.FINE, "Written hyperslab for spectrumIndex {0}", spectrumIndex);
+                    
                     start[0] += block[0];
 
                     spectrumIndex = 0;
@@ -228,86 +197,11 @@ public class ImzMLToHDF5Converter implements Converter {
         }
     }
 
-    /**
-     * Helper methods for HDF5 dataset creation
-     */
-    private class HDF5DataIDs {
-
-        int dcpl_id = -1;
-        int dataset_id = -1;
-        int filespace_id = -1;
-        int file_id = -1;
-    }
-
-    private HDF5DataIDs createDataset(int fileID, String name, long[] dimensions, int type) throws HDF5Exception {
-        return createDataset(fileID, name, dimensions, type, dimensions);
-    }
-
-    private HDF5DataIDs createDataset(int fileID, String name, long[] dimensions, int type, long[] chunkSize) throws HDF5Exception {
-        HDF5DataIDs dataset = new HDF5DataIDs();
-        dataset.file_id = fileID;
-
-        // Create the filespace with desired dimensions (as both the initial and maximum size)
-        dataset.filespace_id = H5.H5Screate_simple(dimensions.length, dimensions, null);
-
-        dataset.dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
-
-        if (dataset.dcpl_id >= 0) {
-            if (shuffle) {
-                H5.H5Pset_shuffle(dataset.dcpl_id);
-            }
-
-            H5.H5Pset_deflate(dataset.dcpl_id, gzipCompression);
-
-            // Set the chunk size.
-            H5.H5Pset_chunk(dataset.dcpl_id, dimensions.length, chunkSize);
-        }
-
-        // Create dataset
-        dataset.dataset_id = H5.H5Dcreate(fileID, name, type, dataset.filespace_id, HDF5Constants.H5P_DEFAULT, dataset.dcpl_id, HDF5Constants.H5P_DEFAULT);
-
-        return dataset;
-    }
-
-    private void closeDataset(HDF5DataIDs dataset) throws HDF5Exception {
-        H5.H5Pclose(dataset.dcpl_id);
-        H5.H5Dclose(dataset.dataset_id);
-        H5.H5Sclose(dataset.filespace_id);
-    }
-
-    private void addDataset(int fileID, String name, double[] data) throws HDF5Exception {
-        long[] datasetDimensions = {data.length};
-
-        HDF5DataIDs dataset = createDataset(fileID, name, datasetDimensions, HDF5Constants.H5T_NATIVE_DOUBLE);
-
-        H5.H5Dwrite(dataset.dataset_id, HDF5Constants.H5T_NATIVE_DOUBLE,
-                HDF5Constants.H5S_ALL, dataset.filespace_id, HDF5Constants.H5P_DEFAULT,
-                data);
-
-        closeDataset(dataset);
-    }
-
-    private void addDataset(int fileID, String name, int[][] data) throws HDF5Exception {
-        long[] datasetDimensions = {data.length, data[0].length};
-
-        HDF5DataIDs dataset = createDataset(fileID, name, datasetDimensions, HDF5Constants.H5T_NATIVE_INT);
-
-        H5.H5Dwrite(dataset.dataset_id, HDF5Constants.H5T_NATIVE_DOUBLE,
-                HDF5Constants.H5S_ALL, dataset.filespace_id, HDF5Constants.H5P_DEFAULT,
-                data);
-
-        closeDataset(dataset);
-    }
-
-    private void addmzList(int fileID, double[] mzList) throws HDF5Exception {
-        addDataset(fileID, "spectralChannels", mzList);
-    }
-
-    private void addOverviewImage(int fileID, double[] overviewImage) throws HDF5Exception {
-        addDataset(fileID, "overviewImage", overviewImage);
-    }
-
-    private void addPixelList(int fileID, int[][] pixelList) throws NullPointerException, HDF5Exception {
-        addDataset(fileID, "pixelList", pixelList);
-    }
+    
+    
+//    public static void main(String args[]) {
+//        args = new String[] {"hdf5", "D:\\GitProjects\\jimzMLConverter\\jimzMLConverter\\target\\test-classes\\IM_500_IM_S.raw.imzML"};
+//        
+//        MainCommand.main(args);
+//    }
 }
