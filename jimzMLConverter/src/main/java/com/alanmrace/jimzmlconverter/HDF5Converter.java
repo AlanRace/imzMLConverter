@@ -22,6 +22,9 @@ public abstract class HDF5Converter implements Converter {
 
     protected long[] chunkSizes;
     
+    protected long[] chunkCacheSize;
+    protected double w0 = 0.75;
+    
     protected int numberOfSpectraPerBlock = 10;
     
     protected String outputFilename;
@@ -57,12 +60,21 @@ public abstract class HDF5Converter implements Converter {
     public void setChunkSizes(long[] chunkSizes) {
         this.chunkSizes = chunkSizes;
     }
+
+    public void setChunkCacheSize(long[] chunkCacheSize) {
+        this.chunkCacheSize = chunkCacheSize;
+    }
+    
+    public void setw0(double w0) {
+        this.w0 = w0;
+    }
     
     /**
      * Helper methods for HDF5 dataset creation
      */
     protected class HDF5DataIDs {
 
+        int dacl_id = -1;
         int dcpl_id = -1;
         int dataset_id = -1;
         int filespace_id = -1;
@@ -81,7 +93,7 @@ public abstract class HDF5Converter implements Converter {
         dataset.filespace_id = H5.H5Screate_simple(dimensions.length, dimensions, null);
 
         dataset.dcpl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_CREATE);
-
+        
         if (dataset.dcpl_id >= 0) {
             if (shuffle) {
                 H5.H5Pset_shuffle(dataset.dcpl_id);
@@ -93,8 +105,14 @@ public abstract class HDF5Converter implements Converter {
             H5.H5Pset_chunk(dataset.dcpl_id, dimensions.length, chunkSize);
         }
 
+        dataset.dacl_id = H5.H5Pcreate(HDF5Constants.H5P_DATASET_ACCESS);
+        
+        if(chunkCacheSize != null) {
+            H5.H5Pset_chunk_cache(dataset.dacl_id, chunkCacheSize[0], chunkCacheSize[1], w0);
+        }
+        
         // Create dataset
-        dataset.dataset_id = H5.H5Dcreate(fileID, name, type, dataset.filespace_id, HDF5Constants.H5P_DEFAULT, dataset.dcpl_id, HDF5Constants.H5P_DEFAULT);
+        dataset.dataset_id = H5.H5Dcreate(fileID, name, type, dataset.filespace_id, HDF5Constants.H5P_DEFAULT, dataset.dcpl_id, dataset.dacl_id);
 
         return dataset;
     }

@@ -211,6 +211,14 @@ public class MainCommand {
                             
                             hdf5Converter.setChunkSizes(chunk);
                         }
+                        
+                        if(commandHDF5.hdf5ChunkCache != null) {
+                            long[] chunkCache = new long[commandHDF5.hdf5ChunkCache.size()];
+                            for(int i = 0; i < chunkCache.length; i++)
+                                chunkCache[i] = commandHDF5.hdf5ChunkCache.get(i);
+                            
+                            hdf5Converter.setChunkCacheSize(chunkCache);
+                        }
                     }
                 }
 
