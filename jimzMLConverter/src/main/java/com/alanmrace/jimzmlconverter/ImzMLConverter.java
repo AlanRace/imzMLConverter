@@ -31,26 +31,20 @@ import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.obo.OBOTerm;
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.ParameterException;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /**
  *
@@ -247,7 +241,11 @@ public abstract class ImzMLConverter implements Converter {
     public void convert() throws ConversionException {
         // Check if the baseimzML is null, if so then use the first (i)mzML file as the base
 //	if(baseImzML == null)
+        logger.log(Level.INFO, "Generating base imzML");
+        
         generateBaseImzML();
+        
+        logger.log(Level.INFO, "Generated base imzML");
 
         if (pixelLocations == null) {
             generatePixelLocations();

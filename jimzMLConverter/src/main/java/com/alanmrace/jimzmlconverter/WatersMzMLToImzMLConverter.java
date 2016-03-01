@@ -45,6 +45,8 @@ public class WatersMzMLToImzMLConverter extends MzMLToImzMLConverter {
         if(patternFile != null) {
             try {
                 this.pixelLocations = WatersMzMLToImzMLConverter.getPixelLocationFromWatersFile(patternFile, baseImzML.getRun().getSpectrumList());
+                
+                logger.log(Level.INFO, "Generated pixel locations from .pat file");
             } catch (ConversionException ex) {
                 logger.log(Level.SEVERE, null, ex); 
             }
@@ -113,21 +115,21 @@ public class WatersMzMLToImzMLConverter extends MzMLToImzMLConverter {
         
         logger.log(Level.INFO, MessageFormat.format("Found {0} spectra per pixel", numSpectraPerPixel));
 
-        PixelLocation[] spectrumLocation = handler.getPatternDefinition().convertToPixelLocations(oldSpectrumList, numSpectraPerPixel);
+        PixelLocation[] spectraLocations = handler.getPatternDefinition().convertToPixelLocations(oldSpectrumList, numSpectraPerPixel);
 
-        for (int i = 0; i < spectrumLocation.length; i++) {
-            if (spectrumLocation[i].getX() > xPixels) {
-                xPixels = spectrumLocation[i].getX();
+        for (PixelLocation spectrumLocation : spectraLocations) {
+            if (spectrumLocation.getX() > xPixels) {
+                xPixels = spectrumLocation.getX();
             }
-            if (spectrumLocation[i].getY() > yPixels) {
-                yPixels = spectrumLocation[i].getY();
+            if (spectrumLocation.getY() > yPixels) {
+                yPixels = spectrumLocation.getY();
             }
-            if (spectrumLocation[i].getZ() > zPixels) {
-                zPixels = spectrumLocation[i].getZ();
+            if (spectrumLocation.getZ() > zPixels) {
+                zPixels = spectrumLocation.getZ();
             }
         }
 
-        return spectrumLocation;
+        return spectraLocations;
     }
 
     

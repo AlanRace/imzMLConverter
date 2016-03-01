@@ -89,6 +89,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
             MzML mzML = MzMLHeaderHandler.parsemzMLHeader(inputFilenames[0], false);
 	    //mzML.close();	    
 
+            Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.INFO, "Finished parsing mzML Header");
+            
             baseImzML = new ImzML(mzML);
             //baseImzML = new ImzML(ImzMLHandler.parseimzML(inputFilenames[0]));
         } catch (MzMLParseException ex) {
@@ -180,6 +182,12 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     }
 
                     for (int i = 0; i < numSpectra; i++) {
+                        if(currentPixelLocation >= pixelLocations.length) {
+                            Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, "Current pixel location index exceeds the number of pixel locations specified");
+                            
+                            break;
+                        }
+                        
                         Spectrum spectrum = currentmzML.getRun().getSpectrumList().getSpectrum(i);
                         int spectrumX = pixelLocations[currentPixelLocation].getX();
                         int spectrumY = pixelLocations[currentPixelLocation].getY();

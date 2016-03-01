@@ -32,6 +32,14 @@ public class PatternDefinition implements Iterable<Region> {
     // Regions
     private ArrayList<Region> regions;
 
+    private double meanThreshold = 1.01;
+    private double meanThresholdIncrements = 0.01;
+
+    private int maxRepeats = 50;
+    private int currentRepeat = 0;
+
+    private int errorThreshold = 1;
+
     public PatternDefinition() {
         regions = new ArrayList<Region>();
     }
@@ -145,9 +153,10 @@ public class PatternDefinition implements Iterable<Region> {
         for (int i = 0; i < chromatogramDiff.length; i++) {
             chromatogramDiff[i] = (chromatogram[i + 1] - chromatogram[i]);
             meanTimeDelay = meanTimeDelay + chromatogramDiff[i];
-            
-            if(chromatogramDiff[i] > maxTimeDelay)
+
+            if (chromatogramDiff[i] > maxTimeDelay) {
                 maxTimeDelay = chromatogramDiff[i];
+            }
         }
 
         meanTimeDelay /= chromatogramDiff.length;
@@ -186,46 +195,50 @@ public class PatternDefinition implements Iterable<Region> {
         }
 
         //int[] numPixelsOnLines = new int[numLines];
-        ArrayList<Integer> numPixelsOnLines = new ArrayList<>(numLines);
-        int currentLineNum = 0;
+        int numErrors = errorThreshold;
+        ArrayList<PixelLocation> pixelLocations = new ArrayList<>();
 
-        // Account for the final pixel
-        
-        numPixelsOnLines.add(currentLineNum, 1);
+        while (numErrors >= errorThreshold && currentRepeat < maxRepeats) {
+            numErrors = 0;
+            int currentLineNum = 0;
 
-        System.out.println("Number of Lines in pattern file: " + numLines);
-        System.out.println("Mean time delay: " + meanTimeDelay);
-        System.out.println("Max time delay: " + maxTimeDelay);
+            ArrayList<Integer> numPixelsOnLines = new ArrayList<>(numLines);
 
-        for (int i = 0; i < chromatogramDiff.length; i++) {
-            if (chromatogramDiff[i] > meanTimeDelay * 1.2) // Was 1.0120
-            {
-                currentLineNum++;
+            numPixelsOnLines.add(currentLineNum, 1);
+
+            System.out.println("Number of Lines in pattern file: " + numLines);
+            System.out.println("Mean time delay: " + meanTimeDelay);
+            System.out.println("Max time delay: " + maxTimeDelay);
+
+            for (int i = 0; i < chromatogramDiff.length; i++) {
+                if (chromatogramDiff[i] > meanTimeDelay * meanThreshold) // Was 1.0120
+                {
+                    currentLineNum++;
+                }
+
+                int curValue = 0;
+
+                if (numPixelsOnLines.size() > currentLineNum) {
+                    curValue = numPixelsOnLines.get(currentLineNum);
+                } else {
+                    numPixelsOnLines.add(currentLineNum, 0);
+                }
+
+                numPixelsOnLines.set(currentLineNum, curValue + 1);
             }
 
-            int curValue = 0;
-            
-            if(numPixelsOnLines.size() > currentLineNum)
-                curValue = numPixelsOnLines.get(currentLineNum);
-            else {
-                numPixelsOnLines.add(currentLineNum, 0);
-            }
-            
-            numPixelsOnLines.set(currentLineNum, curValue + 1);
-        }
+    //		System.out.println("-----");
+            //		for(int lineCount : numPixelsOnLines)
+            //			System.out.println(lineCount);
+            //		System.out.println("-----");
+            System.out.println("X: " + minX + " -> " + maxX);
+            System.out.println("Y: " + minY + " -> " + maxY);
 
-//		System.out.println("-----");
-//		for(int lineCount : numPixelsOnLines)
-//			System.out.println(lineCount);
-//		System.out.println("-----");
-        System.out.println("X: " + minX + " -> " + maxX);
-        System.out.println("Y: " + minY + " -> " + maxY);
+            pixelLocations = new ArrayList<>();
 
-        ArrayList<PixelLocation> pixelLocations = new ArrayList<PixelLocation>();
+            currentLineNum = 0;
 
-        currentLineNum = 0;
-
-       // try {
+            // try {
             for (Region region : regions) {
                 for (int lineNum = 0; lineNum < region.numLines(); lineNum++) {
                     Line line = region.getLine(lineNum);
@@ -236,6 +249,7 @@ public class PatternDefinition implements Iterable<Region> {
 
                     if (currentLineNum >= numPixelsOnLines.size()) {
                         System.out.println("NUMBER OF LINES DETERMINED EXCEEDS NUMBER OF LINES RECORDED");
+                        numErrors++;
 
                         break;
                     }
@@ -251,7 +265,7 @@ public class PatternDefinition implements Iterable<Region> {
 
                             currentLineNum++;
 
-                            if(numPixelsOnLines.size() <= currentLineNum) {
+                            if (numPixelsOnLines.size() <= currentLineNum) {
                                 System.out.println("[" + currentLineNum + "] " + "Needed to merge but couldn't. Setting number of pixels on line to " + (numPixelsOnCurrentLine));
                             } else {
                                 System.out.println("[" + currentLineNum + "] " + "Merging lines. Changing number of pixels on line from " + numPixelsOnLines.get(currentLineNum) + " to " + (numPixelsOnCurrentLine + numPixelsOnLines.get(currentLineNum)));
@@ -265,17 +279,18 @@ public class PatternDefinition implements Iterable<Region> {
                                 numPixelsOnLines.set(currentLineNum, 0);
                                 numPixelsOnLines.set(currentLineNum + 1, numPixelsOnLines.get(currentLineNum + 1) + 1);//[currentLineNum + 1]++;
 
-								// Could try increasing num pixels on next line by 1, incrementing the current line num and then continue to next line - skipping the addition to pixelLocations
+                                // Could try increasing num pixels on next line by 1, incrementing the current line num and then continue to next line - skipping the addition to pixelLocations
                             } else {
-                                if(lineNum + 1 < region.numLines()) {
+                                if (lineNum + 1 < region.numLines()) {
                                     int expectedNumberOfPixelsOnNextLine = ((int) Math.round(region.getLine(lineNum + 1).getLength() / laserSizeX)) + 1;
 
                                     int remainder = numPixelsOnLines.get(currentLineNum) - expectedNumberOfPixels - expectedNumberOfPixelsOnNextLine;
 
                                     currentLineNum -= 1;
 
-                                    if(currentLineNum < 0)
+                                    if (currentLineNum < 0) {
                                         currentLineNum = 0;
+                                    }
 
                                     // Depending on the remainder, adjust the number of pixels that exist on the current line
                                     switch (remainder) {
@@ -312,6 +327,8 @@ public class PatternDefinition implements Iterable<Region> {
                             numPixelsOnCurrentLine = numPixelsOnLines.get(currentLineNum);
 
                         }
+
+                        numErrors++;
                     }
 
                     for (int i = 0; i < numPixelsOnCurrentLine; i++) {
@@ -320,18 +337,22 @@ public class PatternDefinition implements Iterable<Region> {
                         }
                     }
 
-	//				for(float pos = line.getX1(); pos <= line.getX2(); pos += laserSizeX)
+            //				for(float pos = line.getX1(); pos <= line.getX2(); pos += laserSizeX)
                     //					pixelLocations.add(new PixelLocation((xCoordOffset++), yCoord, 1));
-	//				System.out.println("" + line.getY());
-					//System.out.println("" + (xCoordOffset) + ", " + yCoord + "(" + numPixelsOnLine + ")");
+                    //				System.out.println("" + line.getY());
+                    //System.out.println("" + (xCoordOffset) + ", " + yCoord + "(" + numPixelsOnLine + ")");
                     currentLineNum++;
                 }
             }
-        //} catch (ArrayIndexOutOfBoundsException aiob) {
-         //   throw new ImzMLConversionException("Invalid Waters pattern file for this dataset");
-        //}
+            //} catch (ArrayIndexOutOfBoundsException aiob) {
+            //   throw new ImzMLConversionException("Invalid Waters pattern file for this dataset");
+            //}
 
-		//Collections.reverse(pixelLocations);
+            //Collections.reverse(pixelLocations);
+            
+            meanThreshold += this.meanThresholdIncrements;
+        }
+
         return pixelLocations.toArray(new PixelLocation[0]);
     }
 
