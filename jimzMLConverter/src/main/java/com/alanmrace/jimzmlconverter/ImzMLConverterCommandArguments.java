@@ -29,8 +29,8 @@ public class ImzMLConverterCommandArguments {
         @Parameter(names = {"--output", "-o"}, description = "Output filepath")
         protected String output;
         
-        @Parameter(names = {"--combine", "-c"}, description = "Combine all files into a single output file")
-        protected boolean combine;   
+        @Parameter(names = {"--combine", "-c"}, arity = 2, description = "Combine all files into a single output file with dimensions x, y")
+        protected List<Integer> combine;   
     }
     
     @Parameters(commandDescription = "Convert to imzML")

@@ -23,6 +23,7 @@ public class WatersRAWTomzMLConverter {
     
     private static final Logger logger = Logger.getLogger(WatersRAWTomzMLConverter.class.getName());
     
+    public static final String CONVERTER_NAME = "ProteoWizard";
     public static final String CONVERTER_FILENAME = "msconvert.exe";
     //public static final String CONVERTER_x64_LOCATION = "C:\\Program Files\\ProteoWizard";
     public static final String CONVERTER_LOCATION = "C:\\Program Files\\ProteoWizard";
@@ -80,22 +81,31 @@ public class WatersRAWTomzMLConverter {
         return mzMLFiles;
     }
     
-    public static String getCommand() {
-        File converterFolder = new File(CONVERTER_LOCATION);
-        
+    private static File[] getSubfolders(File converterFolder) {
         File[] subfolders = converterFolder.listFiles(new FilenameFilter() {
 
             @Override
             public boolean accept(File dir, String name) {
-                if(name.contains(name))
-                    return true;
-                
-                return false;
+                return name.contains(CONVERTER_NAME) && dir.isDirectory();
             }
         });
         
+        return subfolders;
+    }
+    
+    public static String getCommand() {
+        File converterFolder = new File(CONVERTER_LOCATION);
+        
+        File[] subfolders = getSubfolders(converterFolder);
+        
+        // Check the D drive
+        if(subfolders == null) {
+            converterFolder = new File(CONVERTER_LOCATION.replaceFirst("C", "D"));
+            subfolders = getSubfolders(converterFolder);
+        }
+        
         // Use the latest version of ProteoWizard available
-        if(subfolders.length > 0)
+        if(subfolders != null && subfolders.length > 0)
             converterFolder = subfolders[subfolders.length-1];
         
         
@@ -106,12 +116,12 @@ public class WatersRAWTomzMLConverter {
     public static void main(String[] args) throws IOException, ConversionException {
         //System.out.println(WatersRAWTomzMLConverter.class.getResource("/DAN.wiff"));
         
-        final String[] filePaths = {"D:\\Projects\\TSBSkinEquivalents\\2016_02_05_15x30umSkinImage_Adjusted.raw"};
+        final String[] filePaths = {"D:\\Ela\\2016_03_21_ela_chca_neg_image.raw"};
                             //"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw",
                             //"F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.raw",
                             //"F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.raw",
                             //"F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.raw"};
-        final String[] patternFiles = {"D:\\Projects\\TSBSkinEquivalents\\2016_02_05_15x30um_SkinImage_Adjusted.pat"};
+        final String[] patternFiles = {"D:\\Ela\\2016_03_21_ela_chca_neg_image.pat"};
         //{"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.pat",
         //                    "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.pat",
          //                   "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.pat",
@@ -127,17 +137,17 @@ public class WatersRAWTomzMLConverter {
                 @Override
                 public void run() {
                     try {
-//                        try {
-//                            File[] mzMLFiles = WatersRAWTomzMLConverter.convert(filePaths[index]);
-//                            
-//                            System.out.println("Conversion of " + filePaths[index] + " to mzML took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " s");
-//                        
-//                            for(File file : mzMLFiles) {
-//                                System.out.println("Found : " + file.getAbsolutePath());
-//                            }
-//                        } catch (IOException ex) {
-//                            Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
+                        try {
+                            File[] mzMLFiles = WatersRAWTomzMLConverter.convert(filePaths[index]);
+                            
+                            System.out.println("Conversion of " + filePaths[index] + " to mzML took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " s");
+                        
+                            for(File file : mzMLFiles) {
+                                System.out.println("Found : " + file.getAbsolutePath());
+                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                                                 
                         String[] inputFiles = {filePaths[index].replace(".raw", ".mzML")};//{mzMLFiles[0].getAbsolutePath()};
                         

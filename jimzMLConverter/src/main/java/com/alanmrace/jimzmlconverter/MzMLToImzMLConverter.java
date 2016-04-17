@@ -11,6 +11,7 @@ import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
 import com.alanmrace.jimzmlparser.exceptions.MzMLParseException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
+import com.alanmrace.jimzmlparser.mzML.CV;
 import com.alanmrace.jimzmlparser.mzML.CVParam;
 import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzML.FileContent;
@@ -86,6 +87,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
     protected void generateBaseImzML() {
         try {
 //	    System.out.println(Arrays.toString(inputFilenames));
+            
             MzML mzML = MzMLHeaderHandler.parsemzMLHeader(inputFilenames[0], false);
 	    //mzML.close();	    
 
@@ -114,6 +116,13 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         int maxY = y;
 
         int currentPixelLocation = 0;
+        
+        // Add in IMS cv if it doesn't already exist
+        CV imsCV = baseImzML.getCVList().getCV("IMS");
+        
+        if(imsCV == null) {
+            baseImzML.getCVList().addCV(new CV(CV.IMS_URI, "IMS", "IMS"));
+        }
 
         // Open the .ibd data stream
         DataOutputStream binaryDataStream;

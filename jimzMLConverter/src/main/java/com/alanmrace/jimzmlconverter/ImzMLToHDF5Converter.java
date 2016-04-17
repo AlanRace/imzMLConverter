@@ -6,10 +6,8 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
-import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

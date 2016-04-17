@@ -97,7 +97,7 @@ public abstract class ImzMLConverter implements Converter {
     }
 
     public void setOBO(OBO obo) {
-        this.obo = obo;
+        ImzMLConverter.obo = obo;
     }
 
     // Set the imzML structure that is used to determine the base
@@ -241,6 +241,12 @@ public abstract class ImzMLConverter implements Converter {
     public void convert() throws ConversionException {
         // Check if the baseimzML is null, if so then use the first (i)mzML file as the base
 //	if(baseImzML == null)
+        
+        // Checks
+        if(inputFilenames == null || inputFilenames.length < 1) {
+            throw new ConversionException("Not enough input files to convert, at least one must be supplied");
+        }
+        
         logger.log(Level.INFO, "Generating base imzML");
         
         generateBaseImzML();

@@ -32,13 +32,13 @@ public class PatternDefinition implements Iterable<Region> {
     // Regions
     private ArrayList<Region> regions;
 
-    private double meanThreshold = 1.01;
+    private double meanThreshold = 1.03;
     private double meanThresholdIncrements = 0.01;
 
     private int maxRepeats = 50;
     private int currentRepeat = 0;
 
-    private int errorThreshold = 1;
+    private int errorThreshold = Integer.MAX_VALUE;
 
     public PatternDefinition() {
         regions = new ArrayList<Region>();
@@ -209,6 +209,7 @@ public class PatternDefinition implements Iterable<Region> {
             System.out.println("Number of Lines in pattern file: " + numLines);
             System.out.println("Mean time delay: " + meanTimeDelay);
             System.out.println("Max time delay: " + maxTimeDelay);
+            System.out.println("Mean threshold: " + meanThreshold);
 
             for (int i = 0; i < chromatogramDiff.length; i++) {
                 if (chromatogramDiff[i] > meanTimeDelay * meanThreshold) // Was 1.0120

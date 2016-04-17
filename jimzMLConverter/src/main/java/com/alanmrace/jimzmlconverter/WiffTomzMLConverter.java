@@ -47,7 +47,7 @@ public class WiffTomzMLConverter {
             
         if(extention.equalsIgnoreCase("wiff")) {
             try {
-                String tempCommand = getCommand() + filepath + COMMAND_LINE + filepath.substring(0, filepath.lastIndexOf(".")) + ".mzML" + INDEX_COMMAND;
+                String tempCommand = getCommand() + "\"" + filepath + "\"" + COMMAND_LINE + "\"" +  filepath.substring(0, filepath.lastIndexOf(".")) + ".mzML\"" + INDEX_COMMAND;
                 
                 System.out.println(tempCommand);
                 Process process = Runtime.getRuntime().exec(tempCommand);
@@ -87,20 +87,20 @@ public class WiffTomzMLConverter {
     }
     
     public static String getCommand() {
-        String command;
+        String command = "\"";
         
         if(System.getProperty("os.arch").contains("64"))
-            command = CONVERTER_x64_LOCATION;
+            command += CONVERTER_x64_LOCATION;
         else
-            command = CONVERTER_x86_LOCATION;
+            command += CONVERTER_x86_LOCATION;
         
-        command += "\\" + CONVERTER_FILENAME + " WIFF ";
+        command += "\\" + CONVERTER_FILENAME + "\" WIFF ";
         
         return command;
     }
     
     public static void main(String args[]) throws IOException, ConversionException {
-        String folder = "F:\\Projects\\CRACK-IT";
+        String folder = "D:\\SLAM";
         
         File folderLocation = new File(folder);
         ArrayList<File> files = new ArrayList<File>(Arrays.asList(folderLocation.listFiles()));

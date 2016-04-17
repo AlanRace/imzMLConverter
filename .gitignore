@@ -7,3 +7,4 @@ jimzMLConverter/src/test/resources/2013_12_11_ResolutionAndMatrixTest_25um.pat
 *.raw/*
 jimzMLConverter/src/test/resources/*.raw*
 *.mzML
+*.class

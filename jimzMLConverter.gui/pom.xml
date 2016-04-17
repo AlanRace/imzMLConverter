@@ -16,7 +16,7 @@
 
     <organization>
         <!-- Used as the 'Vendor' for JNLP generation -->
-        <name>Your Organisation</name>
+        <name>Alan M. Race</name>
     </organization>
 
     <build>
@@ -34,7 +34,7 @@
                         </goals>
                         <configuration>
                             <excludeScope>system</excludeScope>
-                            <excludeGroupIds>junit,org.mockito,org.hamcrest</excludeGroupIds>
+                            <excludeGroupIds>junit,org.mockito,org.hamcrest,org.hdfgroup</excludeGroupIds>
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
                         </configuration>
                     </execution>
