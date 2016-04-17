@@ -29,6 +29,8 @@ public class ScreenManager extends StackPane {
 
     private final HashMap<String, Node> screens;
     private final HashMap<String, ManagedScreenController> screenControllers;
+    
+    private String currentScreenName;
     private Node currentScreen;
 
     private double fadeInTime;
@@ -66,6 +68,10 @@ public class ScreenManager extends StackPane {
 
     public ManagedScreenController getScreenController(String screenName) {
         return screenControllers.get(screenName);
+    }
+    
+    public String getCurrentScreenName() {
+        return currentScreenName;
     }
     
     public Node getCurrentScreen() {
@@ -173,6 +179,7 @@ public class ScreenManager extends StackPane {
             }
 
             currentScreen = screenToAdd;
+            currentScreenName = name;
 
             return true;
         } else {

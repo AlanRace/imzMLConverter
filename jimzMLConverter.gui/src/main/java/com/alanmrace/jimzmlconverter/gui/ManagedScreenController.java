@@ -12,7 +12,7 @@ import javafx.fxml.Initializable;
  * @author amr1
  */
 public abstract class ManagedScreenController  implements Initializable {
-    private ScreenManager manager;
+    protected ScreenManager manager;
     
     public void setScreenManager(ScreenManager manager) {
         this.manager = manager;

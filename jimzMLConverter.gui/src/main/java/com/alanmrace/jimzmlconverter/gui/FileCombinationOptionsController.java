@@ -9,17 +9,14 @@ package com.alanmrace.jimzmlconverter.gui;
 import com.alanmrace.jimzmlconverter.gui.ScreenManager.TransitionDirection;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
 
 /**
  * FXML Controller class
  *
  * @author amr1
  */
-public class FileCombinationOptionsController extends ManagedScreenController {
+public class FileCombinationOptionsController extends ManagedConverterScreenController {
 
     @FXML DescriptiveButton parallelButton;
     
@@ -32,10 +29,12 @@ public class FileCombinationOptionsController extends ManagedScreenController {
     
     @FXML
     public void backAction() {
-        getScreenManager().setScreen(MainApp.DRAG_AND_DROP_SCREEN, TransitionDirection.RIGHT_TO_LEFT);
+        //getScreenManager().setScreen(MainApp.DRAG_AND_DROP_SCREEN, TransitionDirection.RIGHT_TO_LEFT);
+        getScreenManager().goToPreviousScreen();
     }
     
     @FXML public void nextAction() {
-        // TODO: move onto next screen
+        //getScreenManager().setScreen(MainApp.WATERS_DETAILS_SCREEN);
+        getScreenManager().goToNextScreen();
     }
 }

@@ -37,6 +37,6 @@
     <DescriptiveButton fx:id="parallelButton" layoutX="100" layoutY="250" prefHeight="75" prefWidth="400" isOn="true" 
                        titleOn="Converting in parallel" titleOff="Converting one after another"
                        bodyOn="Processing in parallel uses more disk space to speed up the conversion process" bodyOff="Processing sequentially uses less disk space at the cost of speed"  />
-    <Button fx:id="nextButton" layoutX="50" layoutY="350" text="Back" onAction="#backAction" />
+    <Button fx:id="backButton" layoutX="50" layoutY="350" text="Back" onAction="#backAction" />
     <Button fx:id="nextButton" layoutX="500" layoutY="350" text="Next" onAction="#nextAction" />
 </AnchorPane>

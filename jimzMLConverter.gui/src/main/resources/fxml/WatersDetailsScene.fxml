@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import com.alanmrace.jimzmlconverter.gui.DescriptiveButton ?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" fx:controller="com.alanmrace.jimzmlconverter.gui.WatersDetailsSceneController">
+    <stylesheets>
+        <URL value="@/styles/detailsscene.css"/>
+        <URL value="@/styles/filecombinationoptions.css"/>
+    </stylesheets>
+    
+    <HBox alignment="CENTER" layoutY="20"  prefWidth="600">
+        <Label fx:id="filenameText" text="" textAlignment="CENTER" />
+    </HBox>
+    
+    <DescriptiveButton fx:id="maldiButton" layoutX="100" layoutY="75" prefHeight="75" prefWidth="175" isOn="true"
+                       titleOn="MALDI" titleOff="MALDI" onMouseClicked="#maldiButtonAction"
+                       bodyOn="" bodyOff="" />
+    <DescriptiveButton fx:id="desiButton" layoutX="325" layoutY="75" prefHeight="75" prefWidth="175" isOn="false"
+                       titleOn="DESI" titleOff="DESI"  onMouseClicked="#desiButtonAction"
+                       bodyOn="" bodyOff="" />
+    
+    <HBox fx:id="maldiHBox" alignment="CENTER" layoutY="200" prefWidth="600" visible="true" >
+        <Label text="Pattern file (*.pat)" layoutX="50" prefWidth="100"  textAlignment="LEFT" alignment="CENTER_LEFT"  />
+        <TextField fx:id="patternFilenameTextField" layoutX="200" prefWidth="200" text=""  />
+    </HBox>
+    
+    <HBox fx:id="desiHBox" alignment="CENTER" layoutY="200" prefWidth="600" visible="false" >
+        <GridPane alignment="center" hgap="10" vgap="10">
+            <Label text="Width" layoutX="100" prefWidth="50"  
+                GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <TextField fx:id="widthTextField" layoutX="200" prefWidth="50" text=""  
+                GridPane.columnIndex="1" GridPane.rowIndex="0"  />
+            
+            <Label text="Height" layoutX="100" prefWidth="50" 
+                GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <TextField fx:id="heightTextField" layoutX="200" prefWidth="50" text=""
+                GridPane.columnIndex="1" GridPane.rowIndex="1" />
+        </GridPane>
+    </HBox>
+    
+    <HBox alignment="CENTER" layoutY="300" prefWidth="600">
+        <Label text="Output filepath" layoutX="50" layoutY="300" prefWidth="100"  textAlignment="LEFT" alignment="CENTER_LEFT"  />
+        <TextField fx:id="outputFilenameTextField" layoutX="200" layoutY="300" prefWidth="200" text=""  />
+    </HBox>
+    
+    <Button fx:id="backButton" layoutX="50" layoutY="350" text="Back" onAction="#backAction" />
+    <Button fx:id="nextButton" layoutX="500" layoutY="350" text="Next" onAction="#nextAction" />
+</AnchorPane>

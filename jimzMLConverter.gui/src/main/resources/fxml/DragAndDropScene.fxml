@@ -13,7 +13,9 @@
         <URL value="@/styles/draganddropscene.css"/>
     </stylesheets>
     <HBox fx:id="fileListBox" layoutX="50" layoutY="120">
-        <ListView fx:id="fileListView" prefWidth="500" prefHeight="200"></ListView>
+        <ListView fx:id="fileListView" prefWidth="500" prefHeight="200">
+            <!-- onDragDetected="#fileListOnDragDetected" onDragOver="#fileListOnDragOver" onDragEntered="#fileListOnDragEntered" onDragExited="#fileListOnDragExited" onDragDropped="#fileListOnDragDropped" onDragDone="#fileListOnDragDone" -->
+        </ListView>
     </HBox>
     <HBox  fx:id="dropBox" layoutX="100" layoutY="100" onMouseClicked="#fileBoxClicked" onDragOver="#fileBoxDragOver" onDragDropped="#fileBoxDragDropped"  >
         <TextField fx:id="dropLocation" onMouseClicked="#fileBoxClicked"  onDragOver="#fileBoxDragOver" onDragDropped="#fileBoxDragDropped"  editable="false" alignment="CENTER"   minHeight="100" minWidth="400" disable="true" >Drop or click here!</TextField>  

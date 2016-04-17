@@ -19,6 +19,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
@@ -34,7 +35,7 @@ import javafx.util.Duration;
  *
  * @author amr1
  */
-public class DragAndDropSceneController extends ManagedScreenController {
+public class DragAndDropSceneController extends ManagedConverterScreenController {
 
     private static final Logger logger = Logger.getLogger(FXMLController.class.getName());
 
@@ -51,7 +52,7 @@ public class DragAndDropSceneController extends ManagedScreenController {
 
     @FXML
     ListView fileListView;
-    protected final static ObservableList<String> fileList = FXCollections.observableArrayList();
+    protected ObservableList<String> fileList;
 
     @FXML
     Button nextButton;
@@ -68,7 +69,8 @@ public class DragAndDropSceneController extends ManagedScreenController {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        fileListView.setItems(fileList);
+        fileListView.setCellFactory(param -> new DraggableListCell<String>());
+        fileListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     }
 
     public void setNextStage(Stage nextStage) {
@@ -76,7 +78,7 @@ public class DragAndDropSceneController extends ManagedScreenController {
     }
 
     @FXML
-    public void fileBoxDragOver(DragEvent event) {
+    protected void fileBoxDragOver(DragEvent event) {
         Dragboard db = event.getDragboard();
         if (db.hasFiles()) {
             event.acceptTransferModes(TransferMode.COPY);
@@ -85,10 +87,56 @@ public class DragAndDropSceneController extends ManagedScreenController {
         }
     }
 
+//    @FXML
+//    protected void fileListOnDragDetected(MouseEvent event) {
+//
+//        int index = fileListView.getSelectionModel().getSelectedIndex();
+//
+//        if (index < 0) {
+//            return;
+//        }
+//
+//        ObservableList<String> items = fileListView.getItems();
+//        
+//        Dragboard dragboard = fileListView.startDragAndDrop(TransferMode.MOVE);
+//        
+//        ClipboardContent content = new ClipboardContent();
+//        content.putString(fileListView.getSelectionModel().getSelectedItem().toString());
+//    //    dragboard.setDragView(new Image(("http://images.clipartpanda.com/test-clip-art-ncB88RjcA.png")));
+//        dragboard.setContent(content);
+//
+//        event.consume();
+//    }
+//
+//    @FXML
+//    protected void fileListOnDragOver(DragEvent event) {
+//    }
+//
+//    @FXML
+//    protected void fileListOnDragEntered(DragEvent event) {
+//
+//    }
+//
+//    @FXML
+//    protected void fileListOnDragExited(DragEvent event) {
+//
+//    }
+//
+//    @FXML
+//    protected void fileListOnDragDropped(DragEvent event) {
+//
+//    }
+//
+//    @FXML
+//    protected void fileListOnDragDone(DragEvent event) {
+//        event.consume();
+//    }
+
     @FXML
     private void nextAction() {
         // Move onto the next screen
-        getScreenManager().setScreen(MainApp.FILE_COMBINATION_SCREEN);
+        
+        getScreenManager().goToNextScreen();
     }
 
     private void performTransition() {
@@ -128,13 +176,22 @@ public class DragAndDropSceneController extends ManagedScreenController {
     public void fileBoxClicked(MouseEvent event) {
         File file = fileChooser.showOpenDialog(fileListBox.getScene().getWindow());
 
-        if (file != null) {
-            fileList.add(file.getAbsolutePath());
+        if (file != null) {            
+            getFileList().add(file.getAbsolutePath());
 
             if (!transitionOccured) {
                 performTransition();
             }
         }
+    }
+    
+    public ObservableList<String> getFileList() {
+        if(fileList == null) {
+            fileList = getScreenManager().getFileList();
+            fileListView.setItems(fileList);
+        }
+        
+        return fileList;
     }
 
     @FXML
@@ -142,14 +199,14 @@ public class DragAndDropSceneController extends ManagedScreenController {
         Dragboard db = event.getDragboard();
         boolean success = false;
 
-        if (db.hasFiles()) {
+        if (db.hasFiles()) {            
             success = true;
 
             String filePath = null;
             for (File file : db.getFiles()) {
                 filePath = file.getAbsolutePath();
 
-                fileList.add(filePath);
+                getFileList().add(filePath);
             }
 
             //fileListView.setItems(fileList);
