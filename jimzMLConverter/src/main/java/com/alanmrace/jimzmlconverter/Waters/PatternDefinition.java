@@ -287,6 +287,8 @@ public class PatternDefinition implements Iterable<Region> {
 
                                     int remainder = numPixelsOnLines.get(currentLineNum) - expectedNumberOfPixels - expectedNumberOfPixelsOnNextLine;
 
+                                    System.out.println("[" + currentLineNum + "] " + "Expected on next line: " + expectedNumberOfPixelsOnNextLine + ". Remainder: " + remainder);
+                                    
                                     currentLineNum -= 1;
 
                                     if (currentLineNum < 0) {
@@ -320,7 +322,7 @@ public class PatternDefinition implements Iterable<Region> {
                                             numPixelsOnLines.set(currentLineNum, expectedNumberOfPixels);
 
                                             System.out.println("[" + currentLineNum + "] " + "Changing next line from: " + numPixelsOnLines.get(currentLineNum + 1) + " to: " + (expectedNumberOfPixelsOnNextLine + remainder) + " (expected next line was: " + expectedNumberOfPixelsOnNextLine + ")");
-                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine + remainder);
+//                                            numPixelsOnLines.set(currentLineNum + 1, expectedNumberOfPixelsOnNextLine + remainder);
                                     }
                                 }
                             }

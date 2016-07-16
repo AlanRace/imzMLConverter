@@ -44,6 +44,7 @@ public class WatersRAWTomzMLConverterTest {
 
     /**
      * Test of convert method, of class WatersRAWTomzMLConverter.
+     * @throws java.lang.Exception
      */
     @Test
     public void testConvert() throws Exception {
@@ -82,6 +83,7 @@ public class WatersRAWTomzMLConverterTest {
 
     /**
      * Test of main method, of class WatersRAWTomzMLConverter.
+     * @throws java.lang.Exception
      */
     @Test
     @Ignore

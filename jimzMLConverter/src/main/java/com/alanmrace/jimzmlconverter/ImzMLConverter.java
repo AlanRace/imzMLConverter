@@ -18,6 +18,7 @@ import com.alanmrace.jimzmlparser.mzML.FileDescription;
 import com.alanmrace.jimzmlparser.mzML.LongCVParam;
 import com.alanmrace.jimzmlparser.mzML.ProcessingMethod;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupList;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupRef;
 import com.alanmrace.jimzmlparser.mzML.Scan;
 import com.alanmrace.jimzmlparser.mzML.ScanList;
@@ -144,7 +145,14 @@ public abstract class ImzMLConverter implements Converter {
 
     protected void generateReferenceableParamArrays() {
         // TODO: MAKE THIS BETTER - ONLY HERE TO PLEASE BIOMAP AND DATACUBE EXPLORER
-        rpgmzArray = baseImzML.getReferenceableParamGroupList().getReferenceableParamGroup("mzArray");
+        ReferenceableParamGroupList rpgList = baseImzML.getReferenceableParamGroupList(); 
+        
+        if(rpgList == null) {
+            rpgList = new ReferenceableParamGroupList(2);
+            baseImzML.setReferenceableParamGroupList(rpgList);
+        }
+        
+        rpgmzArray = baseImzML.getReferenceableParamGroupList().getReferenceableParamGroup("mzArray");            
 
         if (rpgmzArray == null) {
             rpgmzArray = new ReferenceableParamGroup("mzArray");
@@ -328,11 +336,11 @@ public abstract class ImzMLConverter implements Converter {
                 case BinaryDataArray.mzArrayID:
                     // Get the data as a double to populate the full m/z list
                     if (fullmzList != null) {
-                        double[] mzList = binaryDataArray.getDataAsDouble();
-
-                        for (int i = 0; i < mzList.length; i++) {
-                            fullmzList.add(mzList[i]);
-                        }
+//                        double[] mzList = binaryDataArray.getDataAsDouble();
+//
+//                        for (int i = 0; i < mzList.length; i++) {
+//                            fullmzList.add(mzList[i]);
+//                        }
                     }
 
                     dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);

@@ -12,6 +12,7 @@ import com.alanmrace.jimzmlparser.imzML.ImzML;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.FileContent;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzML.SourceFile;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
@@ -171,12 +172,22 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                     PixelLocation startCoordinate = this.imageStartCoordinate.get(fileIndex);
                     System.out.println(startCoordinate);
 
+                    String filenameID = "imzML" + currentmzMLFile++;
+                    
                     // TODO: Add all referenceParamGoups - TEMPORARY FIX
                     for (ReferenceableParamGroup rpg : currentimzML.getReferenceableParamGroupList()) {
+                        rpg.setID(filenameID + "_" + rpg.getID());
                         baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpg);
                     }
-
-                    String filenameID = "imzML" + currentmzMLFile++;
+                    
+                    if(fileIndex > 0) {
+                        // Add in all sourceFiles
+                        for(SourceFile sourceFile : currentimzML.getFileDescription().getSourceFileList()) {
+                            sourceFile.setID(filenameID + "_" + sourceFile.getID());
+                            baseImzML.getFileDescription().getSourceFileList().addSourceFile(sourceFile);
+                        }
+                    }
+                    
                     addSourceFileToImzML(baseImzML, imzMLFilename, filenameID, currentimzML.getFileDescription());
 
                     SpectrumList spectrumList = currentimzML.getRun().getSpectrumList();

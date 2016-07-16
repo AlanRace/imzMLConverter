@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 
 /**
  *
@@ -117,6 +118,15 @@ public class MzMLToImzMLConverterTest {
         System.out.println("convert");
         converter.convert();
         testImzMLOutput();
+    }
+    
+    @Ignore
+    @org.junit.Test
+    public void testConvertPixelPerFile() throws ConversionException {
+        String[] inputFilenames = new String[] {"D:\\SmithAndNephew\\SampleMean\\2016_04_28_SmithNephew_10.mzML", "D:\\SmithAndNephew\\SampleMean\\2016_04_28_SmithNephew_11.mzML"};
+        
+        MzMLToImzMLConverter converter = new MzMLToImzMLConverter("testttttt.imzML", inputFilenames, MzMLToImzMLConverter.FileStorage.pixelPerFile);
+        converter.convert();
     }
     
     @org.junit.Test

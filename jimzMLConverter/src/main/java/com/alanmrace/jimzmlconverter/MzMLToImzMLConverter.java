@@ -41,6 +41,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
     CVParam lineScanDirection;
 
+    protected int x, y;
+    
     public enum FileStorage {
 
         rowPerFile,
@@ -63,6 +65,13 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
     public void setLineScanDirection(CVParam lineScanDirection) {
         this.lineScanDirection = lineScanDirection;
     }
+    
+    public void setPixelPerFile(int x, int y) {
+        fileStorage = FileStorage.pixelPerFile;
+        
+        this.x = x;
+        this.y = y;
+    }
 
     @Override
     protected void generatePixelLocations() {
@@ -72,6 +81,19 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
         switch (fileStorage) {
             case pixelPerFile:
+                if(x == 0 || y == 0) {
+                    // Try and make the image square
+                    x = y = (int) Math.ceil(Math.sqrt(inputFilenames.length));
+                }
+                
+                pixelLocations = new PixelLocation[y*x];
+        
+                for(int i = 0; i < y; i++) {
+                    for(int j = 0; j < x; j++) {
+                        pixelLocations[i*x + j] = new PixelLocation(j + 1, i + 1, 1);
+                    }
+                }
+                
                 break;
             case oneFile:
                 break;

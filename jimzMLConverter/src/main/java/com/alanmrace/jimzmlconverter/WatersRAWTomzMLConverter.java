@@ -116,12 +116,12 @@ public class WatersRAWTomzMLConverter {
     public static void main(String[] args) throws IOException, ConversionException {
         //System.out.println(WatersRAWTomzMLConverter.class.getResource("/DAN.wiff"));
         
-        final String[] filePaths = {"D:\\Ela\\2016_03_21_ela_chca_neg_image.raw"};
+        final String[] filePaths = {"F:\\CRUK\\2016_07_08_CRUK_48T_s20.raw"};
                             //"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw",
                             //"F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.raw",
                             //"F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.raw",
                             //"F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.raw"};
-        final String[] patternFiles = {"D:\\Ela\\2016_03_21_ela_chca_neg_image.pat"};
+        final String[] patternFiles = {"F:\\CRUK\\2016_07_07_cruk_48T_s20.pat"};
         //{"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.pat",
         //                    "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.pat",
          //                   "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.pat",
@@ -148,8 +148,11 @@ public class WatersRAWTomzMLConverter {
                         } catch (IOException ex) {
                             Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                                                
+                               
                         String[] inputFiles = {filePaths[index].replace(".raw", ".mzML")};//{mzMLFiles[0].getAbsolutePath()};
+                        
+                        //String[] inputFiles = {"D:\\AstraZeneca\\John\\19_May_2016_MCTB1604_100mpk_30mins_DHB_MS_100um.mzML"}; //
+                        
                         
                         WatersMzMLToImzMLConverter converter = new WatersMzMLToImzMLConverter(filePaths[index], inputFiles, MzMLToImzMLConverter.FileStorage.oneFile);
                         
