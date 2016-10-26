@@ -12,7 +12,7 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <phase>test-compile</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
@@ -21,6 +21,8 @@
                             <excludeArtifactIds>junit,hamcrest-core</excludeArtifactIds>
                         </configuration>
                     </execution>
+                    
+                    
                     
 <!--                    <execution>
                         <id>copy-hdf5-dll</id>
@@ -50,6 +52,26 @@
                     </execution>-->
                 </executions>
             </plugin>
+            
+            <plugin>
+                <groupId>com.coderplus.maven.plugins</groupId>
+                <artifactId>copy-rename-maven-plugin</artifactId>
+                <version>1.0.1</version>
+                <executions>
+                    <execution>
+                        <id>rename-file</id>
+                        <phase>test-compile</phase>
+                        <goals>
+                            <goal>rename</goal>
+                        </goals>
+                        <configuration>
+                            <sourceFile>${project.build.directory}/lib/jhdf5-2.11.1.dll</sourceFile>
+                            <destinationFile>${project.build.directory}/lib/jhdf5.dll</destinationFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -104,7 +126,7 @@
             <groupId>org.hdfgroup</groupId>
             <artifactId>jarhdf5</artifactId>
             <version>2.11.1</version>
-<!--            <scope>system</scope>
+            <!--            <scope>system</scope>
             <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>-->
         </dependency>
         <dependency>
@@ -113,7 +135,7 @@
             <version>2.11.1</version>
             <scope>runtime</scope>
             <type>dll</type>
-<!--           <scope>system</scope>
+            <!--           <scope>system</scope>
             <type>dll</type>
             <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jhdf5.dll</systemPath>-->
         </dependency>

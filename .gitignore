@@ -8,3 +8,4 @@ jimzMLConverter/src/test/resources/2013_12_11_ResolutionAndMatrixTest_25um.pat
 jimzMLConverter/src/test/resources/*.raw*
 *.mzML
 *.class
+/jimz5Parser/target/

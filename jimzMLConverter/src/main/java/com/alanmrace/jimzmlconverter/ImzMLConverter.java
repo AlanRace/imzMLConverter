@@ -336,11 +336,11 @@ public abstract class ImzMLConverter implements Converter {
                 case BinaryDataArray.mzArrayID:
                     // Get the data as a double to populate the full m/z list
                     if (fullmzList != null) {
-//                        double[] mzList = binaryDataArray.getDataAsDouble();
-//
-//                        for (int i = 0; i < mzList.length; i++) {
-//                            fullmzList.add(mzList[i]);
-//                        }
+                        double[] mzList = binaryDataArray.getDataAsDouble();
+
+                        for (int i = 0; i < mzList.length; i++) {
+                            fullmzList.add(mzList[i]);
+                        }
                     }
 
                     dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);

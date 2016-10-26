@@ -17,7 +17,7 @@ import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
 public abstract class HDF5Converter implements Converter {
     private static final Logger logger = Logger.getLogger(HDF5Converter.class.getName());
     
-    protected int gzipCompression = 9;
+    protected int gzipCompression = 3;
     protected boolean shuffle = false;
 
     protected long[] chunkSizes;
