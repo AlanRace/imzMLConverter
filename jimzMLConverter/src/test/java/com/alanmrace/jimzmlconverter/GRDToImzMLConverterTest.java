@@ -175,7 +175,7 @@ public class GRDToImzMLConverterTest {
         ReferenceableParamGroupRef intensityArrayRef = null;
         DataOutputStream dos = null;
         SpectrumList spectrumList = null;
-        GRDToImzMLConverter.outputSpectrum(spectrumData, x, y, k0, sf, numxPixels, numyPixels, obo, mzArrayRef, intensityArrayRef, dos, spectrumList);
+        GRDToImzMLConverter.outputSpectrum(spectrumData, x, y, k0, sf, numxPixels, numyPixels, obo, mzArrayRef, intensityArrayRef, dos, 0, spectrumList);
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }

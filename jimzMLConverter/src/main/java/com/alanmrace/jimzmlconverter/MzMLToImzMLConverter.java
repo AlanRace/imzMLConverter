@@ -17,15 +17,19 @@ import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzML.FileContent;
 import com.alanmrace.jimzmlparser.mzML.MzML;
 import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzML.Scan;
 import com.alanmrace.jimzmlparser.mzML.ScanSettings;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
 import com.alanmrace.jimzmlparser.parser.MzMLHeaderHandler;
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -43,6 +47,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
     protected int x, y;
     
+    String coordsFilename;
+    
     public enum FileStorage {
 
         rowPerFile,
@@ -58,6 +64,10 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         lineScanDirection = new EmptyCVParam(getOBOTerm(ScanSettings.lineScanDirectionLeftRightID));
     }
 
+    public void setCoordsFile(String filename) {
+        this.coordsFilename = filename;
+    }
+    
     public void setFileStorage(FileStorage fileStorage) {
         this.fileStorage = fileStorage;
     }
@@ -79,30 +89,128 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
             generateBaseImzML();
         }
 
-        switch (fileStorage) {
-            case pixelPerFile:
-                if(x == 0 || y == 0) {
-                    // Try and make the image square
-                    x = y = (int) Math.ceil(Math.sqrt(inputFilenames.length));
-                }
-                
-                pixelLocations = new PixelLocation[y*x];
-        
-                for(int i = 0; i < y; i++) {
-                    for(int j = 0; j < x; j++) {
-                        pixelLocations[i*x + j] = new PixelLocation(j + 1, i + 1, 1);
+        if(coordsFilename != null) {
+            try {
+                pixelLocations = getPixelLocationFromTextFile(coordsFilename, getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList()));
+            } catch (ConversionException ex) {
+                Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            switch (fileStorage) {
+                case pixelPerFile:
+                    if(x == 0 || y == 0) {
+                        // Try and make the image square
+                        x = y = (int) Math.ceil(Math.sqrt(inputFilenames.length));
                     }
-                }
-                
-                break;
-            case oneFile:
-                break;
-            case rowPerFile:
-            default:
-//                pixelLocations = new PixelLocation[inputFilenames.length][baseImzML.getRun().getSpectrumList().size()];
-                break;
 
+                    int spectraPerPixel = getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList());
+
+                    pixelLocations = new PixelLocation[y*x*spectraPerPixel];
+
+                    for(int i = 0; i < y; i++) {
+                        for(int j = 0; j < x; j++) {
+                            for(int k = 0; k < spectraPerPixel; k++) {
+                                pixelLocations[i*x*spectraPerPixel + j*spectraPerPixel + k] = new PixelLocation(j + 1, i + 1, 1);
+                            }
+                        }
+                    }
+
+                    break;
+                case oneFile:
+                    break;
+                case rowPerFile:
+                default:
+    //                pixelLocations = new PixelLocation[inputFilenames.length][baseImzML.getRun().getSpectrumList().size()];
+                    break;
+
+            }   
         }
+    }
+    
+    public static PixelLocation[] getPixelLocationFromTextFile(String spectrumLocationFile, int numSpectraPerPixel) throws ConversionException {
+        int xPixels = 0;
+        int yPixels = 0;
+        int zPixels = 0;
+
+        ArrayList<PixelLocation> location = new ArrayList<>();
+
+        BufferedReader in;
+
+        try {
+            in = new BufferedReader(new FileReader(spectrumLocationFile));
+        } catch (FileNotFoundException e) {
+            throw new ConversionException("Could not find file " + spectrumLocationFile);
+        }
+
+        String line;
+
+        try {
+            while ((line = in.readLine()) != null) {
+                String[] coords;
+
+                if (line.contains(",")) {
+                    coords = line.split(",");
+                } else {
+                    coords = line.split("\\s+");
+                }
+
+                int curX = Integer.parseInt(coords[0]);
+                int curY = Integer.parseInt(coords[1]);
+                int curZ = 1;
+
+                if (coords.length == 3) {
+                    curZ = Integer.parseInt(coords[2]);
+                }
+
+                if (curX > xPixels) {
+                    xPixels = curX;
+                }
+                if (curY > yPixels) {
+                    yPixels = curY;
+                }
+                if (curZ > zPixels) {
+                    zPixels = curZ;
+                }
+
+                location.add(new PixelLocation(curX, curY, curZ));
+            }
+
+            in.close();
+        } catch (IOException e) {
+            throw new ConversionException("Error reading from " + spectrumLocationFile + ". " + e.getLocalizedMessage());
+        }
+        
+        PixelLocation[] spectrumLocation = new PixelLocation[location.size() * numSpectraPerPixel];
+
+        for (int i = 0; i < location.size(); i++) {
+            for(int j = 0; j < numSpectraPerPixel; j++)
+                spectrumLocation[i*numSpectraPerPixel + j] = location.get(i);
+        }
+
+        return spectrumLocation;
+    }
+
+    public static int getNumberSpectraPerPixel(SpectrumList spectrumList) {
+        // Check the number of spectra that have the same scan start time. This is
+        double originalScanStartTime = -1;
+        int numSpectraPerPixel = 0;
+
+        for (Spectrum spectrum : spectrumList) {
+            CVParam scanStartTimeParam = spectrum.getScanList().getScan(0).getCVParam(Scan.scanStartTimeID);
+            double scanStartTime = scanStartTimeParam.getValueAsDouble();
+
+            if (originalScanStartTime == -1) {
+                originalScanStartTime = scanStartTime;
+            }
+
+            if (originalScanStartTime == scanStartTime) {
+                numSpectraPerPixel++;
+            } else {
+                break;
+            }
+        }
+        
+        return numSpectraPerPixel;
     }
 
     @Override
@@ -224,6 +332,9 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                         int spectrumY = pixelLocations[currentPixelLocation].getY();
                         
                         currentPixelLocation++;
+                        
+                        if(spectrumX == -1 || spectrumY == -1)
+                            continue;
 
                         // TODO: REMOVE THIS FOR SPEED INCREASE WHEN WORKAROUND IS IMPLEMENTED
                         spectrum.getmzArray();

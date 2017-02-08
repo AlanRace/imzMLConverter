@@ -128,11 +128,14 @@ public class MainCommand {
                         logger.log(Level.INFO, "Detected Waters RAW file");
 
                         if (commandimzML.pixelLocationFile == null || commandimzML.pixelLocationFile.size() <= fileIndex
-                                || commandimzML.pixelLocationFile.get(fileIndex) == null || !commandimzML.pixelLocationFile.get(fileIndex).contains(".pat")) {
-                            logger.log(Level.SEVERE, "No .pat file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
+                                || commandimzML.pixelLocationFile.get(fileIndex) == null || !(commandimzML.pixelLocationFile.get(fileIndex).contains(".pat") || commandimzML.pixelLocationFile.get(fileIndex).contains(".txt"))) {
+                            logger.log(Level.SEVERE, "No .pat or .txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
                         } else {
                             try {
-                                mzMLFiles = WatersRAWTomzMLConverter.convert(fileName);
+                                if(outputPath == null)
+                                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName);
+                                else
+                                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, outputPath);
                             } catch (IOException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                             }
@@ -155,7 +158,11 @@ public class MainCommand {
                             }
 
                             converter = new WatersMzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
-                            ((WatersMzMLToImzMLConverter) converter).setPatternFile(commandimzML.pixelLocationFile.get(fileIndex));
+                            
+                            if(commandimzML.pixelLocationFile.get(fileIndex).contains(".pat"))
+                                ((WatersMzMLToImzMLConverter) converter).setPatternFile(commandimzML.pixelLocationFile.get(fileIndex));
+                            else
+                                ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
                         }
                     } else if (extension.equals("grd")) {
                         logger.log(Level.INFO, "Detected ION-TOF GRD file");
@@ -231,6 +238,7 @@ public class MainCommand {
                         }
                     }
 
+                    // Perform the conversion
                     if (inputFilenames != null && converter != null) {
                         try {
                             converter.convert();

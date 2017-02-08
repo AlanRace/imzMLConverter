@@ -31,6 +31,9 @@ public class ImzMLConverterCommandArguments {
         
         @Parameter(names = {"--combine", "-c"}, arity = 2, description = "Combine all files into a single output file with dimensions x, y")
         protected List<Integer> combine;   
+        
+        @Parameter(names = {"--split", "-s"}, description = "Split different scans out into separate output files")
+        protected Boolean split = false;   
     }
     
     @Parameters(commandDescription = "Convert to imzML")

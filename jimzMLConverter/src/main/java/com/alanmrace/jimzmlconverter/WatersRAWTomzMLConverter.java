@@ -32,6 +32,10 @@ public class WatersRAWTomzMLConverter {
 //    public static final String INDEX_COMMAND = " /index";
     
     public static File[] convert(String filepath) throws IOException {
+        return convert(filepath, (new File(filepath)).getParent());
+    }
+    
+    public static File[] convert(String filepath, String outputFilepath) throws IOException {
         final File fileToConvert = new File(filepath);
         File[] mzMLFiles = null;
         
@@ -42,7 +46,7 @@ public class WatersRAWTomzMLConverter {
             
         if(extention.equalsIgnoreCase("raw") && fileToConvert.isDirectory()) {
             try {
-                String tempCommand = getCommand() + " \"" + filepath + "\"" + COMMAND_LINE + " -o \"" + fileToConvert.getParent() + "\"";
+                String tempCommand = getCommand() + " \"" + filepath + "\"" + COMMAND_LINE + " -o \"" + outputFilepath + "\"";
                 
                 System.out.println(tempCommand);
                 Process process = Runtime.getRuntime().exec(tempCommand);
@@ -51,7 +55,7 @@ public class WatersRAWTomzMLConverter {
                 process.waitFor();
                 
                 // Locate the mzML files that were created
-                File directory = new File(fileToConvert.getParent());
+                File directory = new File(outputFilepath);
                 
                 // Get a list of mzML files that include part of the original filename
                 mzMLFiles = directory.listFiles(new FileFilter() {
@@ -109,7 +113,7 @@ public class WatersRAWTomzMLConverter {
             converterFolder = subfolders[subfolders.length-1];
         
         
-        return converterFolder.getAbsolutePath() + "\\" + CONVERTER_FILENAME;
+        return "\"" + converterFolder.getAbsolutePath() + "\\" + CONVERTER_FILENAME + "\"";
     }
     
     

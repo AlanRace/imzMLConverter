@@ -30,6 +30,8 @@ import com.alanmrace.jimzmlparser.mzML.ScanList;
 import com.alanmrace.jimzmlparser.mzML.ScanSettings;
 import com.alanmrace.jimzmlparser.mzML.ScanSettingsList;
 import com.alanmrace.jimzmlparser.mzML.SoftwareList;
+import com.alanmrace.jimzmlparser.mzML.SourceFile;
+import com.alanmrace.jimzmlparser.mzML.SourceFileList;
 import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import com.alanmrace.jimzmlparser.mzML.SpectrumList;
 import com.alanmrace.jimzmlparser.mzML.StringCVParam;
@@ -106,6 +108,33 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         FileDescription fileDescription = new FileDescription();
         baseImzML.setFileDescription(fileDescription);
 
+        SourceFileList sourceFileList = new SourceFileList(this.inputFilenames.length);
+        fileDescription.setSourceFileList(sourceFileList);
+        
+        // Add source files to the base imzML
+        for(int i = 0; i < inputFilenames.length; i++) {
+            ImzMLConverter.addSourceFileToImzML(baseImzML, inputFilenames[i], "grd" + i, fileDescription);
+            
+//            String fileName = inputFilenames[i];
+//            File file = new File(fileName);
+//            
+//            // If the file does not have a parent directory then 
+//            File parentFolder = file.getParentFile();
+//            String parentDirectory;
+//
+//            if(parentFolder == null)
+//                parentDirectory = "";
+//            else
+//                parentDirectory = parentFolder.toURI().toString();
+//
+//
+//            SourceFile sourceFile = new SourceFile("grd" + i, parentDirectory, file.getName());
+//            
+//            sourceFileList.addSourceFile(sourceFile);
+//            
+//            sourceFile.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000824")));
+        }
+        
         FileContent fileContent = new FileContent();
         fileDescription.setFileContent(fileContent);
 
@@ -346,6 +375,8 @@ public class GRDToImzMLConverter extends ImzMLConverter {
             dis = new FileInputStream(new File(outputFilename + ".ibdtmp"));
             dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outputFilename + ".ibd")));
 
+            long outputOffset = 0;
+            
             for (int y = 0; y < numPixelsY; y++) {
                 for (int x = 0; x < numPixelsX; x++) {
                     logger.log(Level.FINE, "Pixel ({0}, {1}) has {2} events", new Object[]{x, y, pixelEventsProcessed[y][x]});
@@ -372,9 +403,9 @@ public class GRDToImzMLConverter extends ImzMLConverter {
                         }
                     }
 
-                    outputSpectrum(spectrumData, x, y, k0, sf,
+                    outputOffset = outputSpectrum(spectrumData, x, y, k0, sf,
                             numPixelsX, numPixelsY, obo, mzArrayRef, intensityArrayRef,
-                            dos, spectrumList);
+                            dos, outputOffset, spectrumList);
                 }
             }
 
@@ -393,10 +424,10 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         } 
     }
 
-    public static void outputSpectrum(HashMap<Long, Integer> spectrumData, int x, int y, double k0, double sf,
+    public static long outputSpectrum(HashMap<Long, Integer> spectrumData, int x, int y, double k0, double sf,
             int numxPixels, int numyPixels,
             OBO obo, ReferenceableParamGroupRef mzArrayRef, ReferenceableParamGroupRef intensityArrayRef,
-            DataOutputStream dos, SpectrumList spectrumList) throws IOException {
+            DataOutputStream dos, long outputOffset, SpectrumList spectrumList) throws IOException {
         if (spectrumData != null) {
             SortedSet<Long> keys = new TreeSet<Long>(spectrumData.keySet());
 
@@ -461,7 +492,10 @@ public class GRDToImzMLConverter extends ImzMLConverter {
             // External data
             mzArray.addCVParam(new StringCVParam(obo.getTerm("IMS:1000101"), "true"));
             // External offset
-            mzArray.addCVParam(new LongCVParam(obo.getTerm("IMS:1000102"), dos.size()));
+            mzArray.addCVParam(new LongCVParam(obo.getTerm("IMS:1000102"), outputOffset));
+            
+            // Increment the offset by the encoded length
+            outputOffset += (mzs.length * 8);
 
             ByteBuffer buffer = ByteBuffer.allocate(8 * mzs.length);
             for (double mz : mzs) {
@@ -495,7 +529,10 @@ public class GRDToImzMLConverter extends ImzMLConverter {
             // External data
             intensityArray.addCVParam(new StringCVParam(obo.getTerm("IMS:1000101"), "true"));
             // External offset
-            intensityArray.addCVParam(new LongCVParam(obo.getTerm("IMS:1000102"), dos.size()));
+            intensityArray.addCVParam(new LongCVParam(obo.getTerm("IMS:1000102"), outputOffset));
+            
+            // Increment the offset by the encoded length
+            outputOffset += counts.length * 8;
 
             buffer.rewind();
             buffer.order(ByteOrder.BIG_ENDIAN);
@@ -512,6 +549,8 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 
             spectrumList.addSpectrum(spectrum);
         }
+        
+        return outputOffset;
     }
 
     public static void main(String[] args) {

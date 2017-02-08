@@ -194,12 +194,23 @@ public abstract class ImzMLConverter implements Converter {
     }
 
     protected abstract void generatePixelLocations();
+//    protected abstract int getNumberSpectraPerPixel(SpectrumList spectrumList);
 
     public static void addSourceFileToImzML(ImzML imzML, String filename, String filenameID, FileDescription currentFileDescription) {
         // Add the sourceFile to the sourceFileList
         File file = new File(filename);
+        
+        // If the file does not have a parent directory then 
+        File parentFolder = file.getParentFile();
+        String parentDirectory;
+        
+        if(parentFolder == null)
+            parentDirectory = "";
+        else
+            parentDirectory = parentFolder.toURI().toString();
+        
 
-        SourceFile sourceFile = new SourceFile(filenameID, file.getParentFile().toURI().toString(), file.getName());
+        SourceFile sourceFile = new SourceFile(filenameID, parentDirectory, file.getName());
 
         if (imzML.getFileDescription().getSourceFileList() == null) {
             imzML.getFileDescription().setSourceFileList(new SourceFileList(1));
