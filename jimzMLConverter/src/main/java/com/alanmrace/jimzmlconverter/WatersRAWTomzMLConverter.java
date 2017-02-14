@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -97,6 +98,32 @@ public class WatersRAWTomzMLConverter {
         return subfolders;
     }
     
+    private static class VersionDetails {
+        public int major;
+        public int minor;
+        public int patch;
+        
+        public VersionDetails(int major, int minor, int patch) {
+            this.major = major;
+            this.minor = minor;
+            this.patch = patch;
+        }
+        
+        @Override
+        public String toString() {
+            return "" + major + "." + minor + "." + patch;
+        }
+    }
+    
+    private static VersionDetails parseVersionDetails(String path) {
+        String[] pathSplit = path.split(CONVERTER_NAME);
+        String[] numbers = pathSplit[pathSplit.length-1].trim().split(Pattern.quote("."));
+        
+        VersionDetails details = new VersionDetails(Integer.parseInt(numbers[0]), Integer.parseInt(numbers[1]), Integer.parseInt(numbers[2]));
+        
+        return details;
+    }
+    
     public static String getCommand() {
         File converterFolder = new File(CONVERTER_LOCATION);
         
@@ -109,9 +136,23 @@ public class WatersRAWTomzMLConverter {
         }
         
         // Use the latest version of ProteoWizard available
-        if(subfolders != null && subfolders.length > 0)
-            converterFolder = subfolders[subfolders.length-1];
-        
+        if(subfolders != null && subfolders.length > 0) {
+            VersionDetails details = parseVersionDetails(subfolders[0].getName());
+            int newestID = 0;
+            
+            for(int i = 1; i < subfolders.length; i++) {
+                VersionDetails currentDetails = parseVersionDetails(subfolders[i].getName());
+                                
+                if(currentDetails.major > details.major || 
+                        (currentDetails.major >= details.major && currentDetails.minor > details.minor) ||
+                        (currentDetails.major >= details.major && currentDetails.minor >= details.minor && currentDetails.patch >= details.patch)) {
+                    details = currentDetails;
+                    newestID = i;
+                }
+            }
+            
+            converterFolder = subfolders[newestID];
+        }
         
         return "\"" + converterFolder.getAbsolutePath() + "\\" + CONVERTER_FILENAME + "\"";
     }
