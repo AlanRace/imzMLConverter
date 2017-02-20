@@ -425,6 +425,7 @@ public class ImzMLConverterTest {
      * Test of generateBaseImzML method, of class MzMLToImzMLConverter.
      */
     @org.junit.Test
+    @Ignore
     public void testMain() {
         System.out.println("main");
 	//String[] args = {MzMLToImzMLConverterTest.class.getResource(MzMLToImzMLConverterTest.TEST_RESOURCE).getPath()};

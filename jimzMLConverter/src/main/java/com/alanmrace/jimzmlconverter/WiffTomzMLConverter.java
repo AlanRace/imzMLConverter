@@ -7,11 +7,9 @@ package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.MzMLToImzMLConverter.FileStorage;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;

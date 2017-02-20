@@ -11,9 +11,9 @@ import com.alanmrace.jimzmlparser.mzML.Spectrum;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import ncsa.hdf.hdf5lib.H5;
-import ncsa.hdf.hdf5lib.HDF5Constants;
-import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
+import hdf.hdf5lib.H5;
+import hdf.hdf5lib.HDF5Constants;
+import hdf.hdf5lib.exceptions.HDF5Exception;
 
 /**
  *
@@ -57,7 +57,7 @@ public class ImzMLToHDF5Converter extends HDF5Converter {
                 throw new ConversionException("No full m/z list found. Files must be converted with imzMLConverter 2.0 or later for this feature.");
             }
 
-            int file_id = H5.H5Fcreate(outputFilename, HDF5Constants.H5F_ACC_TRUNC,
+            long file_id = H5.H5Fcreate(outputFilename, HDF5Constants.H5F_ACC_TRUNC,
                     HDF5Constants.H5P_DEFAULT, HDF5Constants.H5P_DEFAULT);
 
             // Store the m/z list in the container
@@ -117,7 +117,7 @@ public class ImzMLToHDF5Converter extends HDF5Converter {
 
 //            block = new long[] {1, dimensionSizes[1], 1};
             
-            int memspace = H5.H5Screate_simple(dimensionSizes.length, block, null);
+            long memspace = H5.H5Screate_simple(dimensionSizes.length, block, null);
 
 //            boolean addedmzList = false;
             int pixelIndex = 0;

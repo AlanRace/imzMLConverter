@@ -6,9 +6,10 @@
 package com.alanmrace.jimzmlconverter;
 
 import java.util.logging.Logger;
-import ncsa.hdf.hdf5lib.H5;
-import ncsa.hdf.hdf5lib.HDF5Constants;
-import ncsa.hdf.hdf5lib.exceptions.HDF5Exception;
+import hdf.hdf5lib.H5;
+import hdf.hdf5lib.HDF5Constants;
+import hdf.hdf5lib.exceptions.HDF5Exception;
+
 
 /**
  *
@@ -74,18 +75,18 @@ public abstract class HDF5Converter implements Converter {
      */
     protected class HDF5DataIDs {
 
-        int dacl_id = -1;
-        int dcpl_id = -1;
-        int dataset_id = -1;
-        int filespace_id = -1;
-        int file_id = -1;
+        long dacl_id = -1;
+        long dcpl_id = -1;
+        long dataset_id = -1;
+        long filespace_id = -1;
+        long file_id = -1;
     }
 
-    protected HDF5DataIDs createDataset(int fileID, String name, long[] dimensions, int type) throws HDF5Exception {
+    protected HDF5DataIDs createDataset(long fileID, String name, long[] dimensions, long type) throws HDF5Exception {
         return createDataset(fileID, name, dimensions, type, dimensions);
     }
 
-    protected HDF5DataIDs createDataset(int fileID, String name, long[] dimensions, int type, long[] chunkSize) throws HDF5Exception {
+    protected HDF5DataIDs createDataset(long fileID, String name, long[] dimensions, long type, long[] chunkSize) throws HDF5Exception {
         HDF5DataIDs dataset = new HDF5DataIDs();
         dataset.file_id = fileID;
 
@@ -123,7 +124,7 @@ public abstract class HDF5Converter implements Converter {
         H5.H5Sclose(dataset.filespace_id);
     }
 
-    protected void addDataset(int fileID, String name, double[] data) throws HDF5Exception {
+    protected void addDataset(long fileID, String name, double[] data) throws HDF5Exception {
         long[] datasetDimensions = {data.length};
 
         HDF5DataIDs dataset = createDataset(fileID, name, datasetDimensions, HDF5Constants.H5T_NATIVE_DOUBLE);
@@ -135,7 +136,7 @@ public abstract class HDF5Converter implements Converter {
         closeDataset(dataset);
     }
 
-    protected void addDataset(int fileID, String name, int[][] data) throws HDF5Exception {
+    protected void addDataset(long fileID, String name, int[][] data) throws HDF5Exception {
         long[] datasetDimensions = {data.length, data[0].length};
 
         HDF5DataIDs dataset = createDataset(fileID, name, datasetDimensions, HDF5Constants.H5T_NATIVE_INT);
@@ -147,15 +148,15 @@ public abstract class HDF5Converter implements Converter {
         closeDataset(dataset);
     }
 
-    protected void addmzList(int fileID, double[] mzList) throws HDF5Exception {
+    protected void addmzList(long fileID, double[] mzList) throws HDF5Exception {
         addDataset(fileID, "spectralChannels", mzList);
     }
 
-    protected void addOverviewImage(int fileID, double[] overviewImage) throws HDF5Exception {
+    protected void addOverviewImage(long fileID, double[] overviewImage) throws HDF5Exception {
         addDataset(fileID, "overviewImage", overviewImage);
     }
 
-    protected void addPixelList(int fileID, int[][] pixelList) throws NullPointerException, HDF5Exception {
+    protected void addPixelList(long fileID, int[][] pixelList) throws NullPointerException, HDF5Exception {
         addDataset(fileID, "pixelList", pixelList);
     }
 }

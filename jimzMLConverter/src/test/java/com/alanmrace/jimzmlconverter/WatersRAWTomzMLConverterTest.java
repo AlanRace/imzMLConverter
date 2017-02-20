@@ -47,6 +47,7 @@ public class WatersRAWTomzMLConverterTest {
      * @throws java.lang.Exception
      */
     @Test
+    @Ignore
     public void testConvert() throws Exception {
         assertNotNull("Test file missing", WatersRAWTomzMLConverterTest.class.getResource(TEST_RESOURCE));
         

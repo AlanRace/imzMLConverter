@@ -65,7 +65,7 @@
                             <goal>rename</goal>
                         </goals>
                         <configuration>
-                            <sourceFile>${project.build.directory}/lib/jhdf5-2.11.1.dll</sourceFile>
+                            <sourceFile>${project.build.directory}/lib/jhdf5-1.10.0.dll</sourceFile>
                             <destinationFile>${project.build.directory}/lib/jhdf5.dll</destinationFile>
                         </configuration>
                     </execution>
@@ -122,17 +122,21 @@
         </dependency>
         
         <!-- FOR HDF5 -->
+        <!-- mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\1.10.0\lib\hdf5_java.dll" -DgroupId=org.hdfgroup -DartifactId=jhdf5 -Dversion=1.10.0 -Dpackaging=dll        
+        -->
+        <!-- mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\1.10.0\lib\jarhdf5-1.10.0.jar" -DgroupId=org.hdfgroup -DartifactId=jarhdf5 -Dversion=1.10.0 -Dpackaging=jar
+        -->
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>jarhdf5</artifactId>
-            <version>2.11.1</version>
+            <version>1.10.0</version>
             <!--            <scope>system</scope>
             <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>jhdf5</artifactId>
-            <version>2.11.1</version>
+            <version>1.10.0</version>
             <scope>runtime</scope>
             <type>dll</type>
             <!--           <scope>system</scope>
