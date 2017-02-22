@@ -164,6 +164,46 @@ public class MainCommand {
                             else
                                 ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
                         }
+                    } else if(extension.equalsIgnoreCase("raw")) {
+                        logger.log(Level.INFO, "Detected Thermo RAW file");
+                        
+                        if (commandimzML.pixelLocationFile == null || commandimzML.pixelLocationFile.size() <= fileIndex
+                                || commandimzML.pixelLocationFile.get(fileIndex) == null || !(commandimzML.pixelLocationFile.get(fileIndex).contains(".udp") || commandimzML.pixelLocationFile.get(fileIndex).contains(".txt"))) {
+                            logger.log(Level.SEVERE, "No .udp or .txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
+                        } else {
+                            try {
+                                if(outputPath == null)
+                                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName);
+                                else
+                                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, outputPath);
+                            } catch (IOException ex) {
+                                logger.log(Level.SEVERE, null, ex);
+                            }
+
+                            if (outputPath == null || outputPath.isEmpty()) {
+                                outputPath = fileName.replace(".raw", "");
+                            }
+
+                            // TODO: Remove duplicate code (appears again above)
+                            if (mzMLFiles != null) {
+                                inputFilenames = new String[mzMLFiles.length];
+
+                                for (int i = 0; i < mzMLFiles.length; i++) {
+                                    inputFilenames[i] = mzMLFiles[i].getAbsolutePath();
+                                }
+                            }
+
+                            if (inputFilenames.length < 1) {
+                                throw new ConversionException("No mzML files found to continue conversion, do they exist in the raw data directory?");
+                            }
+
+                            converter = new ThermoMzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
+                            
+                            if(commandimzML.pixelLocationFile.get(fileIndex).contains(".pat"))
+                                ((ThermoMzMLToImzMLConverter) converter).setUDPFile(commandimzML.pixelLocationFile.get(fileIndex));
+                            else
+                                ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
+                        }
                     } else if (extension.equals("grd")) {
                         logger.log(Level.INFO, "Detected ION-TOF GRD file");
 
@@ -186,6 +226,22 @@ public class MainCommand {
                                 // Failed so just exit
                                 converter = null;
                             }
+                        }
+                    } else if(extension.equals("mzML")) {
+                        logger.log(Level.INFO, "Detected mzML file");
+                        
+                        if (commandimzML.pixelLocationFile == null || commandimzML.pixelLocationFile.size() <= fileIndex
+                                || commandimzML.pixelLocationFile.get(fileIndex) == null || !commandimzML.pixelLocationFile.get(fileIndex).contains(".txt")) {
+                            logger.log(Level.SEVERE, "No coordinates .txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
+                        } else {
+                            inputFilenames = new String[]{fileName};
+
+                            if (outputPath == null || outputPath.isEmpty()) {
+                                outputPath = fileName.replace(".mzML", "");
+                            }
+
+                            converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
+                            ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
                         }
                     } else if (extension.equals("imzML")) {
 
