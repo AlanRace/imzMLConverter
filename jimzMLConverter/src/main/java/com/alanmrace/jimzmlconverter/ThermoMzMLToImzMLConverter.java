@@ -6,19 +6,14 @@
 package com.alanmrace.jimzmlconverter;
 
 import static com.alanmrace.jimzmlconverter.MzMLToImzMLConverter.getNumberSpectraPerPixel;
-import com.alanmrace.jimzmlconverter.Waters.PatternDefinitionHandler;
+import com.alanmrace.jimzmlconverter.Thermo.UDPFile;
+import com.alanmrace.jimzmlconverter.Thermo.UDPFileHandler;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlparser.mzML.SpectrumList;
-import java.io.File;
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.SAXException;
 
 /**
  *
@@ -28,14 +23,14 @@ public class ThermoMzMLToImzMLConverter extends MzMLToImzMLConverter {
     
     private static final Logger logger = Logger.getLogger(WatersMzMLToImzMLConverter.class.getName());
     
-    String udpFile;
+    String udpFileLocation;
     
     public ThermoMzMLToImzMLConverter(String outputFilename, String[] inputFilenames, FileStorage fileStorage) {
         super(outputFilename, inputFilenames, fileStorage);
     }
     
-    public void setUDPFile(String udpFile) {
-        this.udpFile = udpFile;
+    public void setUDPFile(String udpFileLocation) {
+        this.udpFileLocation = udpFileLocation;
     }
     
     @Override
@@ -43,9 +38,10 @@ public class ThermoMzMLToImzMLConverter extends MzMLToImzMLConverter {
         if(coordsFilename != null) {
             super.generatePixelLocations();
         } else {
-            if(udpFile != null) {
+            if(udpFileLocation != null) {
                 try {
-                    this.pixelLocations = ThermoMzMLToImzMLConverter.getPixelLocationFromUDPFile(udpFile, baseImzML.getRun().getSpectrumList());
+                    System.out.println("BaseImzML: " + baseImzML);
+                    this.pixelLocations = ThermoMzMLToImzMLConverter.getPixelLocationFromUDPFile(udpFileLocation, baseImzML.getRun().getSpectrumList());
 
                     logger.log(Level.INFO, "Generated pixel locations from .pat file");
                 } catch (ConversionException ex) {
@@ -67,45 +63,28 @@ public class ThermoMzMLToImzMLConverter extends MzMLToImzMLConverter {
         }
     }
         
-    public static PixelLocation[] getPixelLocationFromUDPFile(String udpFile, SpectrumList oldSpectrumList) throws ConversionException {
-        int xPixels = 0;
-        int yPixels = 0;
-        int zPixels = 0;
-
-        // Convert mzML header information -> imzML
-        PatternDefinitionHandler handler = new PatternDefinitionHandler();
-        File patternF = new File(udpFile);
-
-        SAXParserFactory spf = SAXParserFactory.newInstance();
-        try {
-            //get a new instance of parser
-            SAXParser sp = spf.newSAXParser();
-
-            //parse the file and also register this class for call backs
-            sp.parse(patternF, handler);
-
-        } catch (SAXException | IOException | ParserConfigurationException ex) {
-            logger.log(Level.SEVERE, null, ex);
-        }
+    public static PixelLocation[] getPixelLocationFromUDPFile(String udpFileLocation, SpectrumList oldSpectrumList) throws ConversionException {
+        UDPFile udpFile = UDPFileHandler.parseUDPFile(udpFileLocation);
 
         int numSpectraPerPixel = getNumberSpectraPerPixel(oldSpectrumList);
         
         logger.log(Level.INFO, MessageFormat.format("Found {0} spectra per pixel", numSpectraPerPixel));
 
-        PixelLocation[] spectraLocations = handler.getPatternDefinition().convertToPixelLocations(oldSpectrumList, numSpectraPerPixel);
+        int maxX = udpFile.getMaxX();
+        int maxY = udpFile.getMaxY();
+        
+        PixelLocation[] spectraLocations = new PixelLocation[maxX*maxY*numSpectraPerPixel];
 
-        for (PixelLocation spectrumLocation : spectraLocations) {
-            if (spectrumLocation.getX() > xPixels) {
-                xPixels = spectrumLocation.getX();
-            }
-            if (spectrumLocation.getY() > yPixels) {
-                yPixels = spectrumLocation.getY();
-            }
-            if (spectrumLocation.getZ() > zPixels) {
-                zPixels = spectrumLocation.getZ();
+        for(int y = 0; y < maxY; y++) {
+            for(int x = 0; x < maxX; x++) {
+                int index = y * maxX*numSpectraPerPixel + x * numSpectraPerPixel;
+                
+                for(int n = 0; n < numSpectraPerPixel; n++) {
+                    spectraLocations[index + n] = new PixelLocation(x+1, y+1, 1);
+                }
             }
         }
-
+        
         return spectraLocations;
     }
 }

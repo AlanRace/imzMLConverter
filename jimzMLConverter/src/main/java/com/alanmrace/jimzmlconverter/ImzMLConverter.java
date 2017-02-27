@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -79,6 +80,7 @@ public abstract class ImzMLConverter implements Converter {
     protected ReferenceableParamGroup rpgmzArray;
     protected ReferenceableParamGroup rpgintensityArray;
 
+    protected boolean includeGlobalmzList;
     protected HashSet<Double> fullmzList;
 
     public ImzMLConverter(String outputFilename, String[] inputFilenames) {
@@ -97,6 +99,10 @@ public abstract class ImzMLConverter implements Converter {
         this.outputFilename = outputFilename;
     }
 
+    public void setIncludeGlobalmzList(boolean includeGlobalmzList) {
+        this.includeGlobalmzList = includeGlobalmzList;
+    }
+    
     public void setOBO(OBO obo) {
         ImzMLConverter.obo = obo;
     }
@@ -346,12 +352,15 @@ public abstract class ImzMLConverter implements Converter {
             switch (dataArrayType.getTerm().getID()) {
                 case BinaryDataArray.mzArrayID:
                     // Get the data as a double to populate the full m/z list
-                    if (fullmzList != null) {
+                    if (includeGlobalmzList && fullmzList != null) {
                         double[] mzList = binaryDataArray.getDataAsDouble();
-
+                        Double[] dmzList = new Double[mzList.length];
+                        
                         for (int i = 0; i < mzList.length; i++) {
-                            fullmzList.add(mzList[i]);
+                            dmzList[i] = mzList[i];
                         }
+                        
+                        fullmzList.addAll(Arrays.asList(dmzList));
                     }
 
                     dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);
@@ -405,19 +414,25 @@ public abstract class ImzMLConverter implements Converter {
         return offset;
     }
 
-    protected void outputFullmzList(DataOutputStream binaryDataStream, long offset) throws IOException {
+    protected long outputFullmzList(DataOutputStream binaryDataStream, long offset) throws IOException {
         //System.out.println("Full m/z list size: " + fullmzList.size());
+        
+        if(this.includeGlobalmzList) {
+            List<Double> sortedmzList = new ArrayList(fullmzList);
+            Collections.sort(sortedmzList);
 
-        List<Double> sortedmzList = new ArrayList(fullmzList);
-        Collections.sort(sortedmzList);
+            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalOffsetID), offset));
+            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalArrayLengthID), sortedmzList.size()));
+            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalEncodedLengthID), sortedmzList.size() * Double.BYTES));
 
-        imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalOffsetID), offset));
-        imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalArrayLengthID), sortedmzList.size()));
-        imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalEncodedLengthID), sortedmzList.size() * Double.BYTES));
-
-        for (Double mz : sortedmzList) {
-            binaryDataStream.writeDouble(mz);
+            for (Double mz : sortedmzList) {
+                binaryDataStream.writeDouble(mz);
+            }
+            
+            offset += sortedmzList.size() * Double.BYTES;
         }
+        
+        return offset;
     }
 
     protected static void setCoordinatesOfSpectrum(Spectrum spectrum, int x, int y) {

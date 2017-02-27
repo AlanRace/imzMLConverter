@@ -168,7 +168,7 @@ public class MainCommand {
                         logger.log(Level.INFO, "Detected Thermo RAW file");
                         
                         if (commandimzML.pixelLocationFile == null || commandimzML.pixelLocationFile.size() <= fileIndex
-                                || commandimzML.pixelLocationFile.get(fileIndex) == null || !(commandimzML.pixelLocationFile.get(fileIndex).contains(".udp") || commandimzML.pixelLocationFile.get(fileIndex).contains(".txt"))) {
+                                || commandimzML.pixelLocationFile.get(fileIndex) == null || !(commandimzML.pixelLocationFile.get(fileIndex).toLowerCase().contains(".udp") || commandimzML.pixelLocationFile.get(fileIndex).contains(".txt"))) {
                             logger.log(Level.SEVERE, "No .udp or .txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
                         } else {
                             try {
@@ -193,13 +193,13 @@ public class MainCommand {
                                 }
                             }
 
-                            if (inputFilenames.length < 1) {
+                            if (inputFilenames == null || inputFilenames.length < 1) {
                                 throw new ConversionException("No mzML files found to continue conversion, do they exist in the raw data directory?");
                             }
 
                             converter = new ThermoMzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
                             
-                            if(commandimzML.pixelLocationFile.get(fileIndex).contains(".pat"))
+                            if(commandimzML.pixelLocationFile.get(fileIndex).contains(".UDP"))
                                 ((ThermoMzMLToImzMLConverter) converter).setUDPFile(commandimzML.pixelLocationFile.get(fileIndex));
                             else
                                 ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
@@ -292,6 +292,10 @@ public class MainCommand {
                                 hdf5Converter.setChunkCacheSize(chunkCache);
                             }
                         }
+                    }
+                    
+                    if(jc.getParsedCommand().equals("imzML")) {
+                        ((ImzMLConverter)converter).setIncludeGlobalmzList(commonCommands.includeGlobalmzList);
                     }
 
                     // Perform the conversion

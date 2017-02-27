@@ -45,7 +45,7 @@ public class WatersRAWTomzMLConverter {
         if(filepath.lastIndexOf(".") != -1 && filepath.lastIndexOf(".") != 0)
             extention = filepath.substring(filepath.lastIndexOf(".")+1);
             
-        if(extention.equalsIgnoreCase("raw") && fileToConvert.isDirectory()) {
+        if(extention.equalsIgnoreCase("raw")) { // && fileToConvert.isDirectory()) {
             try {
                 String tempCommand = getCommand() + " \"" + filepath + "\"" + COMMAND_LINE + " -o \"" + outputFilepath + "\"";
                 
@@ -64,7 +64,7 @@ public class WatersRAWTomzMLConverter {
                     public boolean accept(File pathname) {
                         String name = pathname.getName();
                         
-                        return name.contains(fileToConvert.getName().replace(".raw", "")) && name.endsWith(".mzML");
+                        return name.contains(fileToConvert.getName().replace(".raw", "").replace("RAW", "")) && name.endsWith(".mzML");
                     }
                 });
                 

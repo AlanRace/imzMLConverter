@@ -103,5 +103,23 @@ public class UDPFile {
     String pcName;
     String pcip;
     
+    public int getMaxX() {
+        return maxX;
+    }
     
+    public int getMaxY() {
+        return maxY;
+    }
+    
+    public int getResolutionX() {
+        return resolutionX;
+    }
+    
+    public int getResolutionY() {
+        return resolutionY;
+    }
+    
+    public String getDataPath() {
+        return dataPath;
+    }
 }

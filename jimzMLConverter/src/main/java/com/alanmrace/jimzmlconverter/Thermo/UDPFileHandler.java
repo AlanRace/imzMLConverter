@@ -5,13 +5,19 @@
  */
 package com.alanmrace.jimzmlconverter.Thermo;
 
+import com.alanmrace.jimzmlconverter.Waters.PatternDefinition;
 import com.alanmrace.jimzmlconverter.Waters.PatternDefinitionHandler;
+import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -42,6 +48,8 @@ public class UDPFileHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        stringBuffer.setLength(0);
+        
         switch(qName) {
             case "StartTime":
             case "EndTime":
@@ -49,7 +57,6 @@ public class UDPFileHandler extends DefaultHandler {
             case "SampleInLabDate":
             case "SampleMatrixAppDate":
                 processingDate = true;
-                stringBuffer.setLength(0);
                 break;
             case "SpecOrigin":
             case "ScanScenario":
@@ -92,7 +99,6 @@ public class UDPFileHandler extends DefaultHandler {
             case "HighMass":
             case "SampleNo":
                 processingInt = true;
-                stringBuffer.setLength(0);
                 break;
         }
     }
@@ -280,89 +286,114 @@ public class UDPFileHandler extends DefaultHandler {
             
             processingInt = false;
         } else {
+            String value = stringBuffer.toString().trim();
+            
             switch (qName) {
                 case "DataPath":
-                    udpFile.dataPath = stringBuffer.toString();
+                    udpFile.dataPath = value;
                     break;
                 case "Operator":
-                    udpFile.operator = stringBuffer.toString();
+                    udpFile.operator = value;
                     break;
                 case "LastUser":
-                    udpFile.lastUser = stringBuffer.toString();
+                    udpFile.lastUser = value;
                     break;
                 case "LastModifier":
-                    udpFile.lastModifier = stringBuffer.toString();
+                    udpFile.lastModifier = value;
                     break;
                 case "Machine":
-                    udpFile.machine = stringBuffer.toString();
+                    udpFile.machine = value;
                     break;
                 case "Static_Attenuator":
-                    udpFile.staticAttenuator = stringBuffer.toString();
+                    udpFile.staticAttenuator = value;
                     break;
                 case "Tune_filename":
-                    udpFile.tuneFilename = stringBuffer.toString();
+                    udpFile.tuneFilename = value;
                     break;
                 case "Auxiliary_1":
-                    udpFile.auxiliary1 = stringBuffer.toString();
+                    udpFile.auxiliary1 = value;
                     break;
                 case "Auxiliary_2":
-                    udpFile.auxiliary2 = stringBuffer.toString();
+                    udpFile.auxiliary2 = value;
                     break;
                 case "Auxiliary_3":
-                    udpFile.auxiliary3 = stringBuffer.toString();
+                    udpFile.auxiliary3 = value;
                     break;
                 case "Commentary_1":
-                    udpFile.commentary1 = stringBuffer.toString();
+                    udpFile.commentary1 = value;
                     break;
                 case "Commentary_2":
-                    udpFile.commentary2 = stringBuffer.toString();
+                    udpFile.commentary2 = value;
                     break;
                 case "UserName":
-                    udpFile.userName = stringBuffer.toString();
+                    udpFile.userName = value;
                     break;
                 case "UserFunction":
-                    udpFile.userFunction = stringBuffer.toString();
+                    udpFile.userFunction = value;
                     break;
                 case "SampleID":
-                    udpFile.sampleID = stringBuffer.toString();
+                    udpFile.sampleID = value;
                     break;
                 case "SampleOrigin":
-                    udpFile.sampleOrigin = stringBuffer.toString();
+                    udpFile.sampleOrigin = value;
                     break;
                 case "SampleSpecies":
-                    udpFile.sampleSpecies = stringBuffer.toString();
+                    udpFile.sampleSpecies = value;
                     break;
                 case "SampleTissueType":
-                    udpFile.sampleTissueType = stringBuffer.toString();
+                    udpFile.sampleTissueType = value;
                     break;
                 case "SampleStoring":
-                    udpFile.sampleStoring = stringBuffer.toString();
+                    udpFile.sampleStoring = value;
                     break;
                 case "SampleMatrix":
-                    udpFile.sampleMatrix = stringBuffer.toString();
+                    udpFile.sampleMatrix = value;
                     break;
                 case "SampleAddInfos":
-                    udpFile.sampleAddInfos = stringBuffer.toString();
+                    udpFile.sampleAddInfos = value;
                     break;
                 case "MCPVersion":
-                    udpFile.mcpVersion = stringBuffer.toString();
+                    udpFile.mcpVersion = value;
                     break;
                 case "MCPTitle":
-                    udpFile.mcpTitle = stringBuffer.toString();
+                    udpFile.mcpTitle = value;
                     break;
                 case "OSVersion":
-                    udpFile.osVersion = stringBuffer.toString();
+                    udpFile.osVersion = value;
                     break;
                 case "OSTitle":
-                    udpFile.osTitle = stringBuffer.toString();
+                    udpFile.osTitle = value;
                     break;
                 case "PCName":
-                    udpFile.pcName = stringBuffer.toString();
+                    udpFile.pcName = value;
                     break;
                 case "PCIP":
-                    udpFile.pcip = stringBuffer.toString();
+                    udpFile.pcip = value;
                     break;
             }
         }
+    }
+    
+    public UDPFile getUDPFile() {
+        return udpFile;
+    }
+
+    public static UDPFile parseUDPFile(String udpFile) {
+        UDPFileHandler handler = new UDPFileHandler();
+        File patternF = new File(udpFile);
+
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        try {
+            //get a new instance of parser
+            SAXParser sp = spf.newSAXParser();
+
+            //parse the file and also register this class for call backs
+            sp.parse(patternF, handler);
+
+        } catch (SAXException | IOException | ParserConfigurationException ex) {
+            logger.log(Level.SEVERE, null, ex);
+        }
+
+        return handler.udpFile;
     }
 }

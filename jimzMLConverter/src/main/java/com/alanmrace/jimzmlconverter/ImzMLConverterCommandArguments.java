@@ -34,6 +34,9 @@ public class ImzMLConverterCommandArguments {
         
         @Parameter(names = {"--split", "-s"}, description = "Split different scans out into separate output files")
         protected Boolean split = false;   
+        
+        @Parameter(names = {"--include-global-mz-list"}, description = "Calculate and include a global m/z list within the output format")
+        protected Boolean includeGlobalmzList = true;
     }
     
     @Parameters(commandDescription = "Convert to imzML")
