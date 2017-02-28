@@ -414,9 +414,7 @@ public abstract class ImzMLConverter implements Converter {
         return offset;
     }
 
-    protected long outputFullmzList(DataOutputStream binaryDataStream, long offset) throws IOException {
-        //System.out.println("Full m/z list size: " + fullmzList.size());
-        
+    protected long outputFullmzList(DataOutputStream binaryDataStream, long offset) throws IOException {    
         if(this.includeGlobalmzList) {
             List<Double> sortedmzList = new ArrayList(fullmzList);
             Collections.sort(sortedmzList);
