@@ -144,7 +144,7 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         ReferenceableParamGroup mzArrayGroup = new ReferenceableParamGroup();
         rpgl.addReferenceableParamGroup(mzArrayGroup);
         // m/z array
-        mzArrayGroup.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000514")));
+        mzArrayGroup.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000514"), obo.getTerm("MS:1000040")));
         // 64-bit float
         mzArrayGroup.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000523")));
         // no compression
@@ -154,7 +154,7 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         ReferenceableParamGroup intensityArrayGroup = new ReferenceableParamGroup();
         rpgl.addReferenceableParamGroup(intensityArrayGroup);
         // intensity array
-        intensityArrayGroup.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000515")));
+        intensityArrayGroup.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000515"), obo.getTerm("MS:1000131")));
         // 64-bit float
         intensityArrayGroup.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000523")));
         // no compression

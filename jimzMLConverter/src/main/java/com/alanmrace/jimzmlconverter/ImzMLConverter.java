@@ -163,7 +163,7 @@ public abstract class ImzMLConverter implements Converter {
         if (rpgmzArray == null) {
             rpgmzArray = new ReferenceableParamGroup("mzArray");
 
-            rpgmzArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.mzArrayID), ""));
+            rpgmzArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.mzArrayID), getOBOTerm(BinaryDataArray.mzArrayUnitsID)));
             rpgmzArray.addCVParam(mzArrayDataType);
 
             baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpgmzArray);
@@ -183,7 +183,7 @@ public abstract class ImzMLConverter implements Converter {
         if (rpgintensityArray == null) {
             rpgintensityArray = new ReferenceableParamGroup("intensityArray");
 
-            rpgintensityArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.intensityArrayID), ""));
+            rpgintensityArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.intensityArrayID), getOBOTerm(BinaryDataArray.intensityArrayUnitsNumberOfCountsID)));
             rpgintensityArray.addCVParam(intensityArrayDataType);
 
             baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpgintensityArray);
