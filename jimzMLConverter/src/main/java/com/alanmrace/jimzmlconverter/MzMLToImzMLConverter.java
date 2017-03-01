@@ -260,6 +260,11 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         try {
             binaryDataStream = new DataOutputStream(new FileOutputStream(outputFilename + ".ibd"));
 
+            // Default to 'Processed' data
+            baseImzML.getFileDescription().getFileContent().removeChildOfCVParam(FileContent.binaryTypeID);
+            baseImzML.getFileDescription().getFileContent().addCVParam(new EmptyCVParam(getOBOTerm(FileContent.binaryTypeProcessedID)));
+
+            
             String uuid = UUID.randomUUID().toString().replace("-", "");
             System.out.println(uuid);
 
