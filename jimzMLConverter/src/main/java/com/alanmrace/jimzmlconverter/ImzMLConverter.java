@@ -6,30 +6,29 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
-import com.alanmrace.jimzmlparser.imzML.PixelLocation;
-import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
-import com.alanmrace.jimzmlparser.mzML.BinaryDataArrayList;
-import com.alanmrace.jimzmlparser.mzML.CVParam;
-import com.alanmrace.jimzmlparser.mzML.ChromatogramList;
-import com.alanmrace.jimzmlparser.mzML.DataProcessing;
-import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
-import com.alanmrace.jimzmlparser.mzML.FileDescription;
-import com.alanmrace.jimzmlparser.mzML.LongCVParam;
-import com.alanmrace.jimzmlparser.mzML.ProcessingMethod;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupList;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupRef;
-import com.alanmrace.jimzmlparser.mzML.Scan;
-import com.alanmrace.jimzmlparser.mzML.ScanList;
-import com.alanmrace.jimzmlparser.mzML.ScanSettings;
-import com.alanmrace.jimzmlparser.mzML.ScanSettingsList;
-import com.alanmrace.jimzmlparser.mzML.Software;
-import com.alanmrace.jimzmlparser.mzML.SourceFile;
-import com.alanmrace.jimzmlparser.mzML.SourceFileList;
-import com.alanmrace.jimzmlparser.mzML.Spectrum;
-import com.alanmrace.jimzmlparser.mzML.SpectrumList;
-import com.alanmrace.jimzmlparser.mzML.StringCVParam;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
+import com.alanmrace.jimzmlparser.imzml.PixelLocation;
+import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
+import com.alanmrace.jimzmlparser.mzml.BinaryDataArrayList;
+import com.alanmrace.jimzmlparser.mzml.CVParam;
+import com.alanmrace.jimzmlparser.mzml.ChromatogramList;
+import com.alanmrace.jimzmlparser.mzml.DataProcessing;
+import com.alanmrace.jimzmlparser.mzml.EmptyCVParam;
+import com.alanmrace.jimzmlparser.mzml.FileDescription;
+import com.alanmrace.jimzmlparser.mzml.LongCVParam;
+import com.alanmrace.jimzmlparser.mzml.ProcessingMethod;
+import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroupList;
+import com.alanmrace.jimzmlparser.mzml.Scan;
+import com.alanmrace.jimzmlparser.mzml.ScanList;
+import com.alanmrace.jimzmlparser.mzml.ScanSettings;
+import com.alanmrace.jimzmlparser.mzml.ScanSettingsList;
+import com.alanmrace.jimzmlparser.mzml.Software;
+import com.alanmrace.jimzmlparser.mzml.SourceFile;
+import com.alanmrace.jimzmlparser.mzml.SourceFileList;
+import com.alanmrace.jimzmlparser.mzml.Spectrum;
+import com.alanmrace.jimzmlparser.mzml.SpectrumList;
+import com.alanmrace.jimzmlparser.mzml.StringCVParam;
 import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.obo.OBOTerm;
 import java.io.DataInputStream;
@@ -41,7 +40,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -295,7 +293,7 @@ public abstract class ImzMLConverter implements Converter {
 
         // Add processing description to DataProcessing list
         DataProcessing conversionToImzML = new DataProcessing("conversionToImzML");
-        conversionToImzML.addProcessingMethod(new ProcessingMethod(1, imzMLConverter));
+        conversionToImzML.addProcessingMethod(new ProcessingMethod(imzMLConverter));
         conversionToImzML.getProcessingMethod(0).addCVParam(new StringCVParam(getOBOTerm(ProcessingMethod.fileFormatConversionID), getConversionDescription()));
         conversionToImzML.getProcessingMethod(0).setSoftwareRef(imzMLConverter);
 
@@ -331,86 +329,89 @@ public abstract class ImzMLConverter implements Converter {
     }
 
     protected long copySpectrumToImzML(ImzML imzML, Spectrum spectrum, DataOutputStream binaryDataStream, long offset) throws IOException {
-        long prevOffset = offset;
-
-        imzML.getRun().getSpectrumList().addSpectrum(spectrum);
-
-        // Copy over data to .ibd stream if any
-        BinaryDataArrayList binaryDataArrayList = spectrum.getBinaryDataArrayList();
-
-        if (binaryDataArrayList == null) {
-            binaryDataArrayList = createDefaultBinaryDataArrayList();
-            spectrum.setBinaryDataArrayList(binaryDataArrayList);
-        }
-
-        for (BinaryDataArray binaryDataArray : binaryDataArrayList) {
-            byte[] dataToWrite = binaryDataArray.getDataAsByte();
-            CVParam dataArrayType = binaryDataArray.getDataArrayType();
-
-            CVParam dataType;
-
-            switch (dataArrayType.getTerm().getID()) {
-                case BinaryDataArray.mzArrayID:
-                    // Get the data as a double to populate the full m/z list
-                    if (includeGlobalmzList && fullmzList != null) {
-                        double[] mzList = binaryDataArray.getDataAsDouble();
-                        Double[] dmzList = new Double[mzList.length];
-                        
-                        for (int i = 0; i < mzList.length; i++) {
-                            dmzList[i] = mzList[i];
-                        }
-                        
-                        fullmzList.addAll(Arrays.asList(dmzList));
-                    }
-
-                    dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);
-
-                    binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
-                    binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
-
-                    dataType = mzArrayDataType;
-                    break;
-                case BinaryDataArray.intensityArrayID:
-                    dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.intensityArrayDataType);
-
-                    binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
-                    binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
-
-                    dataType = intensityArrayDataType;
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Unsupported dataArrayType: " + dataArrayType);
-            }
-
-            // Compress if necessary
-            dataToWrite = BinaryDataArray.compress(dataToWrite, this.compressionType);
-
-            // Write out data 
-            if (dataToWrite != null) {
-                binaryDataStream.write(dataToWrite);
-                offset += dataToWrite.length;
-            }
-
-            // Make sure that any previous settings are removed
-            binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
-            binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
-
-            // Add binary data values to cvParams
-            binaryDataArray.removeCVParam(BinaryDataArray.externalEncodedLengthID);
-            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalEncodedLengthID), (offset - prevOffset)));
-
-            binaryDataArray.removeCVParam(BinaryDataArray.externalDataID);
-            binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalDataID), "true"));
-
-            binaryDataArray.removeCVParam(BinaryDataArray.externalOffsetID);
-            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalOffsetID), prevOffset));
-
-            binaryDataArray.removeCVParam(BinaryDataArray.externalArrayLengthID);
-            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalArrayLengthID), dataToWrite.length / BinaryDataArray.getDataTypeInBytes(dataType)));
-
-            prevOffset = offset;
-        }
-
+//        long prevOffset = offset;
+//
+//        imzML.getRun().getSpectrumList().addSpectrum(spectrum);
+//
+//        // Copy over data to .ibd stream if any
+//        BinaryDataArrayList binaryDataArrayList = spectrum.getBinaryDataArrayList();
+//
+//        if (binaryDataArrayList == null) {
+//            binaryDataArrayList = createDefaultBinaryDataArrayList();
+//            spectrum.setBinaryDataArrayList(binaryDataArrayList);
+//        }
+//
+//        for (BinaryDataArray binaryDataArray : binaryDataArrayList) {
+//            byte[] dataToWrite = binaryDataArray.getDataAsByte();
+//            CVParam dataArrayType = binaryDataArray.getDataArrayType();
+//
+//            CVParam dataType;
+//
+//            switch (dataArrayType.getTerm().getID()) {
+//                case BinaryDataArray.mzArrayID:
+//                    // Get the data as a double to populate the full m/z list
+//                    if (includeGlobalmzList && fullmzList != null) {
+//                        double[] mzList = binaryDataArray.getDataAsDouble();
+//                        
+//                        if(mzList != null) {
+//                            Double[] dmzList = new Double[mzList.length];
+//
+//                            for (int i = 0; i < mzList.length; i++) {
+//                                dmzList[i] = mzList[i];
+//                            }
+//
+//                            fullmzList.addAll(Arrays.asList(dmzList));
+//                        }
+//                    }
+//
+//                    dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.mzArrayDataType);
+//
+//                    binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
+//                    binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
+//
+//                    dataType = mzArrayDataType;
+//                    break;
+//                case BinaryDataArray.intensityArrayID:
+//                    dataToWrite = BinaryDataArray.convertDataType(dataToWrite, binaryDataArray.getDataType(), this.intensityArrayDataType);
+//
+//                    binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
+//                    binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
+//
+//                    dataType = intensityArrayDataType;
+//                    break;
+//                default:
+//                    throw new UnsupportedOperationException("Unsupported dataArrayType: " + dataArrayType);
+//            }
+//
+//            // Compress if necessary
+//            dataToWrite = BinaryDataArray.compress(dataToWrite, this.compressionType);
+//
+//            // Write out data 
+//            if (dataToWrite != null) {
+//                binaryDataStream.write(dataToWrite);
+//                offset += dataToWrite.length;
+//            }
+//
+//            // Make sure that any previous settings are removed
+//            binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
+//            binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
+//
+//            // Add binary data values to cvParams
+//            binaryDataArray.removeCVParam(BinaryDataArray.externalEncodedLengthID);
+//            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalEncodedLengthID), (offset - prevOffset)));
+//
+//            binaryDataArray.removeCVParam(BinaryDataArray.externalDataID);
+//            binaryDataArray.addCVParam(new StringCVParam(getOBOTerm(BinaryDataArray.externalDataID), "true"));
+//
+//            binaryDataArray.removeCVParam(BinaryDataArray.externalOffsetID);
+//            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalOffsetID), prevOffset));
+//
+//            binaryDataArray.removeCVParam(BinaryDataArray.externalArrayLengthID);
+//            binaryDataArray.addCVParam(new LongCVParam(getOBOTerm(BinaryDataArray.externalArrayLengthID), dataToWrite.length / BinaryDataArray.getDataTypeInBytes(dataType)));
+//
+//            prevOffset = offset;
+//        }
+//
         return offset;
     }
 

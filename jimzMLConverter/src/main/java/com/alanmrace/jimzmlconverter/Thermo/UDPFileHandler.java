@@ -5,8 +5,6 @@
  */
 package com.alanmrace.jimzmlconverter.Thermo;
 
-import com.alanmrace.jimzmlconverter.Waters.PatternDefinition;
-import com.alanmrace.jimzmlconverter.Waters.PatternDefinitionHandler;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -27,7 +25,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @author Alan
  */
 public class UDPFileHandler extends DefaultHandler {
-    private static final Logger logger = Logger.getLogger(PatternDefinitionHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(UDPFileHandler.class.getName());
 
     UDPFile udpFile;
 

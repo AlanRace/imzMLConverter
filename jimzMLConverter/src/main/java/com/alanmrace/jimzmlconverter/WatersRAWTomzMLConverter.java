@@ -33,10 +33,14 @@ public class WatersRAWTomzMLConverter {
 //    public static final String INDEX_COMMAND = " /index";
     
     public static File[] convert(String filepath) throws IOException {
-        return convert(filepath, (new File(filepath)).getParent());
+        return convert(filepath, false);
     }
     
-    public static File[] convert(String filepath, String outputFilepath) throws IOException {
+    public static File[] convert(String filepath, boolean centroid) throws IOException {
+        return convert(filepath, (new File(filepath)).getParent(), centroid);
+    }
+    
+    public static File[] convert(String filepath, String outputFilepath, boolean centroid) throws IOException {
         final File fileToConvert = new File(filepath);
         File[] mzMLFiles = null;
         
@@ -47,7 +51,12 @@ public class WatersRAWTomzMLConverter {
             
         if(extention.equalsIgnoreCase("raw")) { // && fileToConvert.isDirectory()) {
             try {
-                String tempCommand = getCommand() + " \"" + filepath + "\"" + COMMAND_LINE + " -o \"" + outputFilepath + "\"";
+                String tempCommand = getCommand() + " \"" + filepath + "\"" + COMMAND_LINE;
+                
+                if(centroid)
+                    tempCommand +=  " --filter \"peakPicking true 1-\"";
+                
+                tempCommand += " -o \"" + outputFilepath + "\"";
                 
                 System.out.println(tempCommand);
                 Process process = Runtime.getRuntime().exec(tempCommand);

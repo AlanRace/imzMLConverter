@@ -6,8 +6,8 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
+import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
@@ -133,9 +133,9 @@ public class MainCommand {
                         } else {
                             try {
                                 if(outputPath == null)
-                                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName);
+                                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
                                 else
-                                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, outputPath);
+                                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
                             } catch (IOException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                             }
@@ -173,9 +173,9 @@ public class MainCommand {
                         } else {
                             try {
                                 if(outputPath == null)
-                                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName);
+                                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
                                 else
-                                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, outputPath);
+                                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
                             } catch (IOException ex) {
                                 logger.log(Level.SEVERE, null, ex);
                             }
@@ -258,7 +258,7 @@ public class MainCommand {
                                 logger.log(Level.INFO, "Parsed {0}", fileName);
                                 converter = new ImzMLToHDF5Converter(imzML, outputPath);
                                 logger.log(Level.INFO, "Set up converter");
-                            } catch (ImzMLParseException ex) {
+                            } catch (FatalParseException ex) {
                                 Logger.getLogger(MainCommand.class.getName()).log(Level.SEVERE, null, ex);
 
                                 converter = null;

@@ -9,8 +9,8 @@ import static com.alanmrace.jimzmlconverter.MzMLToImzMLConverter.getNumberSpectr
 import com.alanmrace.jimzmlconverter.Thermo.UDPFile;
 import com.alanmrace.jimzmlconverter.Thermo.UDPFileHandler;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import com.alanmrace.jimzmlparser.imzML.PixelLocation;
-import com.alanmrace.jimzmlparser.mzML.SpectrumList;
+import com.alanmrace.jimzmlparser.imzml.PixelLocation;
+import com.alanmrace.jimzmlparser.mzml.SpectrumList;
 import java.text.MessageFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +39,10 @@ public class ThermoMzMLToImzMLConverter extends MzMLToImzMLConverter {
             super.generatePixelLocations();
         } else {
             if(udpFileLocation != null) {
+                if (baseImzML == null) {
+                    generateBaseImzML();
+                }
+                
                 try {
                     System.out.println("BaseImzML: " + baseImzML);
                     this.pixelLocations = ThermoMzMLToImzMLConverter.getPixelLocationFromUDPFile(udpFileLocation, baseImzML.getRun().getSpectrumList());

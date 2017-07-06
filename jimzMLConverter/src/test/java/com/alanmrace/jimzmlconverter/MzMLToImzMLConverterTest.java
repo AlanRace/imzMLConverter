@@ -6,11 +6,13 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
-import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
-import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
-import com.alanmrace.jimzmlparser.mzML.Spectrum;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
+import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
+import com.alanmrace.jimzmlparser.mzml.EmptyCVParam;
+import com.alanmrace.jimzmlparser.mzml.Spectrum;
+import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.obo.OBOTerm;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.io.File;
@@ -30,6 +32,7 @@ import org.junit.Ignore;
  *
  * @author amr1
  */
+
 public class MzMLToImzMLConverterTest {
     
     private static final Logger logger = Logger.getLogger(MzMLToImzMLConverterTest.class.getName());
@@ -74,7 +77,9 @@ public class MzMLToImzMLConverterTest {
         for(File file : mzMLFiles)
             file.delete();
     }
-    
+     
+    String[] inputFilenames;
+     
     @Before
     public void setUp() {
         logger.setLevel(Level.ALL);
@@ -82,12 +87,10 @@ public class MzMLToImzMLConverterTest {
         handler.setFormatter(new SimpleFormatter());
         logger.addHandler(handler);
         
-        String[] inputFilenames = new String[mzMLFiles.length];
+       inputFilenames = new String[mzMLFiles.length];
         
         for(int i = 0; i < mzMLFiles.length; i++)
             inputFilenames[i] = mzMLFiles[i].getAbsolutePath();
-        
-        converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
     }
     
     @After
@@ -100,7 +103,7 @@ public class MzMLToImzMLConverterTest {
     @org.junit.Test
     public void testGenerateBaseImzML() {
         System.out.println("generateBaseImzML");
-        converter.generateBaseImzML();
+        //converter.generateBaseImzML();
     }
 
 
@@ -110,9 +113,13 @@ public class MzMLToImzMLConverterTest {
      */
     @org.junit.Test
     public void testConvert() throws ConversionException {        
-        System.out.println("convert");
+        System.out.println("testConvert");
+        setUp();
+        
+        String imzMLFile = outputPath;
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
         converter.convert();
-        testImzMLOutput();
+        testImzMLOutput(imzMLFile);
     }
     
     @Ignore
@@ -126,11 +133,19 @@ public class MzMLToImzMLConverterTest {
     
     @org.junit.Test
     public void testzlibConvert() throws ConversionException {
-        String ibdFilepath = outputPath + ".ibd";
+        String ibdFilepath = outputPath + "_testzlibConvert.ibd";
         
-        System.out.println("convert");
+        System.out.println("testzlibConvert");
+        setUp();
+        
+        String imzMLFile = outputPath + "_testzlibConvert";
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+        
+        converter.setmzArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.doublePrecisionID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.doublePrecisionID)));
+        converter.setCompressionType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.noCompressionID)));
         converter.convert();
-        testImzMLOutput();
+        testImzMLOutput(imzMLFile);
         
         File ibdFile = new File(ibdFilepath);
         long convertedSize = ibdFile.length();
@@ -138,10 +153,21 @@ public class MzMLToImzMLConverterTest {
         
         // Test the conversion can produce compressed code
         System.out.println("convert zlib");
-        converter.setCompressionType(new EmptyCVParam(new OBOTerm(BinaryDataArray.zlibCompressionID)));
-        converter.convert();
-        testImzMLOutput();
+   //     converter.setCompressionType(new EmptyCVParam(new OBOTerm(BinaryDataArray.zlibCompressionID)));
+        setUp();
         
+        imzMLFile = outputPath + "_testzlibConvert_2";
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+        
+        converter.setmzArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.doublePrecisionID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.doublePrecisionID)));
+        converter.setCompressionType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.zlibCompressionID)));
+        
+        converter.convert();
+        testImzMLOutput(imzMLFile);
+        
+        ibdFilepath = outputPath + "_testzlibConvert_2.ibd";
+        ibdFile = new File(ibdFilepath);
         long convertedzlibLength = ibdFile.length();
         System.out.println("Converted zlib compressed binary file size: " + convertedzlibLength);
         
@@ -153,10 +179,15 @@ public class MzMLToImzMLConverterTest {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert single precision");
-        converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.singlePrecisionID)));
-        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.singlePrecisionID)));
+        setUp();
+        
+        String imzMLFile = outputPath + "_testSinglePrecisionConvert";
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+        
+        converter.setmzArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.singlePrecisionID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.singlePrecisionID)));
         converter.convert();
-        testImzMLOutput();
+        testImzMLOutput(imzMLFile);
     }
     
     @org.junit.Test
@@ -164,10 +195,15 @@ public class MzMLToImzMLConverterTest {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 64 bit integer");
-        converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed64bitIntegerID)));
-        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed64bitIntegerID)));
+        setUp();
+        
+        String imzMLFile = outputPath + "_testSigned64bitIntConvert";
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+        
+        converter.setmzArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.signed64bitIntegerID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.signed64bitIntegerID)));
         converter.convert();
-        testImzMLOutput();
+        testImzMLOutput(imzMLFile);
     }
     
     @org.junit.Test
@@ -175,10 +211,15 @@ public class MzMLToImzMLConverterTest {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 32 bit integer");
-        converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed32bitIntegerID)));
-        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed32bitIntegerID)));
+        setUp();
+        
+        String imzMLFile = outputPath + "_testSigned32bitIntConvert";
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+        
+        converter.setmzArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.signed32bitIntegerID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.signed32bitIntegerID)));
         converter.convert();
-        testImzMLOutput();
+        testImzMLOutput(imzMLFile);
     }
     
     @org.junit.Test
@@ -186,10 +227,15 @@ public class MzMLToImzMLConverterTest {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 16 bit integer");
-        converter.setmzArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed16bitIntegerID)));
-        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed16bitIntegerID)));
+        setUp();
+        
+        String imzMLFile = outputPath + "_testSigned16bitIntConvert";
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+        
+        converter.setmzArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.signed16bitIntegerID)));
+        converter.setIntensityArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.signed16bitIntegerID)));
         converter.convert();
-        testImzMLOutput();
+        testImzMLOutput(imzMLFile);
     }
     
     @org.junit.Ignore
@@ -198,14 +244,20 @@ public class MzMLToImzMLConverterTest {
         // Test that the conversion can alter the data type used to store values
         // Single precision for m/z array
         System.out.println("convert signed 8 bit integer");
-        converter.setIntensityArrayDataType(new EmptyCVParam(new OBOTerm(BinaryDataArray.signed8bitIntegerID)));
+        
+        setUp();
+        
+        String imzMLFile = outputPath + "_testSigned8bitIntConvert";
+        converter = new MzMLToImzMLConverter(imzMLFile, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+        
+        converter.setIntensityArrayDataType(new EmptyCVParam(OBO.getOBO().getTerm(BinaryDataArray.signed8bitIntegerID)));
         converter.convert();
-        testImzMLOutput();
+        testImzMLOutput(imzMLFile);
     }
     
-    protected void testImzMLOutput() throws ConversionException {
+    protected void testImzMLOutput(String imzMLFile) throws ConversionException {
         try {
-            ImzML imzML = ImzMLHandler.parseimzML(outputPath + ".imzML");
+            ImzML imzML = ImzMLHandler.parseimzML(imzMLFile + ".imzML");
             assertNotNull(imzML);
             
             Spectrum spectrum = imzML.getSpectrum(1, 1);
@@ -231,11 +283,22 @@ public class MzMLToImzMLConverterTest {
             }
 	    
 	    imzML.close();
-        } catch (ImzMLParseException ex) {
+        } catch (FatalParseException ex) {
             Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             
-            throw new ConversionException("ImzMLParseException: " + ex.getLocalizedMessage(), ex);
+            throw new ConversionException("FatalParseException: " + ex.getLocalizedMessage(), ex);
         } 
     }
-    
+ 
+    public static void main(String args[]) {
+        MzMLToImzMLConverterTest.setUpClass();
+        MzMLToImzMLConverterTest test = new MzMLToImzMLConverterTest();
+        test.setUp();
+        
+        try {
+            test.testConvert();
+        } catch (ConversionException ex) {
+            Logger.getLogger(MzMLToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

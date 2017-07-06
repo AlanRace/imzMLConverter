@@ -5,11 +5,12 @@
  */
 package com.alanmrace.jimzmlconverter;
 
+import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupRef;
-import com.alanmrace.jimzmlparser.mzML.Spectrum;
-import com.alanmrace.jimzmlparser.mzML.SpectrumList;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
+import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroupRef;
+import com.alanmrace.jimzmlparser.mzml.Spectrum;
+import com.alanmrace.jimzmlparser.mzml.SpectrumList;
 import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.io.DataOutputStream;
@@ -127,6 +128,7 @@ public class GRDToImzMLConverterTest {
      * Test of convert method, of class GRDToImzMLConverter.
      */
     @Test
+    @Ignore
     public void testConvert() {
         System.out.println("convert");
         
@@ -145,10 +147,10 @@ public class GRDToImzMLConverterTest {
             logger.log(Level.FINE, "intensities array length {0}", intensities.length);
             
             assertEquals("Intensity of first pixel", 3, intensities[0], 0.1);
-        } catch (ImzMLParseException ex) {
+        } catch (FatalParseException ex) {
             Logger.getLogger(GRDToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             
-            fail("ImzMLParseException " + ex);
+            fail("FatalParseException " + ex);
         } catch (IOException ex) {
             Logger.getLogger(GRDToImzMLConverterTest.class.getName()).log(Level.SEVERE, null, ex);
             

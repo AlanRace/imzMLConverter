@@ -7,11 +7,8 @@ package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.Waters.PatternDefinitionHandler;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import com.alanmrace.jimzmlparser.imzML.PixelLocation;
-import com.alanmrace.jimzmlparser.mzML.CVParam;
-import com.alanmrace.jimzmlparser.mzML.Scan;
-import com.alanmrace.jimzmlparser.mzML.Spectrum;
-import com.alanmrace.jimzmlparser.mzML.SpectrumList;
+import com.alanmrace.jimzmlparser.imzml.PixelLocation;
+import com.alanmrace.jimzmlparser.mzml.SpectrumList;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;

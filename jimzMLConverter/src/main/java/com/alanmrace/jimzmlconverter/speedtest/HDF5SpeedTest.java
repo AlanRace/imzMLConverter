@@ -7,8 +7,9 @@ package com.alanmrace.jimzmlconverter.speedtest;
 
 import com.alanmrace.jimzmlconverter.ImzMLToHDF5Converter;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -36,7 +37,7 @@ public class HDF5SpeedTest {
             System.out.println("About to convert");
             instance.convert();
             System.out.println("Converted");
-        } catch (ImzMLParseException | ConversionException ex) {
+        } catch (FatalParseException | ConversionException ex) {
             Logger.getLogger(HDF5SpeedTest.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

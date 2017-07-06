@@ -1,15 +1,15 @@
 package com.alanmrace.jimzmlconverter.Waters;
 
-import com.alanmrace.jimzmlparser.imzML.PixelLocation;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.alanmrace.jimzmlparser.mzML.CVParam;
-import com.alanmrace.jimzmlparser.mzML.Scan;
-import com.alanmrace.jimzmlparser.mzML.Spectrum;
-import com.alanmrace.jimzmlparser.mzML.SpectrumList;
+import com.alanmrace.jimzmlparser.mzml.CVParam;
+import com.alanmrace.jimzmlparser.mzml.Scan;
+import com.alanmrace.jimzmlparser.mzml.Spectrum;
+import com.alanmrace.jimzmlparser.mzml.SpectrumList;
 
 public class PatternDefinition implements Iterable<Region> {
 

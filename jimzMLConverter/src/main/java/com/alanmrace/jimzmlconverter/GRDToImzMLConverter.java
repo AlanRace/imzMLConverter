@@ -8,34 +8,34 @@ package com.alanmrace.jimzmlconverter;
 import com.alanmrace.jimzmlconverter.IONTOF.IONTOFProperties;
 import com.alanmrace.jimzmlconverter.IONTOF.IONTOFProperty;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
-import com.alanmrace.jimzmlparser.mzML.BinaryDataArray;
-import com.alanmrace.jimzmlparser.mzML.BinaryDataArrayList;
-import com.alanmrace.jimzmlparser.mzML.DataProcessing;
-import com.alanmrace.jimzmlparser.mzML.DataProcessingList;
-import com.alanmrace.jimzmlparser.mzML.DoubleCVParam;
-import com.alanmrace.jimzmlparser.mzML.EmptyCVParam;
-import com.alanmrace.jimzmlparser.mzML.FileContent;
-import com.alanmrace.jimzmlparser.mzML.FileDescription;
-import com.alanmrace.jimzmlparser.mzML.InstrumentConfiguration;
-import com.alanmrace.jimzmlparser.mzML.InstrumentConfigurationList;
-import com.alanmrace.jimzmlparser.mzML.IntegerCVParam;
-import com.alanmrace.jimzmlparser.mzML.LongCVParam;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupList;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroupRef;
-import com.alanmrace.jimzmlparser.mzML.Run;
-import com.alanmrace.jimzmlparser.mzML.Scan;
-import com.alanmrace.jimzmlparser.mzML.ScanList;
-import com.alanmrace.jimzmlparser.mzML.ScanSettings;
-import com.alanmrace.jimzmlparser.mzML.ScanSettingsList;
-import com.alanmrace.jimzmlparser.mzML.SoftwareList;
-import com.alanmrace.jimzmlparser.mzML.SourceFile;
-import com.alanmrace.jimzmlparser.mzML.SourceFileList;
-import com.alanmrace.jimzmlparser.mzML.Spectrum;
-import com.alanmrace.jimzmlparser.mzML.SpectrumList;
-import com.alanmrace.jimzmlparser.mzML.StringCVParam;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
+import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
+import com.alanmrace.jimzmlparser.mzml.BinaryDataArrayList;
+import com.alanmrace.jimzmlparser.mzml.DataProcessing;
+import com.alanmrace.jimzmlparser.mzml.DataProcessingList;
+import com.alanmrace.jimzmlparser.mzml.DoubleCVParam;
+import com.alanmrace.jimzmlparser.mzml.EmptyCVParam;
+import com.alanmrace.jimzmlparser.mzml.FileContent;
+import com.alanmrace.jimzmlparser.mzml.FileDescription;
+import com.alanmrace.jimzmlparser.mzml.InstrumentConfiguration;
+import com.alanmrace.jimzmlparser.mzml.InstrumentConfigurationList;
+import com.alanmrace.jimzmlparser.mzml.IntegerCVParam;
+import com.alanmrace.jimzmlparser.mzml.LongCVParam;
+import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroupList;
+import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroupRef;
+import com.alanmrace.jimzmlparser.mzml.Run;
+import com.alanmrace.jimzmlparser.mzml.Scan;
+import com.alanmrace.jimzmlparser.mzml.ScanList;
+import com.alanmrace.jimzmlparser.mzml.ScanSettings;
+import com.alanmrace.jimzmlparser.mzml.ScanSettingsList;
+import com.alanmrace.jimzmlparser.mzml.SoftwareList;
+import com.alanmrace.jimzmlparser.mzml.SourceFileList;
+import com.alanmrace.jimzmlparser.mzml.Spectrum;
+import com.alanmrace.jimzmlparser.mzml.SpectrumList;
+import com.alanmrace.jimzmlparser.mzml.StringCVParam;
 import com.alanmrace.jimzmlparser.obo.OBO;
+import com.alanmrace.jimzmlparser.writer.ImzMLHeaderWriter;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -417,11 +417,19 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 
         logger.log(Level.FINE, "Outputting {0} spectra", spectrumList.size());
 
+        ImzMLHeaderWriter imzMLWriter = new ImzMLHeaderWriter();
+        
         try {
-            baseImzML.write(outputFilename + ".imzML");
-        } catch (ImzMLWriteException ex) {
-            Logger.getLogger(GRDToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
-        } 
+            imzMLWriter.write(baseImzML, outputFilename);
+        } catch (IOException ex) {
+            Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+//        try {
+//            baseImzML.write(outputFilename + ".imzML");
+//        } catch (ImzMLWriteException ex) {
+//            Logger.getLogger(GRDToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+//        } 
     }
 
     public static long outputSpectrum(HashMap<Long, Integer> spectrumData, int x, int y, double k0, double sf,
@@ -458,7 +466,7 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 //                logger.log(Level.INFO, "counts {0}", counts[0]);
 //            }
 
-            Spectrum spectrum = new Spectrum("index=" + index, 0, index);
+            Spectrum spectrum = new Spectrum("index=" + index, 0);
             // MS1 spectrum
             spectrum.addCVParam(new EmptyCVParam(obo.getTerm("MS:1000579")));
             // Total Ion Current

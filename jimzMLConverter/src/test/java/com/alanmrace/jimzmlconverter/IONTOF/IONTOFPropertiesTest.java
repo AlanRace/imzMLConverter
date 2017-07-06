@@ -5,7 +5,6 @@
  */
 package com.alanmrace.jimzmlconverter.IONTOF;
 
-import com.alanmrace.jimzmlconverter.WatersRAWTomzMLConverter;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;

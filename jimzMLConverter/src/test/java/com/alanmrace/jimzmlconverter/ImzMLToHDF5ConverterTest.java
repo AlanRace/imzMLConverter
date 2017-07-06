@@ -5,8 +5,7 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import static com.alanmrace.jimzmlconverter.MzMLToImzMLConverterTest.TEST_RESOURCE;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import org.junit.After;
 import org.junit.AfterClass;

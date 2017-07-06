@@ -6,17 +6,18 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
+import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
 import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
-import com.alanmrace.jimzmlparser.imzML.ImzML;
-import com.alanmrace.jimzmlparser.imzML.PixelLocation;
-import com.alanmrace.jimzmlparser.mzML.FileContent;
-import com.alanmrace.jimzmlparser.mzML.ReferenceableParamGroup;
-import com.alanmrace.jimzmlparser.mzML.SourceFile;
-import com.alanmrace.jimzmlparser.mzML.Spectrum;
-import com.alanmrace.jimzmlparser.mzML.SpectrumList;
-import com.alanmrace.jimzmlparser.mzML.StringCVParam;
+import com.alanmrace.jimzmlparser.imzml.ImzML;
+import com.alanmrace.jimzmlparser.imzml.PixelLocation;
+import com.alanmrace.jimzmlparser.mzml.FileContent;
+import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroup;
+import com.alanmrace.jimzmlparser.mzml.SourceFile;
+import com.alanmrace.jimzmlparser.mzml.Spectrum;
+import com.alanmrace.jimzmlparser.mzml.SpectrumList;
+import com.alanmrace.jimzmlparser.mzml.StringCVParam;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
+import com.alanmrace.jimzmlparser.writer.ImzMLHeaderWriter;
 import java.io.DataOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
     protected void generateBaseImzML() {
         try {
             baseImzML = ImzMLHandler.parseimzML(inputFilenames[0], false);
-        } catch (ImzMLParseException ex) {
+        } catch (FatalParseException ex) {
             Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -75,7 +76,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                     ImzML imzML = ImzMLHandler.parseimzML(inputFilenames[i], false);
                     
                     imageSizes.add(i, new PixelLocation(imzML.getWidth(), imzML.getHeight(), imzML.getDepth()));
-                } catch (ImzMLParseException ex) {
+                } catch (FatalParseException ex) {
                     Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                 } 
             }
@@ -218,7 +219,7 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
 
                     Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.FINEST, "About to close mzML in convert()");
                     currentimzML.close();
-                } catch (ImzMLParseException ex) {
+                } catch (FatalParseException ex) {
                     Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
                     
                     throw new ConversionException("ImzMLParseException: " + ex, ex);
@@ -247,11 +248,19 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
         baseImzML.getFileDescription().getFileContent().addCVParam(new StringCVParam(getOBOTerm(FileContent.sha1ChecksumID), sha1Hash));
 
         // Output the imzML portion of the data
+        ImzMLHeaderWriter imzMLWriter = new ImzMLHeaderWriter();
+        
         try {
-            baseImzML.write(outputFilename + ".imzML");
-        } catch (ImzMLWriteException ex) {
-            Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            imzMLWriter.write(baseImzML, outputFilename);
+        } catch (IOException ex) {
+            Logger.getLogger(ImzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        //try {
+        //    baseImzML.write(outputFilename + ".imzML");
+        //} catch (ImzMLWriteException ex) {
+        //    Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+        //}
 
         baseImzML.close();
     }

@@ -37,6 +37,9 @@ public class ImzMLConverterCommandArguments {
         
         @Parameter(names = {"--include-global-mz-list"}, arity = 1, description = "Calculate and include a global m/z list within the output format")
         protected Boolean includeGlobalmzList = true;
+        
+        @Parameter(names = {"--centroid"}, description = "Perform peak picking (centroid the data)")
+        protected Boolean centroid = false;
     }
     
     @Parameters(commandDescription = "Convert to imzML")
