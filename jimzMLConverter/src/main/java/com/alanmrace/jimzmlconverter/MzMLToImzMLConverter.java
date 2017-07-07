@@ -361,6 +361,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         } catch (IOException ex) {
             Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        baseImzML.close();
 
 //        // Open the .ibd data stream
 //        DataOutputStream binaryDataStream;

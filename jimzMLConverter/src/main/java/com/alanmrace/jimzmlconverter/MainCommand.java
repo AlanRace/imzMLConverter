@@ -295,7 +295,17 @@ public class MainCommand {
                     }
                     
                     if(jc.getParsedCommand().equals("imzML")) {
-                        ((ImzMLConverter)converter).setIncludeGlobalmzList(commonCommands.includeGlobalmzList);
+                        if(converter instanceof ImzMLConverter) {
+                            ((ImzMLConverter)converter).setIncludeGlobalmzList(commonCommands.includeGlobalmzList);
+                        
+                            if(commandimzML.mzArrayType != null) {
+                                ((ImzMLConverter)converter).setmzArrayDataType(commandimzML.mzArrayType);
+                            }
+                            
+                            if(commandimzML.intensityArrayType != null) {
+                                ((ImzMLConverter)converter).setIntensityArrayDataType(commandimzML.intensityArrayType);
+                            }
+                        }
                     }
 
                     // Perform the conversion
@@ -312,12 +322,14 @@ public class MainCommand {
                     // Cleanup
                     if (mzMLFiles != null) {
                         for (File mzMLFile : mzMLFiles) {
-                            try {
-                                Files.delete(mzMLFile.toPath());
-                                logger.log(Level.FINER, MessageFormat.format("Cleaned up {0}", mzMLFile));
-                            } catch (IOException ex) {
-                                logger.log(Level.WARNING, MessageFormat.format("Failed to clean up {0}", mzMLFile), ex);
-                            }
+                            mzMLFile.deleteOnExit();
+                            
+                            //try {
+                            //    Files.delete(mzMLFile.toPath());
+                            //    logger.log(Level.FINER, MessageFormat.format("Cleaned up {0}", mzMLFile));
+                            //} catch (IOException ex) {
+                            //    logger.log(Level.WARNING, MessageFormat.format("Failed to clean up {0}", mzMLFile), ex);
+                            //}
                         }
                     }
                 }

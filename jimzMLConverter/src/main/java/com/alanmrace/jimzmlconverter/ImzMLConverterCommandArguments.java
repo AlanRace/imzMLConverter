@@ -5,6 +5,8 @@
  */
 package com.alanmrace.jimzmlconverter;
 
+import com.alanmrace.jimzmlparser.data.DataTypeTransform.DataType;
+import com.alanmrace.jimzmlparser.mzml.BinaryDataArray.CompressionType;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.util.List;
@@ -36,7 +38,7 @@ public class ImzMLConverterCommandArguments {
         protected Boolean split = false;   
         
         @Parameter(names = {"--include-global-mz-list"}, arity = 1, description = "Calculate and include a global m/z list within the output format")
-        protected Boolean includeGlobalmzList = true;
+        protected Boolean includeGlobalmzList = false;
         
         @Parameter(names = {"--centroid"}, description = "Perform peak picking (centroid the data)")
         protected Boolean centroid = false;
@@ -47,8 +49,14 @@ public class ImzMLConverterCommandArguments {
         @Parameter(names = {"--pixel-location-file", "-p"}, description = "Pixel location file. (*.pat) for Waters data. (*.properties.txt) for ION-TOF data.")
         protected List<String> pixelLocationFile;
         
-        @Parameter(names = {"--compression"}, description = "Compression type")
-        protected String compression;
+        @Parameter(names = {"--compression"}, description = "Compression type", converter = CompressionConverter.class)
+        protected CompressionType compression = CompressionType.None;
+        
+        @Parameter(names = {"--mz-array-type"}, description = "Data type used to store m/z array", converter = DataTypeConverter.class)
+        protected DataType mzArrayType = DataType.Double;
+        
+        @Parameter(names = {"--intensity-array-type"}, description = "Data type used to store intensity array", converter = DataTypeConverter.class)
+        protected DataType intensityArrayType = DataType.Double;
     }
     
     @Parameters(separators = "=", commandDescription = "Convert to HDF5")

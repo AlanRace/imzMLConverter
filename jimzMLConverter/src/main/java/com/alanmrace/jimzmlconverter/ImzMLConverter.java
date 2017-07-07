@@ -6,6 +6,7 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlparser.data.DataTypeTransform.DataType;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
@@ -114,10 +115,24 @@ public abstract class ImzMLConverter implements Converter {
         this.compressionType = compressionType;
     }
 
+    public void setmzArrayDataType(DataType dataType) {
+        OBOTerm term = DataType.toOBOTerm(dataType);
+        
+        if(term != null)
+            this.mzArrayDataType = new EmptyCVParam(term);
+    }
+    
     public void setmzArrayDataType(CVParam mzArrayDataType) {
         this.mzArrayDataType = mzArrayDataType;
     }
 
+    public void setIntensityArrayDataType(DataType dataType) {
+        OBOTerm term = DataType.toOBOTerm(dataType);
+        
+        if(term != null)
+            this.intensityArrayDataType = new EmptyCVParam(term);
+    }
+    
     public void setIntensityArrayDataType(CVParam intensityArrayDataType) {
         this.intensityArrayDataType = intensityArrayDataType;
     }
