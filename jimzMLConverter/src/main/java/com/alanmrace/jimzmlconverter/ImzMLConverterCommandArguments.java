@@ -36,7 +36,7 @@ public class ImzMLConverterCommandArguments {
         
         @Parameter(names = {"--split", "-s"}, arity = 1, description = "Split x different scans out into separate output files")
         protected Integer split = 1;   
-        
+                
         @Parameter(names = {"--include-global-mz-list"}, arity = 1, description = "Calculate and include a global m/z list within the output format")
         protected Boolean includeGlobalmzList = false;
         
@@ -46,8 +46,14 @@ public class ImzMLConverterCommandArguments {
     
     @Parameters(commandDescription = "Convert to imzML")
     public class CommandimzML extends CommonCommands {  
-        @Parameter(names = {"--pixel-location-file", "-p"}, description = "Pixel location file. (*.pat) for Waters data. (*.properties.txt) for ION-TOF data.")
+        @Parameter(names = {"--pixel-location-file", "-p"}, description = "Pixel location file. (*.pat) for Waters data. (*.properties.txt) for ION-TOF data. Not compatible with --image-dimensions option.")
         protected List<String> pixelLocationFile;
+        
+        @Parameter(names = {"--image-dimensions"}, arity = 2, description = "Create rectangular image with dimensions x, y in number of pixels. Not compatible with --pixel-location-file or --split option.")
+        protected List<Integer> imageDimensions;
+        
+        @Parameter(names = {"--ignore-scans"}, arity = 1, description = "Skip the first x scans when converting. Only compatible with --image-dimensions option.")
+        protected Integer ignoreScans = 0;
         
         @Parameter(names = {"--compression"}, description = "Compression type", converter = CompressionConverter.class)
         protected CompressionType compression = CompressionType.None;

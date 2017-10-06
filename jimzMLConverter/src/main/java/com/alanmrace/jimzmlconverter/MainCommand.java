@@ -166,6 +166,13 @@ public class MainCommand {
 
         if (jc.getParsedCommand().equals("imzML")) {
             commonCommands = commandimzML;
+            
+            // Check that exclusive arguments aren't both supplied
+            if(commandimzML.imageDimensions != null && commandimzML.pixelLocationFile != null) {
+                System.out.println("imzMLConverter version " + ImzMLConverter.version);
+                System.out.println("Cannot supply both arguments --pixel-location-file and --image-dimensions");
+                System.exit(0);
+            }
         } else {
             commonCommands = commandHDF5;
         }
@@ -350,6 +357,24 @@ public class MainCommand {
                                     
                                     ((ImzMLConverter) converter).setPixelLocations(locations);
                                     ((ImzMLConverter) converter).setOutputFilename(outputPath + "_" + splitIndex);
+                                }
+                                
+                                if(commandimzML.imageDimensions != null) {                                    
+                                    int numPixels = (commandimzML.imageDimensions.get(0) * commandimzML.imageDimensions.get(1)) + commandimzML.ignoreScans;
+                                    PixelLocation[] locations = new PixelLocation[numPixels];
+                                    
+                                    int pixelIndex = 0;
+                                    
+                                    for(pixelIndex = 0; pixelIndex < commandimzML.ignoreScans; pixelIndex++)
+                                        locations[pixelIndex] = new PixelLocation(-1, -1, -1);
+                                    
+                                    for(int y = 0; y < commandimzML.imageDimensions.get(1); y++) {
+                                        for(int x = 0; x < commandimzML.imageDimensions.get(0); x++) {
+                                            locations[pixelIndex++] = new PixelLocation(x + 1, y + 1, 1);
+                                        }
+                                    }
+                                        
+                                    ((ImzMLConverter) converter).setPixelLocations(locations);    
                                 }
                             }
                         }
