@@ -10,6 +10,7 @@ import com.alanmrace.jimzmlparser.data.DataTypeTransform.DataType;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
+import com.alanmrace.jimzmlparser.mzml.BinaryDataArray.CompressionType;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArrayList;
 import com.alanmrace.jimzmlparser.mzml.CVParam;
 import com.alanmrace.jimzmlparser.mzml.ChromatogramList;
@@ -111,6 +112,13 @@ public abstract class ImzMLConverter implements Converter {
         this.baseImzML = baseImzML;
     }
 
+    public void setCompressionType(CompressionType compressionType) {
+        OBOTerm term = CompressionType.toOBOTerm(compressionType);
+//        System.out.println("Setting compression type (" + compressionType + ") to " + term);
+        if(term != null)
+            this.compressionType = new EmptyCVParam(term);
+    }
+    
     public void setCompressionType(CVParam compressionType) {
         this.compressionType = compressionType;
     }
@@ -143,6 +151,14 @@ public abstract class ImzMLConverter implements Converter {
 
     public void setPixelLocations(PixelLocation[] pixelLocations) {
         this.pixelLocations = pixelLocations;
+    }
+    
+    public PixelLocation[] getPixelLocations() {
+        if (pixelLocations == null) {
+            generatePixelLocations();
+        }
+        
+        return pixelLocations;
     }
 
 //    public abstract void convert();
@@ -238,17 +254,17 @@ public abstract class ImzMLConverter implements Converter {
         imzML.getFileDescription().getSourceFileList().addSourceFile(sourceFile);
 
         try {
-            sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.sha1FileChecksumType), calculateSHA1(filename)));
+            sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.sha1FileChecksumID), calculateSHA1(filename)));
         } catch (ConversionException ex) {
             Logger.getLogger(ImzMLConverter.class.getName()).log(Level.SEVERE, "Failed to generate SHA1 for " + filename, ex);
         }
 
         // Add the native spectrum format
         if (currentFileDescription.getSourceFileList() != null) {
-            sourceFile.addCVParam(currentFileDescription.getSourceFileList().getSourceFile(0).getCVParamOrChild(SourceFile.nativeSpectrumIdentifierFormat));
+            sourceFile.addCVParam(currentFileDescription.getSourceFileList().getSourceFile(0).getCVParamOrChild(SourceFile.nativeSpectrumIdentifierFormatID));
             // TODO: Checksum					
         }
-        sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.mzMLFileFormat), ""));
+        sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.mzMLFileFormatID), ""));
     }
 
     public static void removeEmptySpectraFromImzML(ImzML imzML) {

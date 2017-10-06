@@ -34,8 +34,8 @@ public class ImzMLConverterCommandArguments {
         @Parameter(names = {"--combine", "-c"}, arity = 2, description = "Combine all files into a single output file with dimensions x, y")
         protected List<Integer> combine;   
         
-        @Parameter(names = {"--split", "-s"}, description = "Split different scans out into separate output files")
-        protected Boolean split = false;   
+        @Parameter(names = {"--split", "-s"}, arity = 1, description = "Split x different scans out into separate output files")
+        protected Integer split = 1;   
         
         @Parameter(names = {"--include-global-mz-list"}, arity = 1, description = "Calculate and include a global m/z list within the output format")
         protected Boolean includeGlobalmzList = false;
