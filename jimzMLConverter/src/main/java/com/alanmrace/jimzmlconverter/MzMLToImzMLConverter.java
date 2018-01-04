@@ -325,7 +325,9 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                             binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
                         }
                     }
-                                        
+                    
+                    // TODO: Generate a new chromatogram?                    
+                    
                     baseImzML.addSpectrum(spectrum);
                     
                     setCoordinatesOfSpectrum(spectrum, spectrumX, spectrumY);
@@ -350,11 +352,16 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
             }
         }
 
+        
 //        for(Spectrum spectrum : baseImzML.getSpectrumList()) {
 //            System.out.println(spectrum);
 //            System.out.println(spectrum.getBinaryDataArrayList().size() + " BDA");
 //        }
         
+    // If the chromatogram list is empty, then remove it to comply with the (i)mzML standard
+        if(baseImzML.getRun().getChromatogramList().size() == 0)
+            baseImzML.getRun().setChromatogramList(null);
+
         ImzMLWriter writer = new ImzMLWriter();
         try {
             writer.write(baseImzML, outputFilename + ".imzML");
