@@ -49,7 +49,7 @@ public class ImzMLConverterCommandArguments {
         @Parameter(names = {"--pixel-location-file", "-p"}, description = "Pixel location file. (*.pat) for Waters data. (*.properties.txt) for ION-TOF data. Not compatible with --image-dimensions option.")
         protected List<String> pixelLocationFile;
         
-        @Parameter(names = {"--image-dimensions"}, arity = 2, description = "Create rectangular image with dimensions x, y in number of pixels. Not compatible with --pixel-location-file or --split option.")
+        @Parameter(names = {"--image-dimensions"}, arity = 2, description = "Create rectangular image with dimensions x, y in number of pixels. Not compatible with --pixel-location-file.")
         protected List<Integer> imageDimensions;
         
         @Parameter(names = {"--ignore-scans"}, arity = 1, description = "Skip the first x scans when converting. Only compatible with --image-dimensions option.")

@@ -339,26 +339,6 @@ public class MainCommand {
                                     ((ImzMLConverter) converter).setCompressionType(commandimzML.compression);
                                 }
                                 
-                                // If splitting up the data then need to redefine the pixel locations and output path
-                                if(commonCommands.split > 1) {
-                                    if(splitIndex == 0)
-                                        pixelLocations = ((ImzMLConverter) converter).getPixelLocations();
-                                    
-                                    PixelLocation[] locations = new PixelLocation[pixelLocations.length];
-                                    
-                                    for(int pixelIndex = 0; pixelIndex < pixelLocations.length; pixelIndex++) {
-                                        if(pixelIndex % commonCommands.split == splitIndex) {
-                                            locations[pixelIndex] = new PixelLocation((pixelLocations[pixelIndex].getX()-1) / commonCommands.split + 1, 
-                                                pixelLocations[pixelIndex].getY(), pixelLocations[pixelIndex].getZ());
-                                        } else {
-                                            locations[pixelIndex] = new PixelLocation(-1, -1, -1);
-                                        }
-                                    }
-                                    
-                                    ((ImzMLConverter) converter).setPixelLocations(locations);
-                                    ((ImzMLConverter) converter).setOutputFilename(outputPath + "_" + splitIndex);
-                                }
-                                
                                 if(commandimzML.imageDimensions != null) {                                    
                                     int numPixels = (commandimzML.imageDimensions.get(0) * commandimzML.imageDimensions.get(1)) + commandimzML.ignoreScans;
                                     PixelLocation[] locations = new PixelLocation[numPixels];
@@ -374,7 +354,28 @@ public class MainCommand {
                                         }
                                     }
                                         
+                                    pixelLocations = locations;
                                     ((ImzMLConverter) converter).setPixelLocations(locations);    
+                                }
+                                
+                                // If splitting up the data then need to redefine the pixel locations and output path
+                                if(commonCommands.split > 1) {
+                                    if(splitIndex == 0 && commandimzML.imageDimensions == null)
+                                        pixelLocations = ((ImzMLConverter) converter).getPixelLocations();
+                                    
+                                    PixelLocation[] locations = new PixelLocation[pixelLocations.length];
+                                    
+                                    for(int pixelIndex = 0; pixelIndex < pixelLocations.length; pixelIndex++) {
+                                        if(pixelIndex % commonCommands.split == splitIndex) {
+                                            locations[pixelIndex] = new PixelLocation((pixelLocations[pixelIndex].getX()-1) / commonCommands.split + 1, 
+                                                pixelLocations[pixelIndex].getY(), pixelLocations[pixelIndex].getZ());
+                                        } else {
+                                            locations[pixelIndex] = new PixelLocation(-1, -1, -1);
+                                        }
+                                    }
+                                    
+                                    ((ImzMLConverter) converter).setPixelLocations(locations);
+                                    ((ImzMLConverter) converter).setOutputFilename(outputPath + "_" + splitIndex);
                                 }
                             }
                         }

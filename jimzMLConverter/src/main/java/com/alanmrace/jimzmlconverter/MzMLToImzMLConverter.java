@@ -13,7 +13,6 @@ import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzml.CV;
 import com.alanmrace.jimzmlparser.mzml.CVParam;
-import com.alanmrace.jimzmlparser.mzml.DataProcessing;
 import com.alanmrace.jimzmlparser.mzml.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzml.MzML;
 import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroup;
@@ -340,6 +339,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 }
 
                 Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.FINEST, "About to close mzML in convert()");
+                // TODO: Figure out a way around this?
                 //currentmzML.close();
             } catch (MzMLParseException ex) {
                 Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
