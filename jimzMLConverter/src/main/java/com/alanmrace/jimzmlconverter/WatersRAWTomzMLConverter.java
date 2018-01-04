@@ -37,7 +37,7 @@ public class WatersRAWTomzMLConverter {
     }
     
     public static File[] convert(String filepath, boolean centroid) throws IOException {
-        return convert(filepath, (new File(filepath)).getParent(), centroid);
+        return convert(filepath, (new File(filepath)).getAbsoluteFile().getParent(), centroid);
     }
     
     public static File[] convert(String filepath, String outputFilepath, boolean centroid) throws IOException {
