@@ -197,7 +197,12 @@ public class MainCommand {
 
                     Converter converter = null;
 
-                    String[] inputFilenames = generatemzMLFiles(fileName, commandimzML);
+                    String[] inputFilenames;
+                    
+                    if (extension.equals("grd"))
+                        inputFilenames = new String[] {fileName};
+                    else
+                        inputFilenames = generatemzMLFiles(fileName, commandimzML);
 
                     // TODO: CHECK MzML FILES EXIST
                     // UPDATE OUTPUT PATH
@@ -244,7 +249,7 @@ public class MainCommand {
                                     inputFilenames = new String[]{fileName};
 
                                     if (outputPath == null || outputPath.isEmpty()) {
-                                        outputPath = fileName.replace(".grd", "");
+                                        outputPath = fileName.replace(".grd", ".imzML");
                                     }
 
                                     converter = new GRDToImzMLConverter(outputPath, inputFilenames);
