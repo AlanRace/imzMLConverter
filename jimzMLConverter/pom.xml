@@ -6,6 +6,16 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.7</maven.compiler.source>
+        <maven.compiler.target>1.7</maven.compiler.target>
+	
+        <mainClass>com.alanmrace.jimzmlconverter.MainCommand</mainClass>
+        <hdf5Version>1.10.1</hdf5Version>
+    </properties>
+    
     <build>
         <plugins>
             <plugin>
@@ -65,7 +75,7 @@
                             <goal>rename</goal>
                         </goals>
                         <configuration>
-                            <sourceFile>${project.build.directory}/lib/jhdf5-1.10.0.dll</sourceFile>
+                            <sourceFile>${project.build.directory}/lib/jhdf5-${hdf5Version}.dll</sourceFile>
                             <destinationFile>${project.build.directory}/lib/jhdf5.dll</destinationFile>
                         </configuration>
                     </execution>
@@ -122,21 +132,22 @@
         </dependency>
         
         <!-- FOR HDF5 -->
-        <!-- mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\1.10.0\lib\hdf5_java.dll" -DgroupId=org.hdfgroup -DartifactId=jhdf5 -Dversion=1.10.0 -Dpackaging=dll        
-        -->
-        <!-- mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\1.10.0\lib\jarhdf5-1.10.0.jar" -DgroupId=org.hdfgroup -DartifactId=jarhdf5 -Dversion=1.10.0 -Dpackaging=jar
+        <!-- 
+        SET HDF5VERSION=1.10.1
+        mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\%HDF5VERSION%\lib\hdf5_java.dll" -DgroupId=org.hdfgroup -DartifactId=jhdf5 -Dversion=%HDF5VERSION% -Dpackaging=dll
+        mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\%HDF5VERSION%\lib\jarhdf5-%HDF5VERSION%.jar" -DgroupId=org.hdfgroup -DartifactId=jarhdf5 -Dversion=%HDF5VERSION% -Dpackaging=jar
         -->
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>jarhdf5</artifactId>
-            <version>1.10.0</version>
+            <version>${hdf5Version}</version>
             <!--            <scope>system</scope>
             <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>jhdf5</artifactId>
-            <version>1.10.0</version>
+            <version>${hdf5Version}</version>
             <scope>runtime</scope>
             <type>dll</type>
             <!--           <scope>system</scope>
@@ -163,11 +174,4 @@
         </dependency>
         -->
     </dependencies>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-	
-        <mainClass>com.alanmrace.jimzmlconverter.MainCommand</mainClass>
-    </properties>
 </project>
