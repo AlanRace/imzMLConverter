@@ -6,6 +6,7 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlconverter.exceptions.ProteoWizardNotInstalledException;
 import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.imzml.PixelLocation;
@@ -54,7 +55,7 @@ public class MainCommand {
         this.commandHDF5 = commandHDF5;
     }
 
-    private String[] generatemzMLFiles(String fileName, ImzMLConverterCommandArguments.CommandimzML commandimzML) throws ConversionException {
+    private String[] generatemzMLFiles(String fileName, ImzMLConverterCommandArguments.CommandimzML commandimzML) throws ConversionException, ProteoWizardNotInstalledException {
         File[] mzMLFiles = null;
         String[] inputFilenames = null;
         File currentFile = new File(fileName);
@@ -72,34 +73,31 @@ public class MainCommand {
             if (outputPath == null || outputPath.isEmpty()) {
                 outputPath = fileName.replace(".wiff", "");
             }
-        } else if (extension.equalsIgnoreCase("raw") && currentFile.isDirectory()) {
-            logger.log(Level.INFO, "Detected Waters RAW file");
-
+        } else if(extension.equalsIgnoreCase("raw")) {
             try {
-                if (outputPath == null) {
-                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
+                if(currentFile.isDirectory()) {
+                    logger.log(Level.INFO, "Detected Waters RAW file");
+
+                    if (outputPath == null) {
+                        mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
+                    } else {
+                        mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
+                    }
                 } else {
-                    mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
+                    logger.log(Level.INFO, "Detected Thermo RAW file");
+
+                    if (outputPath == null) {
+                        mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
+                    } else {
+                        mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
+                    }
                 }
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
-            }
-
-            if (outputPath == null || outputPath.isEmpty()) {
-                outputPath = fileName.replace(".raw", "");
-            }
-
-        } else if (extension.equalsIgnoreCase("raw")) {
-            logger.log(Level.INFO, "Detected Thermo RAW file");
-
-            try {
-                if (outputPath == null) {
-                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
+                if(ex.getMessage().contains("CreateProcess")) {
+                    throw new ProteoWizardNotInstalledException();
                 } else {
-                    mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
+                    logger.log(Level.SEVERE, null, ex);
                 }
-            } catch (IOException ex) {
-                logger.log(Level.SEVERE, null, ex);
             }
 
             if (outputPath == null || outputPath.isEmpty()) {
@@ -107,7 +105,6 @@ public class MainCommand {
             }
         }
         
-        // TODO: Remove duplicate code (appears again above)
         if (mzMLFiles != null) {
             inputFilenames = new String[mzMLFiles.length];
 
@@ -421,6 +418,8 @@ public class MainCommand {
             }
         } catch (ConversionException ex) {
             Logger.getLogger(MainCommand.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ProteoWizardNotInstalledException ex) {
+            Logger.getLogger(MainCommand.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage());
         }
     }
 }
