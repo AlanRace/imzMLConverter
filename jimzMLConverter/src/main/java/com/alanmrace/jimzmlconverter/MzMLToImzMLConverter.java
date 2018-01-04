@@ -256,7 +256,14 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
                 // TODO: Add all referenceParamGoups - TEMPORARY FIX
                 for (ReferenceableParamGroup rpg : currentmzML.getReferenceableParamGroupList()) {
-                    baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpg);
+                    if(!baseImzML.getReferenceableParamGroupList().contains(rpg)) {
+                        // Check if the ID is the same as one already in the list
+                        if(baseImzML.getReferenceableParamGroupList().containsID(rpg.getID())) {
+                            rpg.setID(rpg.getID() + "_");
+                        }
+                        
+                        baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpg);
+                    }
                 }
 
                 String filenameID = "mzML" + currentmzMLFile++;

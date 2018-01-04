@@ -311,6 +311,7 @@ public abstract class ImzMLConverter implements Converter {
             generatePixelLocations();
         }
 
+        baseImzML.getReferenceableParamGroupList().clear();
         generateReferenceableParamArrays();
 
         // Add in the data processing describing the conversion
