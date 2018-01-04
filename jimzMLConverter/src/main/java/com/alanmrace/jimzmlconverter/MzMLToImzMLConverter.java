@@ -240,13 +240,6 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
         int currentPixelLocation = 0;
 
-        // Add in IMS cv if it doesn't already exist
-        CV imsCV = baseImzML.getCVList().getCV("IMS");
-
-        if (imsCV == null) {
-            baseImzML.getCVList().addCV(new CV(CV.IMS_URI, "IMS", "IMS"));
-        }
-
         // Add all necessary spectra to the base imzML
         int currentmzMLFile = 0;
 

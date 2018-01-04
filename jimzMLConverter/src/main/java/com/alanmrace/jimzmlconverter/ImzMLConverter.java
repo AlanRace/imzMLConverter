@@ -12,6 +12,7 @@ import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray.CompressionType;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArrayList;
+import com.alanmrace.jimzmlparser.mzml.CV;
 import com.alanmrace.jimzmlparser.mzml.CVParam;
 import com.alanmrace.jimzmlparser.mzml.ChromatogramList;
 import com.alanmrace.jimzmlparser.mzml.DataProcessing;
@@ -307,6 +308,21 @@ public abstract class ImzMLConverter implements Converter {
         
         logger.log(Level.INFO, "Generated base imzML");
 
+        baseImzML.getCVList().clear();
+        OBO obo = OBO.getOBO();
+        List<OBO> fullOBOList = obo.getFullImportHeirarchy();
+        
+        for(OBO currentOBO : fullOBOList) {
+            baseImzML.getCVList().addCV(new CV(currentOBO));
+        }
+        
+        // Add in IMS cv if it doesn't already exist
+//        CV imsCV = baseImzML.getCVList().getCV("IMS");
+
+//        if (imsCV == null) {
+//            baseImzML.getCVList().addCV(new CV(CV.IMS_URI, "IMS", "IMS"));
+//        }
+        
         if (pixelLocations == null) {
             generatePixelLocations();
         }
