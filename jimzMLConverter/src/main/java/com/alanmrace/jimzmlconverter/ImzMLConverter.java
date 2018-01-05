@@ -58,6 +58,7 @@ public abstract class ImzMLConverter implements Converter {
     private static final Logger logger = Logger.getLogger(ImzMLConverter.class.getName());
 
     public static final String version = "2.0.0";
+    public static final String IMZMLCONVERTER_ID = "IMS:1000502";
 
     protected double progress;
 
@@ -335,6 +336,7 @@ public abstract class ImzMLConverter implements Converter {
 
         if (imzMLConverter == null || !imzMLConverter.getVersion().equals(ImzMLConverter.version)) {
             imzMLConverter = new Software("imzMLConverter", ImzMLConverter.version);
+            imzMLConverter.addCVParam(new EmptyCVParam(obo.getTerm(IMZMLCONVERTER_ID)));
 
             baseImzML.getSoftwareList().addSoftware(imzMLConverter);
         }
