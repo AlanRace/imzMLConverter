@@ -12,6 +12,7 @@ import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray.CompressionType;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArrayList;
+import com.alanmrace.jimzmlparser.mzml.BooleanCVParam;
 import com.alanmrace.jimzmlparser.mzml.CV;
 import com.alanmrace.jimzmlparser.mzml.CVParam;
 import com.alanmrace.jimzmlparser.mzml.ChromatogramList;
@@ -71,7 +72,8 @@ public abstract class ImzMLConverter implements Converter {
 
     protected PixelLocation[] pixelLocations;
 
-    protected CVParam compressionType;
+    protected CVParam mzArrayCompressionType;
+    protected CVParam intenstiyArrayCompressionType;
     protected CVParam mzArrayDataType;
     protected CVParam intensityArrayDataType;
 
@@ -90,7 +92,8 @@ public abstract class ImzMLConverter implements Converter {
         this.inputFilenames = inputFilenames;
 
         // Set up defaults
-        compressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
+        mzArrayCompressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
+        intenstiyArrayCompressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
         mzArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
         intensityArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
 
@@ -117,12 +120,39 @@ public abstract class ImzMLConverter implements Converter {
     public void setCompressionType(CompressionType compressionType) {
         OBOTerm term = CompressionType.toOBOTerm(compressionType);
 //        System.out.println("Setting compression type (" + compressionType + ") to " + term);
-        if(term != null)
-            this.compressionType = new EmptyCVParam(term);
+        if(term != null) {
+            this.mzArrayCompressionType = new EmptyCVParam(term);
+            this.intenstiyArrayCompressionType = new EmptyCVParam(term);
+        }
+    }
+    
+    public void setmzArrayCompressionType(CompressionType compressionType) {
+        OBOTerm term = CompressionType.toOBOTerm(compressionType);
+        
+        if(term != null) {
+            this.mzArrayCompressionType = new EmptyCVParam(term);
+        }
+    }
+    
+    public void setintensityArrayCompressionType(CompressionType compressionType) {
+        OBOTerm term = CompressionType.toOBOTerm(compressionType);
+        
+        if(term != null) {
+            this.intenstiyArrayCompressionType = new EmptyCVParam(term);
+        }
     }
     
     public void setCompressionType(CVParam compressionType) {
-        this.compressionType = compressionType;
+        this.mzArrayCompressionType = compressionType;
+        this.intenstiyArrayCompressionType = compressionType;
+    }
+    
+    public void setmzArrayCompressionType(CVParam compressionType) {
+        this.mzArrayCompressionType = compressionType;
+    }
+    
+    public void setIntensityArrayCompressionType(CVParam compressionType) {
+        this.intenstiyArrayCompressionType = compressionType;
     }
 
     public void setmzArrayDataType(DataType dataType) {
@@ -225,9 +255,15 @@ public abstract class ImzMLConverter implements Converter {
 
         // Add in compression type
         rpgmzArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
-        rpgmzArray.addCVParam(compressionType);
+        rpgmzArray.addCVParam(mzArrayCompressionType);
         rpgintensityArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
-        rpgintensityArray.addCVParam(compressionType);
+        rpgintensityArray.addCVParam(intenstiyArrayCompressionType);
+        
+        // 
+        rpgmzArray.removeChildOfCVParam(BinaryDataArray.externalDataID);
+        rpgmzArray.addCVParam(new BooleanCVParam(getOBOTerm(BinaryDataArray.externalDataID), true));
+        rpgintensityArray.removeChildOfCVParam(BinaryDataArray.externalDataID);
+        rpgintensityArray.addCVParam(new BooleanCVParam(getOBOTerm(BinaryDataArray.externalDataID), true));
     }
 
     protected abstract void generatePixelLocations();

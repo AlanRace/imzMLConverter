@@ -196,7 +196,7 @@ public class MainCommand {
 
                     String[] inputFilenames;
                     
-                    if (extension.equals("grd"))
+                    if (extension.equals("grd") || extension.equals("mzML"))
                         inputFilenames = new String[] {fileName};
                     else
                         inputFilenames = generatemzMLFiles(fileName, commandimzML);
@@ -262,8 +262,10 @@ public class MainCommand {
                             logger.log(Level.INFO, "Detected mzML file");
 
                             if (commandimzML.pixelLocationFile == null || commandimzML.pixelLocationFile.size() <= fileIndex
-                                    || commandimzML.pixelLocationFile.get(fileIndex) == null || !commandimzML.pixelLocationFile.get(fileIndex).contains(".txt")) {
+                                    || commandimzML.pixelLocationFile.get(fileIndex) == null || !(commandimzML.pixelLocationFile.get(fileIndex).contains(".txt") || commandimzML.pixelLocationFile.get(fileIndex).contains(".pat"))) {
                                 logger.log(Level.SEVERE, "No coordinates .txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
+                                
+                                converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
                             } else {
                                 inputFilenames = new String[]{fileName};
 
@@ -271,8 +273,13 @@ public class MainCommand {
                                     outputPath = fileName.replace(".mzML", "");
                                 }
 
-                                converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
-                                ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
+                                if(commandimzML.pixelLocationFile.get(fileIndex).contains(".pat")) {
+                                    converter = new WatersMzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
+                                    ((WatersMzMLToImzMLConverter) converter).setPatternFile(commandimzML.pixelLocationFile.get(fileIndex));
+                                } else {
+                                    converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
+                                    ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
+                                }
                             }
                         } else if (extension.equals("imzML")) {
 
@@ -339,6 +346,14 @@ public class MainCommand {
 
                                 if (commandimzML.compression != null) {
                                     ((ImzMLConverter) converter).setCompressionType(commandimzML.compression);
+                                }
+                                
+                                if(commandimzML.mzArrayCompression != null) {
+                                    ((ImzMLConverter) converter).setmzArrayCompressionType(commandimzML.mzArrayCompression);
+                                }
+                                
+                                if(commandimzML.intensityArrayCompression != null) {
+                                    ((ImzMLConverter) converter).setintensityArrayCompressionType(commandimzML.intensityArrayCompression);
                                 }
                                 
                                 if(commandimzML.imageDimensions != null) {                                    

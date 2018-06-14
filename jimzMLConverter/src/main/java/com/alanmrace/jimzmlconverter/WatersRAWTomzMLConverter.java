@@ -29,7 +29,7 @@ public class WatersRAWTomzMLConverter {
     //public static final String CONVERTER_x64_LOCATION = "C:\\Program Files\\ProteoWizard";
     public static final String CONVERTER_LOCATION = "C:\\Program Files\\ProteoWizard";
     
-    public static final String COMMAND_LINE = " --zlib ";
+    public static final String COMMAND_LINE = " --zlib --simAsSpectra ";
 //    public static final String INDEX_COMMAND = " /index";
     
     public static File[] convert(String filepath) throws IOException {
@@ -45,6 +45,10 @@ public class WatersRAWTomzMLConverter {
         File[] mzMLFiles = null;
         
         String extention = "";
+        
+        File outputFile = new File(outputFilepath);
+        if(!outputFile.isDirectory())
+            outputFilepath = outputFile.getParentFile().getAbsolutePath();
             
         if(filepath.lastIndexOf(".") != -1 && filepath.lastIndexOf(".") != 0)
             extention = filepath.substring(filepath.lastIndexOf(".")+1);

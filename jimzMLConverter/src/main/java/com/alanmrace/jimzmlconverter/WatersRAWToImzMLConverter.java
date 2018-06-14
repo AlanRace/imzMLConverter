@@ -5,10 +5,6 @@
  */
 package com.alanmrace.jimzmlconverter;
 
-import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import java.io.IOException;
-import java.util.logging.Level;
-
 /**
  *
  * @author amr1

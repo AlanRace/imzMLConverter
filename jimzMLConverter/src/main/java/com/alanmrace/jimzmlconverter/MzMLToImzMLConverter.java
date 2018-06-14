@@ -11,7 +11,6 @@ import com.alanmrace.jimzmlparser.exceptions.MzMLParseException;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
-import com.alanmrace.jimzmlparser.mzml.CV;
 import com.alanmrace.jimzmlparser.mzml.CVParam;
 import com.alanmrace.jimzmlparser.mzml.EmptyCVParam;
 import com.alanmrace.jimzmlparser.mzml.MzML;
@@ -92,6 +91,8 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
+            int spectraPerPixel = getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList());
+            
             switch (fileStorage) {
                 case pixelPerFile:
                     if (x == 0 || y == 0) {
@@ -99,7 +100,6 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                         x = y = (int) Math.ceil(Math.sqrt(inputFilenames.length));
                     }
 
-                    int spectraPerPixel = getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList());
 
                     pixelLocations = new PixelLocation[y * x * spectraPerPixel];
 
@@ -113,6 +113,16 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
                     break;
                 case oneFile:
+                    int numSpectra = baseImzML.getRun().getSpectrumList().size();
+                    
+                    pixelLocations = new PixelLocation[numSpectra * spectraPerPixel];
+                    
+                    for(int i = 0; i < numSpectra; i++) {
+                        for (int k = 0; k < spectraPerPixel; k++) {
+                            pixelLocations[i * spectraPerPixel + k] = new PixelLocation(i + 1, 1, 1);
+                        }
+                    }
+                    
                     break;
                 case rowPerFile:
                 default:
@@ -206,7 +216,12 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 break;
             }
         }
+        
+        //if(numSpectraPerPixel > 1000)
+        //    numSpectraPerPixel = 1;
 
+        Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.INFO, "Detected {0} spectra per pixel", numSpectraPerPixel);
+        
         return numSpectraPerPixel;
     }
 
@@ -316,6 +331,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     for(BinaryDataArray binaryDataArray : spectrum.getBinaryDataArrayList()) {
                         binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
                         binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
+                        binaryDataArray.removeChildOfCVParam(BinaryDataArray.externalDataID);
                         
                         if(binaryDataArray.ismzArray()) {
                             binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));

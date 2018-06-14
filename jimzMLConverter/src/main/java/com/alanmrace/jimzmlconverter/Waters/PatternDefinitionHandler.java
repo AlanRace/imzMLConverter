@@ -1,6 +1,5 @@
 package com.alanmrace.jimzmlconverter.Waters;
 
-import com.alanmrace.jimzmlconverter.WatersRAWTomzMLConverter;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;

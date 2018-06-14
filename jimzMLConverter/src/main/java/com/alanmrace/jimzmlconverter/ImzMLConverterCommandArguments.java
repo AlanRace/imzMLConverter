@@ -58,6 +58,12 @@ public class ImzMLConverterCommandArguments {
         @Parameter(names = {"--compression"}, description = "Compression type", converter = CompressionConverter.class)
         protected CompressionType compression = CompressionType.None;
         
+        @Parameter(names = {"--compression-mz-array"}, description = "Compression type for m/z array", converter = CompressionConverter.class)
+        protected CompressionType mzArrayCompression = null;
+        
+        @Parameter(names = {"--compression-intensity-array"}, description = "Compression type for intensity array", converter = CompressionConverter.class)
+        protected CompressionType intensityArrayCompression = null;
+        
         @Parameter(names = {"--mz-array-type"}, description = "Data type used to store m/z array", converter = DataTypeConverter.class)
         protected DataType mzArrayType = DataType.Double;
         
