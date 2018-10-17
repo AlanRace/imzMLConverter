@@ -55,8 +55,17 @@ public class ImzMLConverterCommandArguments {
         @Parameter(names = {"--ignore-scans"}, arity = 1, description = "Skip the first x scans when converting. Only compatible with --image-dimensions option.")
         protected Integer ignoreScans = 0;
         
+        @Parameter(names = {"--sum-scans-with-ppm"}, description = "Sum all scans within a single file with the specified ppm tolerance")
+        protected Double sumScansWithPPM = -Double.MAX_VALUE;
+        
+        @Parameter(names = {"--lesa-step-size"}, description = "LESA step size (um)")
+        protected Integer lesaStepSize = 200;
+        
+        @Parameter(names = {"--ms-level-filter"}, arity = 2, description = "Apply a filter to the MS level when converting to mzML files. Requires min and max level")
+        protected List<Integer> msLevelFilter;
+        
         @Parameter(names = {"--compression"}, description = "Compression type", converter = CompressionConverter.class)
-        protected CompressionType compression = CompressionType.None;
+        protected CompressionType compression = CompressionType.NONE;
         
         @Parameter(names = {"--compression-mz-array"}, description = "Compression type for m/z array", converter = CompressionConverter.class)
         protected CompressionType mzArrayCompression = null;

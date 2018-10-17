@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public class ThermoMzMLToImzMLConverter extends MzMLToImzMLConverter {
     
-    private static final Logger logger = Logger.getLogger(WatersMzMLToImzMLConverter.class.getName());
+    private static final Logger logger = Logger.getLogger(ThermoMzMLToImzMLConverter.class.getName());
     
     String udpFileLocation;
     
@@ -44,10 +44,9 @@ public class ThermoMzMLToImzMLConverter extends MzMLToImzMLConverter {
                 }
                 
                 try {
-                    System.out.println("BaseImzML: " + baseImzML);
                     this.pixelLocations = ThermoMzMLToImzMLConverter.getPixelLocationFromUDPFile(udpFileLocation, baseImzML.getRun().getSpectrumList());
 
-                    logger.log(Level.INFO, "Generated pixel locations from .pat file");
+                    logger.log(Level.INFO, "Generated pixel locations from .udp file");
                 } catch (ConversionException ex) {
                     logger.log(Level.SEVERE, null, ex); 
                 }

@@ -8,7 +8,6 @@ package com.alanmrace.jimzmlconverter.speedtest;
 import com.alanmrace.jimzmlconverter.ImzMLToHDF5Converter;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
-import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.parser.ImzMLHandler;
 import java.util.logging.Level;

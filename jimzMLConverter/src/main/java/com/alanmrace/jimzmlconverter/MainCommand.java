@@ -15,7 +15,10 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,21 +78,27 @@ public class MainCommand {
             }
         } else if(extension.equalsIgnoreCase("raw")) {
             try {
+                String msconvertFilter = "";
+                
+                // TODO move this into the conversion - this class shouldn't care about msconvert's filters
+                if(commandimzML.msLevelFilter != null && commandimzML.msLevelFilter.size() > 0)
+                    msconvertFilter = "msLevel " + commandimzML.msLevelFilter.get(0) + "-" + commandimzML.msLevelFilter.get(1);
+                
                 if(currentFile.isDirectory()) {
                     logger.log(Level.INFO, "Detected Waters RAW file");
 
                     if (outputPath == null) {
-                        mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
+                        mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, commonCommands.centroid, msconvertFilter);
                     } else {
-                        mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
+                        mzMLFiles = WatersRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid, msconvertFilter);
                     }
                 } else {
                     logger.log(Level.INFO, "Detected Thermo RAW file");
 
                     if (outputPath == null) {
-                        mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, commonCommands.centroid);
+                        mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, commonCommands.centroid, msconvertFilter);
                     } else {
-                        mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid);
+                        mzMLFiles = ThermoRAWTomzMLConverter.convert(fileName, outputPath, commonCommands.centroid, msconvertFilter);
                     }
                 }
             } catch (IOException ex) {
@@ -178,6 +187,16 @@ public class MainCommand {
         command.convert(jc.getParsedCommand());
     }
 
+    public static boolean isConvertableFile(String filename) {
+        String extension = getExtension(filename);
+        
+        // Removed mzML and imzML for now as this method is used to determine if it's possible to convert to mzML
+        if (extension.equals("grd") || extension.equals("wiff") || extension.equalsIgnoreCase("raw")) // || extension.equals("mzML") || extension.equals("imzML"))
+            return true;
+        
+        return false;
+    }
+    
     public void convert(String parsedCommand) {
         outputPath = commonCommands.output;
 
@@ -198,7 +217,25 @@ public class MainCommand {
                     
                     if (extension.equals("grd") || extension.equals("mzML"))
                         inputFilenames = new String[] {fileName};
-                    else
+                    else if(currentFile.isDirectory() && !fileName.endsWith(".raw")) {
+                        inputFilenames = currentFile.list();
+                        ArrayList<String> fullmzMLList = new ArrayList<>();
+                        
+                        System.out.println("------- File order:");
+                        for(String filename : inputFilenames) {
+                            if(isConvertableFile(filename)) {
+                                System.out.println(filename);
+
+                                fullmzMLList.addAll(Arrays.asList(generatemzMLFiles(Paths.get(currentFile.getAbsolutePath(), filename).toString(), commandimzML)));
+                            }
+                        }
+                        System.out.println("-------");
+                        
+                        inputFilenames = new String[fullmzMLList.size()];
+                        inputFilenames = fullmzMLList.toArray(inputFilenames);
+                        
+                        System.out.println(fullmzMLList);
+                    } else
                         inputFilenames = generatemzMLFiles(fileName, commandimzML);
 
                     // TODO: CHECK MzML FILES EXIST
@@ -208,15 +245,15 @@ public class MainCommand {
                         if (extension.equals("wiff")) {
                             converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
                         } else if (extension.equalsIgnoreCase("raw") && currentFile.isDirectory()) {
-                            if (commandimzML.pixelLocationFile == null || commandimzML.pixelLocationFile.size() <= fileIndex
-                                    || commandimzML.pixelLocationFile.get(fileIndex) == null || !(commandimzML.pixelLocationFile.get(fileIndex).contains(".pat") || commandimzML.pixelLocationFile.get(fileIndex).contains(".txt"))) {
+                            if (commandimzML.imageDimensions == null && (commandimzML.pixelLocationFile == null || commandimzML.pixelLocationFile.size() <= fileIndex
+                                    || commandimzML.pixelLocationFile.get(fileIndex) == null || !(commandimzML.pixelLocationFile.get(fileIndex).contains(".pat") || commandimzML.pixelLocationFile.get(fileIndex).contains(".txt")))) {
                                 logger.log(Level.SEVERE, "No .pat or .txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
                             } else {
                                 converter = new WatersMzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
 
-                                if (commandimzML.pixelLocationFile.get(fileIndex).contains(".pat")) {
+                                if (commandimzML.pixelLocationFile != null && commandimzML.pixelLocationFile.get(fileIndex).contains(".pat")) {
                                     ((WatersMzMLToImzMLConverter) converter).setPatternFile(commandimzML.pixelLocationFile.get(fileIndex));
-                                } else {
+                                } else if(commandimzML.pixelLocationFile != null) {
                                     ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
                                 }
                             }
@@ -243,8 +280,6 @@ public class MainCommand {
                                 logger.log(Level.SEVERE, "No .properties.txt file supplied for the {0}th file {1}", new Object[]{fileIndex, fileName});
                             } else {
                                 try {
-                                    inputFilenames = new String[]{fileName};
-
                                     if (outputPath == null || outputPath.isEmpty()) {
                                         outputPath = fileName.replace(".grd", ".imzML");
                                     }
@@ -267,8 +302,6 @@ public class MainCommand {
                                 
                                 converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.oneFile);
                             } else {
-                                inputFilenames = new String[]{fileName};
-
                                 if (outputPath == null || outputPath.isEmpty()) {
                                     outputPath = fileName.replace(".mzML", "");
                                 }
@@ -281,6 +314,18 @@ public class MainCommand {
                                     ((MzMLToImzMLConverter) converter).setCoordsFile(commandimzML.pixelLocationFile.get(fileIndex));
                                 }
                             }
+                        } else if(currentFile.isDirectory()) {
+                            logger.log(Level.INFO, "Detected folder of files - LESA data");
+                            
+                            if (outputPath == null || outputPath.isEmpty()) {
+                                outputPath = fileName;
+                            }
+                            
+                            converter = new LESAToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.pixelPerFile);
+                            ((LESAToImzMLConverter) converter).setLESAStepSize(commandimzML.lesaStepSize);
+                            ((LESAToImzMLConverter) converter).setCSVFile(commandimzML.pixelLocationFile.get(fileIndex));
+                            
+                            ((LESAToImzMLConverter) converter).setSumScansPPMTolerance(commandimzML.sumScansWithPPM);
                         } else if (extension.equals("imzML")) {
 
                             if (parsedCommand.equals("hdf5")) {
