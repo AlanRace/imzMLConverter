@@ -92,10 +92,10 @@ public abstract class ImzMLConverter implements Converter {
         this.inputFilenames = inputFilenames;
 
         // Set up defaults
-        mzArrayCompressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
-        intenstiyArrayCompressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID));
-        mzArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
-        intensityArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID));
+        mzArrayCompressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.NO_COMPRESSION_ID));
+        intenstiyArrayCompressionType = new EmptyCVParam(getOBOTerm(BinaryDataArray.NO_COMPRESSION_ID));
+        mzArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.DOUBLE_PRECISION_ID));
+        intensityArrayDataType = new EmptyCVParam(getOBOTerm(BinaryDataArray.DOUBLE_PRECISION_ID));
 
         fullmzList = new HashSet<>();
     }
@@ -224,12 +224,12 @@ public abstract class ImzMLConverter implements Converter {
         if (rpgmzArray == null) {
             rpgmzArray = new ReferenceableParamGroup("mzArray");
 
-            rpgmzArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.mzArrayID), getOBOTerm(BinaryDataArray.mzArrayUnitsID)));
+            rpgmzArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.MZ_ARRAY_ID), getOBOTerm(BinaryDataArray.MZ_ARRAY_UNITS_ID)));
             rpgmzArray.addCVParam(mzArrayDataType);
 
             baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpgmzArray);
         } else {
-            rpgmzArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
+            rpgmzArray.removeChildrenOfCVParam(BinaryDataArray.BINARY_DATA_TYPE_ID, false);
             rpgmzArray.addCVParam(mzArrayDataType);
         }
 
@@ -244,26 +244,26 @@ public abstract class ImzMLConverter implements Converter {
         if (rpgintensityArray == null) {
             rpgintensityArray = new ReferenceableParamGroup("intensityArray");
 
-            rpgintensityArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.intensityArrayID), getOBOTerm(BinaryDataArray.intensityArrayUnitsNumberOfCountsID)));
+            rpgintensityArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.INTENSITY_ARRAY_ID), getOBOTerm(BinaryDataArray.INTENSITY_ARRAY_UNITS_NUMBER_OF_COUNTS_ID)));
             rpgintensityArray.addCVParam(intensityArrayDataType);
 
             baseImzML.getReferenceableParamGroupList().addReferenceableParamGroup(rpgintensityArray);
         } else {
-            rpgintensityArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
+            rpgintensityArray.removeChildrenOfCVParam(BinaryDataArray.BINARY_DATA_TYPE_ID, false);
             rpgintensityArray.addCVParam(intensityArrayDataType);
         }
 
         // Add in compression type
-        rpgmzArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
+        rpgmzArray.removeChildrenOfCVParam(BinaryDataArray.COMPRESSION_TYPE_ID, false);
         rpgmzArray.addCVParam(mzArrayCompressionType);
-        rpgintensityArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
+        rpgintensityArray.removeChildrenOfCVParam(BinaryDataArray.COMPRESSION_TYPE_ID, false);
         rpgintensityArray.addCVParam(intenstiyArrayCompressionType);
         
         // 
-        rpgmzArray.removeChildOfCVParam(BinaryDataArray.externalDataID);
-        rpgmzArray.addCVParam(new BooleanCVParam(getOBOTerm(BinaryDataArray.externalDataID), true));
-        rpgintensityArray.removeChildOfCVParam(BinaryDataArray.externalDataID);
-        rpgintensityArray.addCVParam(new BooleanCVParam(getOBOTerm(BinaryDataArray.externalDataID), true));
+        rpgmzArray.removeCVParam(BinaryDataArray.EXTERNAL_DATA_ID);
+        rpgmzArray.addCVParam(new BooleanCVParam(getOBOTerm(BinaryDataArray.EXTERNAL_DATA_ID), true));
+        rpgintensityArray.removeCVParam(BinaryDataArray.EXTERNAL_DATA_ID);
+        rpgintensityArray.addCVParam(new BooleanCVParam(getOBOTerm(BinaryDataArray.EXTERNAL_DATA_ID), true));
     }
 
     protected abstract void generatePixelLocations();
@@ -292,24 +292,24 @@ public abstract class ImzMLConverter implements Converter {
         imzML.getFileDescription().getSourceFileList().addSourceFile(sourceFile);
 
         try {
-            sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.sha1FileChecksumID), calculateSHA1(filename)));
+            sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.SHA1_FILE_CHECKSUM_ID), calculateSHA1(filename)));
         } catch (ConversionException ex) {
             Logger.getLogger(ImzMLConverter.class.getName()).log(Level.SEVERE, "Failed to generate SHA1 for " + filename, ex);
         }
 
         // Add the native spectrum format
         if (currentFileDescription.getSourceFileList() != null) {
-            sourceFile.addCVParam(currentFileDescription.getSourceFileList().getSourceFile(0).getCVParamOrChild(SourceFile.nativeSpectrumIdentifierFormatID));
+            sourceFile.addCVParam(currentFileDescription.getSourceFileList().getSourceFile(0).getCVParamOrChild(SourceFile.NATIVE_SPECTRUM_IDENTIFIER_FORMAT_ID));
             // TODO: Checksum					
         }
-        sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.mzMLFileFormatID), ""));
+        sourceFile.addCVParam(new StringCVParam(getOBOTerm(SourceFile.MZML_FILE_FORMAT_ID), ""));
     }
 
     public static void removeEmptySpectraFromImzML(ImzML imzML) {
         // Remove empty spectra
         System.out.println("Checking spectra to remove...");
 
-        ArrayList<Spectrum> spectraToRemove = new ArrayList<Spectrum>();
+        ArrayList<Spectrum> spectraToRemove = new ArrayList<>();
 
         for (Spectrum spectrum : imzML.getRun().getSpectrumList()) {
             if (spectrum.getBinaryDataArrayList().getBinaryDataArray(0) != null
@@ -380,7 +380,7 @@ public abstract class ImzMLConverter implements Converter {
         // Add processing description to DataProcessing list
         DataProcessing conversionToImzML = new DataProcessing("conversionToImzML");
         conversionToImzML.addProcessingMethod(new ProcessingMethod(imzMLConverter));
-        conversionToImzML.getProcessingMethod(0).addCVParam(new StringCVParam(getOBOTerm(ProcessingMethod.fileFormatConversionID), getConversionDescription()));
+        conversionToImzML.getProcessingMethod(0).addCVParam(new StringCVParam(getOBOTerm(ProcessingMethod.FILE_FORMAT_CONVERSION_ID), getConversionDescription()));
         conversionToImzML.getProcessingMethod(0).setSoftwareRef(imzMLConverter);
 
         baseImzML.getDataProcessingList().addDataProcessing(conversionToImzML);
@@ -406,11 +406,11 @@ public abstract class ImzMLConverter implements Converter {
             scanSettings = new ScanSettings("scanSettings1");
             scanSettingsList.addScanSettings(scanSettings);
         }
-        scanSettings.removeChildOfCVParam(ScanSettings.maxCountPixelXID);
-        scanSettings.removeChildOfCVParam(ScanSettings.maxCountPixelYID);
+        scanSettings.removeCVParam(ScanSettings.MAX_COUNT_PIXEL_X_ID);
+        scanSettings.removeCVParam(ScanSettings.MAX_COUNT_PIXEL_Y_ID);
 
-        scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.maxCountPixelXID), "" + xPixels));
-        scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.maxCountPixelYID), "" + yPixels));
+        scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.MAX_COUNT_PIXEL_X_ID), "" + xPixels));
+        scanSettings.addCVParam(new StringCVParam(getOBOTerm(ScanSettings.MAX_COUNT_PIXEL_Y_ID), "" + yPixels));
         //scanSettings.addCVParam(new CVParam(obo.getTerm(ScanSettings.maxCountPixelZID), ""+zPixels));
     }
 
@@ -506,9 +506,9 @@ public abstract class ImzMLConverter implements Converter {
             List<Double> sortedmzList = new ArrayList(fullmzList);
             Collections.sort(sortedmzList);
 
-            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalOffsetID), offset));
-            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalArrayLengthID), sortedmzList.size()));
-            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.externalEncodedLengthID), sortedmzList.size() * Double.BYTES));
+            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.EXTERNAL_OFFSET_ID), offset));
+            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.EXTERNAL_ARRAY_LENGTH_ID), sortedmzList.size()));
+            imzMLConverter.addCVParam(new LongCVParam(obo.getTerm(BinaryDataArray.EXTERNAL_ENCODED_LENGTH_ID), sortedmzList.size() * Double.BYTES));
 
             for (Double mz : sortedmzList) {
                 binaryDataStream.writeDouble(mz);
@@ -536,10 +536,10 @@ public abstract class ImzMLConverter implements Converter {
         }
 
         Scan scan = scanList.getScan(0);
-        scan.removeCVParam(Scan.positionXID);
-        scan.addCVParam(new StringCVParam(getOBOTerm(Scan.positionXID), "" + x));
-        scan.removeCVParam(Scan.positionYID);
-        scan.addCVParam(new StringCVParam(getOBOTerm(Scan.positionYID), "" + y));
+        scan.removeCVParam(Scan.POSITION_X_ID);
+        scan.addCVParam(new StringCVParam(getOBOTerm(Scan.POSITION_X_ID), "" + x));
+        scan.removeCVParam(Scan.POSITION_Y_ID);
+        scan.addCVParam(new StringCVParam(getOBOTerm(Scan.POSITION_Y_ID), "" + y));
     }
 
     protected static BinaryDataArrayList createDefaultBinaryDataArrayList() {
@@ -547,17 +547,17 @@ public abstract class ImzMLConverter implements Converter {
 
         // m/z
         BinaryDataArray mzBinaryDataArray = new BinaryDataArray(0);
-        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.mzArrayID)));
-        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID)));
-        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID)));
+        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.MZ_ARRAY_ID)));
+        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.DOUBLE_PRECISION_ID)));
+        mzBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.NO_COMPRESSION_ID)));
 
         binaryDataArrayList.addBinaryDataArray(mzBinaryDataArray);
 
         // Counts
         BinaryDataArray countsBinaryDataArray = new BinaryDataArray(0);
-        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.intensityArrayID)));
-        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.doublePrecisionID)));
-        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.noCompressionID)));
+        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.INTENSITY_ARRAY_ID)));
+        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.DOUBLE_PRECISION_ID)));
+        countsBinaryDataArray.addCVParam(new EmptyCVParam(getOBOTerm(BinaryDataArray.NO_COMPRESSION_ID)));
 
         binaryDataArrayList.addBinaryDataArray(countsBinaryDataArray);
 

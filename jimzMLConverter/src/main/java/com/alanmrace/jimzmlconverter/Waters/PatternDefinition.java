@@ -144,7 +144,7 @@ public class PatternDefinition implements Iterable<Region> {
         for (int i = 0; i < spectrumList.size(); i += numSpectraPerPixel) {
             Spectrum spectrum = spectrumList.getSpectrum(i);
 
-            CVParam scanStartTime = spectrum.getScanList().getScan(0).getCVParam(Scan.scanStartTimeID);
+            CVParam scanStartTime = spectrum.getScanList().getScan(0).getCVParam(Scan.SCAN_START_TIME_ID);
             //System.out.println(scanStartTime);
 
             chromatogram[spectrumIndex++] = scanStartTime.getValueAsDouble();

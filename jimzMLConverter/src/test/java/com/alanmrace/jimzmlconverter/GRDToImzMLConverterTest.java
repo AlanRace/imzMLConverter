@@ -5,8 +5,8 @@
  */
 package com.alanmrace.jimzmlconverter;
 
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
-import com.alanmrace.jimzmlparser.exceptions.ImzMLParseException;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.mzml.ReferenceableParamGroupRef;
 import com.alanmrace.jimzmlparser.mzml.Spectrum;
@@ -129,7 +129,7 @@ public class GRDToImzMLConverterTest {
      */
     @Test
     @Ignore
-    public void testConvert() {
+    public void testConvert() throws ConversionException {
         System.out.println("convert");
         
         try {
@@ -187,7 +187,7 @@ public class GRDToImzMLConverterTest {
      */
     @Test
     @Ignore
-    public void testMain() {
+    public void testMain() throws ConversionException {
         System.out.println("main");
         String[] args = null;
         GRDToImzMLConverter.main(args);

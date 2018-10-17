@@ -7,7 +7,7 @@ package com.alanmrace.jimzmlconverter;
 
 import static com.alanmrace.jimzmlconverter.ImzMLConverter.getOBOTerm;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import com.alanmrace.jimzmlparser.exceptions.MzMLParseException;
+import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
@@ -56,7 +56,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
         this.fileStorage = fileStorage;
 
-        lineScanDirection = new EmptyCVParam(getOBOTerm(ScanSettings.lineScanDirectionLeftRightID));
+        lineScanDirection = new EmptyCVParam(getOBOTerm(ScanSettings.LINE_SCAN_DIRECTION_LEFT_RIGHT_ID));
     }
 
     public void setCoordsFile(String filename) {
@@ -86,7 +86,11 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
         if (coordsFilename != null) {
             try {
-                pixelLocations = getPixelLocationFromTextFile(coordsFilename, getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList()));
+//                if(coordsFilename.endsWith("csv")) {
+//                    pixelLocations = getPixelLocationFromCSVFile(coordsFilename);
+//                } else {
+                    pixelLocations = getPixelLocationFromTextFile(coordsFilename, getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList()));
+//                }
             } catch (ConversionException ex) {
                 Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -133,6 +137,10 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         }
     }
 
+    //public static PixelLocation[] getPixelLocationFromCSVFile(String spectrumLocationFile) {
+    //    throw new UnsupportedOperationException("Not supported yet.");
+    //}
+    
     public static PixelLocation[] getPixelLocationFromTextFile(String spectrumLocationFile, int numSpectraPerPixel) throws ConversionException {
         int xPixels = 0;
         int yPixels = 0;
@@ -203,7 +211,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         int numSpectraPerPixel = 0;
 
         for (Spectrum spectrum : spectrumList) {
-            CVParam scanStartTimeParam = spectrum.getScanList().getScan(0).getCVParam(Scan.scanStartTimeID);
+            CVParam scanStartTimeParam = spectrum.getScanList().getScan(0).getCVParam(Scan.SCAN_START_TIME_ID);
             double scanStartTime = scanStartTimeParam.getValueAsDouble();
 
             if (originalScanStartTime == -1) {
@@ -233,7 +241,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
             Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.INFO, "Finished parsing mzML Header");
 
             baseImzML = new ImzML(mzML);
-        } catch (MzMLParseException ex) {
+        } catch (FatalParseException ex) {
             Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -243,6 +251,10 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         return "Conversion from mzML to imzML";
     }
 
+    protected void superconvert() throws ConversionException {
+        super.convert();
+    }
+    
     @Override
     public void convert() throws ConversionException {
         super.convert();
@@ -285,7 +297,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     int startValue = numSpectra;
                     int endValue = -1;
 
-                    if (lineScanDirection.getTerm().getID().equals(ScanSettings.lineScanDirectionLeftRightID)) {
+                    if (lineScanDirection.getTerm().getID().equals(ScanSettings.LINE_SCAN_DIRECTION_LEFT_RIGHT_ID)) {
                         xDirection = 1;
                         startValue = 1;
                         endValue = numSpectra;
@@ -329,16 +341,16 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 //                    }
                     
                     for(BinaryDataArray binaryDataArray : spectrum.getBinaryDataArrayList()) {
-                        binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
-                        binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
-                        binaryDataArray.removeChildOfCVParam(BinaryDataArray.externalDataID);
+                        binaryDataArray.removeChildrenOfCVParam(BinaryDataArray.COMPRESSION_TYPE_ID, false);
+                        binaryDataArray.removeChildrenOfCVParam(BinaryDataArray.BINARY_DATA_TYPE_ID, false);
+                        binaryDataArray.removeCVParam(BinaryDataArray.EXTERNAL_DATA_ID);
                         
                         if(binaryDataArray.ismzArray()) {
                             binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
-                            binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
+                            binaryDataArray.removeCVParam(BinaryDataArray.MZ_ARRAY_ID);
                         } else if(binaryDataArray.isIntensityArray()) {
                             binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
-                            binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
+                            binaryDataArray.removeCVParam(BinaryDataArray.INTENSITY_ARRAY_ID);
                         }
                     }
                     
@@ -354,17 +366,19 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     if (spectrumY > maxY) {
                         maxY = spectrumY;
                     }
+                    
+                    if (fileStorage == FileStorage.pixelPerFile) {
+                        break;
+                    }
                 }
 
                 Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.FINEST, "About to close mzML in convert()");
                 // TODO: Figure out a way around this?
                 //currentmzML.close();
-            } catch (MzMLParseException ex) {
+            } catch (FatalParseException ex) {
                 Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
 
                 throw new ConversionException("MzMLParseException: " + ex, ex);
-            } catch (ArrayIndexOutOfBoundsException ex) {
-                Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

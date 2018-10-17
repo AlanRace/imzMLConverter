@@ -65,10 +65,10 @@ public class ImzMLConverterCommandArguments {
         protected CompressionType intensityArrayCompression = null;
         
         @Parameter(names = {"--mz-array-type"}, description = "Data type used to store m/z array", converter = DataTypeConverter.class)
-        protected DataType mzArrayType = DataType.Double;
+        protected DataType mzArrayType = DataType.DOUBLE;
         
         @Parameter(names = {"--intensity-array-type"}, description = "Data type used to store intensity array", converter = DataTypeConverter.class)
-        protected DataType intensityArrayType = DataType.Double;
+        protected DataType intensityArrayType = DataType.DOUBLE;
     }
     
     @Parameters(separators = "=", commandDescription = "Convert to HDF5")

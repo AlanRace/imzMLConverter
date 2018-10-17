@@ -149,8 +149,8 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
             System.out.println(uuid);
 
             // Add UUID to the imzML file
-            baseImzML.getFileDescription().getFileContent().removeChildOfCVParam(FileContent.ibdIdentificationID);
-            baseImzML.getFileDescription().getFileContent().addCVParam(new StringCVParam(getOBOTerm(FileContent.uuidIdntificationID), uuid));
+            baseImzML.getFileDescription().getFileContent().removeChildrenOfCVParam(FileContent.IDB_IDENTIFICATION_ID, false);
+            baseImzML.getFileDescription().getFileContent().addCVParam(new StringCVParam(getOBOTerm(FileContent.UUID_IDENTIFICATION_ID), uuid));
 
             try {
                 binaryDataStream.write(hexStringToByteArray(uuid));
@@ -210,15 +210,15 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                         //spectrum.getmzArray();
                         //offset = copySpectrumToImzML(baseImzML, spectrum, binaryDataStream, offset);
                         for (BinaryDataArray binaryDataArray : spectrum.getBinaryDataArrayList()) {
-                            binaryDataArray.removeChildOfCVParam(BinaryDataArray.compressionTypeID);
-                            binaryDataArray.removeChildOfCVParam(BinaryDataArray.dataTypeID);
+                            binaryDataArray.removeChildrenOfCVParam(BinaryDataArray.COMPRESSION_TYPE_ID, false);
+                            binaryDataArray.removeChildrenOfCVParam(BinaryDataArray.BINARY_DATA_TYPE_ID, false);
 
                             if (binaryDataArray.ismzArray()) {
                                 binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
-                                binaryDataArray.removeCVParam(BinaryDataArray.mzArrayID);
+                                binaryDataArray.removeCVParam(BinaryDataArray.MZ_ARRAY_ID);
                             } else if (binaryDataArray.isIntensityArray()) {
                                 binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
-                                binaryDataArray.removeCVParam(BinaryDataArray.intensityArrayID);
+                                binaryDataArray.removeCVParam(BinaryDataArray.INTENSITY_ARRAY_ID);
                             }
                         }
 
@@ -259,10 +259,10 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
         setImzMLImageDimensions(baseImzML, maxX, maxY);
 
         String sha1Hash = calculateSHA1(outputFilename + ".ibd");
-        baseImzML.getFileDescription().getFileContent().removeChildOfCVParam(FileContent.ibdChecksumID);
+        baseImzML.getFileDescription().getFileContent().removeChildrenOfCVParam(FileContent.IBD_CHECKSUM_ID, false);
 
         System.out.println("SHA-1 Hash: " + sha1Hash);
-        baseImzML.getFileDescription().getFileContent().addCVParam(new StringCVParam(getOBOTerm(FileContent.sha1ChecksumID), sha1Hash));
+        baseImzML.getFileDescription().getFileContent().addCVParam(new StringCVParam(getOBOTerm(FileContent.SHA1_CHECKSUM_ID), sha1Hash));
 
         // Output the imzML portion of the data
         ImzMLWriter imzMLWriter = new ImzMLWriter();
