@@ -7,10 +7,13 @@ package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.IONTOF.IONTOFProperties;
 import com.alanmrace.jimzmlconverter.IONTOF.IONTOFProperty;
-import com.alanmrace.jimzmlparser.exceptions.ImzMLWriteException;
+import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
+import com.alanmrace.jimzmlparser.data.BinaryDataStorage;
+import com.alanmrace.jimzmlparser.data.DataLocation;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArrayList;
+import com.alanmrace.jimzmlparser.mzml.CVList;
 import com.alanmrace.jimzmlparser.mzml.DataProcessing;
 import com.alanmrace.jimzmlparser.mzml.DataProcessingList;
 import com.alanmrace.jimzmlparser.mzml.DoubleCVParam;
@@ -36,10 +39,12 @@ import com.alanmrace.jimzmlparser.mzml.SpectrumList;
 import com.alanmrace.jimzmlparser.mzml.StringCVParam;
 import com.alanmrace.jimzmlparser.obo.OBO;
 import com.alanmrace.jimzmlparser.writer.ImzMLHeaderWriter;
+import com.alanmrace.jimzmlparser.writer.ImzMLWriter;
 import java.io.BufferedOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -110,6 +115,8 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 
         SourceFileList sourceFileList = new SourceFileList(this.inputFilenames.length);
         fileDescription.setSourceFileList(sourceFileList);
+        
+        baseImzML.setCVList(CVList.create());
         
         // Add source files to the base imzML
         for(int i = 0; i < inputFilenames.length; i++) {
@@ -201,12 +208,13 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 
     @Override
     protected void generatePixelLocations() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void convert() {
-        generateBaseImzML();
+    public void convert() throws ConversionException {
+        //generateBaseImzML();
+        super.convert();
 
         HashMap<Long, Short>[][] pixelData = new HashMap[numPixelsY][numPixelsX];
 
@@ -372,8 +380,11 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         // Third pass
         // Go through the new temporary file to organise into spectra 
         try {
-            dis = new FileInputStream(new File(outputFilename + ".ibdtmp"));
-            dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outputFilename + ".ibd")));
+            File tempibdFile = new File(outputFilename + ".ibdtmp");
+            tempibdFile.deleteOnExit();
+            
+            dis = new FileInputStream(tempibdFile);
+            dos = new DataOutputStream(new BufferedOutputStream(new FileOutputStream(outputFilename + ".tmp.ibd")));
 
             long outputOffset = 0;
             
@@ -417,7 +428,29 @@ public class GRDToImzMLConverter extends ImzMLConverter {
 
         logger.log(Level.FINE, "Outputting {0} spectra", spectrumList.size());
 
-        ImzMLHeaderWriter imzMLWriter = new ImzMLHeaderWriter();
+        ImzMLWriter imzMLWriter = new ImzMLWriter();
+        
+        for(Spectrum spectrum : spectrumList) {
+            Spectrum newSpectrum = new Spectrum(spectrum, baseImzML);
+            BinaryDataArray mzArray = newSpectrum.getBinaryDataArrayList().getBinaryDataArray(0);
+            mzArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));
+            
+            BinaryDataArray intensityArray = newSpectrum.getBinaryDataArrayList().getBinaryDataArray(1);
+            intensityArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgintensityArray));
+            
+            // Update the DataLocation to the temporary ibd file
+            File ibdFile = new File(outputFilename + ".tmp.ibd");
+            ibdFile.deleteOnExit();
+            
+            try {
+                mzArray.setDataLocation(new DataLocation(new BinaryDataStorage(ibdFile, false), mzArray.getExternalOffset(), (int) mzArray.getExternalEncodedLength()));
+                intensityArray.setDataLocation(new DataLocation(new BinaryDataStorage(ibdFile, false), intensityArray.getExternalOffset(), (int)intensityArray.getExternalEncodedLength()));
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(GRDToImzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            baseImzML.getRun().getSpectrumList().add(newSpectrum);
+        }
         
         try {
             imzMLWriter.write(baseImzML, outputFilename);
@@ -501,7 +534,7 @@ public class GRDToImzMLConverter extends ImzMLConverter {
             mzArray.addCVParam(new StringCVParam(obo.getTerm("IMS:1000101"), "true"));
             // External offset
             mzArray.addCVParam(new LongCVParam(obo.getTerm("IMS:1000102"), outputOffset));
-            
+                        
             // Increment the offset by the encoded length
             outputOffset += (mzs.length * 8);
 
@@ -561,7 +594,7 @@ public class GRDToImzMLConverter extends ImzMLConverter {
         return outputOffset;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ConversionException {
         try {
             GRDToImzMLConverter converter = new GRDToImzMLConverter("D:\\Rory\\2014_03_17_lipid_standard\\2014_03_17_PC16-0_16-0_20keVAr500_+ve_1.itm.grd", new String[]{"D:\\Rory\\2014_03_17_lipid_standard\\2014_03_17_PC16-0_16-0_20keVAr500_+ve_1.itm.grd"});
             converter.setPropertiesFile("D:\\Rory\\2014_03_17_lipid_standard\\2014_03_17_PC16-0_16-0_20keVAr500_+ve_1.properties.txt");
