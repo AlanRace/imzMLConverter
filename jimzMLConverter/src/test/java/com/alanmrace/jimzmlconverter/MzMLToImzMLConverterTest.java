@@ -47,34 +47,34 @@ public class MzMLToImzMLConverterTest {
     
     @BeforeClass
     public static void setUpClass() {
-        org.junit.Assume.assumeTrue(isWindows());
-        System.out.println("Setting up MzMLToImzMLConverterTest");
-        assertNotNull("Test file missing", MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE));
-        
-        try {
-            String resourcePath = MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE).getPath();
-            
-            if(resourcePath.startsWith("/"))
-                resourcePath = resourcePath.substring(1);
-            
-            mzMLFiles = WiffTomzMLConverter.convert(resourcePath);
-            
-            // Create the output path
-            outputPath = resourcePath.replace(".wiff", "");
-            
-            System.out.println("Converted " + mzMLFiles.length + " files");
-            //assertEquals("Number of mzML files produced ", 4, mzMLFiles.length);
-            
-            // Check to see if the correct number of files have been converted to continue (i.e. if MS Data Converter (SCIEX) is installed)
-            org.junit.Assume.assumeTrue(mzMLFiles.length == 4);
-        } catch (IOException ex) {
-            fail("IOException: " + ex);
+        if(isWindows()) {
+            System.out.println("Setting up MzMLToImzMLConverterTest");
+            assertNotNull("Test file missing", MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE));
+
+            try {
+                String resourcePath = MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE).getPath();
+
+                if (resourcePath.startsWith("/"))
+                    resourcePath = resourcePath.substring(1);
+
+                mzMLFiles = WiffTomzMLConverter.convert(resourcePath);
+
+                // Create the output path
+                outputPath = resourcePath.replace(".wiff", "");
+
+                System.out.println("Converted " + mzMLFiles.length + " files");
+                //assertEquals("Number of mzML files produced ", 4, mzMLFiles.length);
+
+                // Check to see if the correct number of files have been converted to continue (i.e. if MS Data Converter (SCIEX) is installed)
+                org.junit.Assume.assumeTrue(mzMLFiles.length == 4);
+            } catch (IOException ex) {
+                fail("IOException: " + ex);
+            }
         }
     }
     
     @AfterClass
     public static void tearDownClass() {
-        org.junit.Assume.assumeTrue(isWindows());
         System.out.println("Removing mzML files");
 
         if(mzMLFiles != null)
@@ -90,6 +90,8 @@ public class MzMLToImzMLConverterTest {
 
     @Before
     public void setUp() {
+        org.junit.Assume.assumeTrue(isWindows());
+
         logger.setLevel(Level.ALL);
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter());
