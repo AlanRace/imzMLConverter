@@ -47,8 +47,8 @@ public class MzMLToImzMLConverterTest {
     
     @BeforeClass
     public static void setUpClass() {
-        System.out.println("Setting up MzMLToImzMLConverterTest");
         org.junit.Assume.assumeTrue(isWindows());
+        System.out.println("Setting up MzMLToImzMLConverterTest");
         assertNotNull("Test file missing", MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE));
         
         try {
@@ -74,10 +74,12 @@ public class MzMLToImzMLConverterTest {
     
     @AfterClass
     public static void tearDownClass() {
+        org.junit.Assume.assumeTrue(isWindows());
         System.out.println("Removing mzML files");
-        
-        for(File file : mzMLFiles)
-            file.delete();
+
+        if(mzMLFiles != null)
+            for(File file : mzMLFiles)
+                file.delete();
     }
      
     String[] inputFilenames;
