@@ -1,6 +1,11 @@
 language: java
 sudo: required
 
+before_install:
+    - wget http://support.hdfgroup.org/ftp/HDF5/releases/HDF-JAVA/hdfjni-3.3.2/bin/HDFJava-3.3.2_Stat-centos7_64.tar.gz
+    - tar -xvzf HDFJava-3.3.2_Stat-centos7_64.tar.gz
+    - ls
+
 script: 
     - cd jimzMLConverter
     - mvn clean package
