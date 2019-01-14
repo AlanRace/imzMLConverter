@@ -9,6 +9,11 @@ script:
     - cd jimzMLConverter
     - mvn clean package
     - cd ..
+    - ls jimzMLConverter/
+    - ls jimzMLConverter/target
+    - ls jimzMLConverter/target/lib
+    - zip jimzMLConverter-$TRAVIS_TAG.zip jimzMLConverter/target/jimzMLConverter-$TRAVIS_TAG.jar jimzMLConverter/target/lib
+    - ls -la
 
 deploy:
   provider: releases
