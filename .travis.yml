@@ -11,10 +11,13 @@ script:
     - cd ..
     - zip -r jimzMLConverter-$TRAVIS_TAG.zip jimzMLConverter/target/jimzMLConverter-$TRAVIS_TAG.jar jimzMLConverter/target/lib
     - ls -la
+    - pwd
 
 before_deploy:
+    - pwd
     - cd ~
     - ls
+    - pwd
     
 deploy:
   provider: releases
