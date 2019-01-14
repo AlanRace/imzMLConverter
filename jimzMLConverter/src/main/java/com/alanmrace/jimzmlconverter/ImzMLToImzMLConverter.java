@@ -170,6 +170,8 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
             for (int fileIndex = 0; fileIndex < inputFilenames.length; fileIndex++) {
                 String imzMLFilename = inputFilenames[fileIndex];
 
+                Logger.getLogger(MzMLToImzMLConverter.class.getName()).log(Level.INFO, "Processing " + imzMLFilename);
+
                 try {
                     ImzML currentimzML = ImzMLHandler.parseimzML(imzMLFilename);
 
@@ -212,6 +214,10 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
                         for (BinaryDataArray binaryDataArray : spectrum.getBinaryDataArrayList()) {
                             binaryDataArray.removeChildrenOfCVParam(BinaryDataArray.COMPRESSION_TYPE_ID, false);
                             binaryDataArray.removeChildrenOfCVParam(BinaryDataArray.BINARY_DATA_TYPE_ID, false);
+
+                            // TODO: ONLY HERE BECAUSE OF 3D DATA FROM SCILS LAB - need a better way to do this otherwise this will
+                            // cause all RPGs to be removed which may not be desirable
+                            binaryDataArray.removeAllReferenceableParamGroupRefs();
 
                             if (binaryDataArray.ismzArray()) {
                                 binaryDataArray.addReferenceableParamGroupRef(new ReferenceableParamGroupRef(rpgmzArray));

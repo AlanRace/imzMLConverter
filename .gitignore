@@ -38,3 +38,7 @@ jimzMLConverter/src/main/assembly/
 jimzMLConverter/\.idea/
 
 jimzMLConverter/jimzMLConverter\.iml
+
+\.idea/
+
+jimzMLConverter/Ontologies/

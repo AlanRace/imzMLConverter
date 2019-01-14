@@ -215,7 +215,7 @@ public class MainCommand {
 
                     String[] inputFilenames;
                     
-                    if (extension.equals("grd") || extension.equals("mzML"))
+                    if (extension.equals("grd") || extension.equals("mzML") || extension.equals("imzML"))
                         inputFilenames = new String[] {fileName};
                     else if(currentFile.isDirectory() && !fileName.endsWith(".raw")) {
                         inputFilenames = currentFile.list();
@@ -346,6 +346,8 @@ public class MainCommand {
 
                                     converter = null;
                                 }
+                            } else {
+                                converter = new ImzMLToImzMLConverter(outputPath, inputFilenames);
                             }
                         }
 
@@ -439,6 +441,8 @@ public class MainCommand {
                                     ((ImzMLConverter) converter).setPixelLocations(locations);
                                     ((ImzMLConverter) converter).setOutputFilename(outputPath + "_" + splitIndex);
                                 }
+
+                                logger.log(Level.INFO, MessageFormat.format("Converting using {0} compression for m/z array", ((ImzMLConverter)converter).mzArrayCompressionType));
                             }
                         }
 
