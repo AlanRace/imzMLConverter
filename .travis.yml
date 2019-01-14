@@ -2,15 +2,8 @@ language: java
 sudo: required
 
 before_install:
-    - wget http://support.hdfgroup.org/ftp/HDF5/releases/HDF-JAVA/hdfjni-3.3.2/bin/HDFJava-3.3.2_Stat-centos7_64.tar.gz
-    - tar -xvzf HDFJava-3.3.2_Stat-centos7_64.tar.gz
-    - hdf/HDFJava-3.3.2-Linux.sh --skip-license
-    - pwd
-    - ls HDF_Group/HDFJava
-    - ls HDF_Group/HDFJava/3.3.2
-    - ls HDF_Group/HDFJava/3.3.2/lib
-    - mvn install:install-file -Dfile="HDF_Group\HDFJava\3.3.2\lib\jhdf5.dll" -DgroupId=org.hdfgroup -DartifactId=jhdf5 -Dversion=1.10.1 -Dpackaging=dll
-    - mvn install:install-file -Dfile="HDF_Group\HDFJava\3.3.2\lib\jarhdf5-3.3.2.jar" -DgroupId=org.hdfgroup -DartifactId=jarhdf5 -Dversion=1.10.1 -Dpackaging=jar
+    - mvn install:install-file -Dfile="Dependencies\hdf5_java.dll" -DgroupId=org.hdfgroup -DartifactId=jhdf5 -Dversion=1.10.1 -Dpackaging=dll
+    - mvn install:install-file -Dfile="Dependencies\jarhdf5-1.10.1.jar" -DgroupId=org.hdfgroup -DartifactId=jarhdf5 -Dversion=1.10.1 -Dpackaging=jar
 
 script: 
     - cd jimzMLConverter
