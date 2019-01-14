@@ -80,9 +80,15 @@ public class MzMLToImzMLConverterTest {
     }
      
     String[] inputFilenames;
-     
+
+    private boolean isWindows() {
+        return System.getProperty("os.name").startsWith("Windows");
+    }
+
     @Before
     public void setUp() {
+        org.junit.Assume.assumeTrue(isWindows());
+
         logger.setLevel(Level.ALL);
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter());
