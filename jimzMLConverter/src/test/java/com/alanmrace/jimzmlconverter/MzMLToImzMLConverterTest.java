@@ -48,6 +48,7 @@ public class MzMLToImzMLConverterTest {
     @BeforeClass
     public static void setUpClass() {
         System.out.println("Setting up MzMLToImzMLConverterTest");
+        org.junit.Assume.assumeTrue(isWindows());
         assertNotNull("Test file missing", MzMLToImzMLConverterTest.class.getResource(TEST_RESOURCE));
         
         try {
@@ -81,14 +82,12 @@ public class MzMLToImzMLConverterTest {
      
     String[] inputFilenames;
 
-    private boolean isWindows() {
+    private static boolean isWindows() {
         return System.getProperty("os.name").startsWith("Windows");
     }
 
     @Before
     public void setUp() {
-        org.junit.Assume.assumeTrue(isWindows());
-
         logger.setLevel(Level.ALL);
         ConsoleHandler handler = new ConsoleHandler();
         handler.setFormatter(new SimpleFormatter());
