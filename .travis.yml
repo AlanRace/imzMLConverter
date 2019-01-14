@@ -8,6 +8,7 @@ before_install:
 script: 
     - cd jimzMLConverter
     - mvn clean package
+    - cd ..
 
 deploy:
   provider: releases
