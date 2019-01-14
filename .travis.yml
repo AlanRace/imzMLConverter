@@ -15,7 +15,7 @@ script:
 
 before_deploy:
     - pwd
-    - cd ~
+    - cd /home/travis/build/AlanRace/imzMLConverter
     - ls
     - pwd
     
