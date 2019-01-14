@@ -14,6 +14,8 @@ script:
 
 before_deploy:
     - cd ~
+    - ls
+    - zip -r jimzMLConverter-$TRAVIS_TAG.zip jimzMLConverter/target/jimzMLConverter-$TRAVIS_TAG.jar jimzMLConverter/target/lib
 
 deploy:
   provider: releases
