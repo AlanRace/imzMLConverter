@@ -23,11 +23,11 @@ To see a full list of options for the converter run the command:
 #### Converting Waters data
 * Modify the following command:
 
-`java -jar jimzMLConverter-2.0.2.jar -p "C:\Path\To\Data\my_data.pat "C:\Path\To\Data\my_data.raw"`
+`java -jar jimzMLConverter-2.0.2.jar imzML -p "C:\Path\To\Data\my_data.pat "C:\Path\To\Data\my_data.raw"`
 
 #### Converting ION-TOF data
 
 * Export the data to GRD, ensuring that the properties.txt file is generated
 * Modify the following command:
 
-`java -jar jimzMLConverter-2.0.2.jar -p "C:\Path\To\Data\my_data.properties.txt "C:\Path\To\Data\my_data.grd"`
+`java -jar jimzMLConverter-2.0.2.jar imzML -p "C:\Path\To\Data\my_data.properties.txt "C:\Path\To\Data\my_data.grd"`
