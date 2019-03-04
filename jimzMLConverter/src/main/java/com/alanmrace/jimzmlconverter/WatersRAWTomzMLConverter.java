@@ -6,10 +6,8 @@
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -33,6 +31,8 @@ public class WatersRAWTomzMLConverter {
     
     public static final String COMMAND_LINE = " --zlib --simAsSpectra ";
 //    public static final String INDEX_COMMAND = " /index";
+
+
     
     public static File[] convert(String filepath) throws IOException {
         return convert(filepath, false, "");
@@ -57,7 +57,15 @@ public class WatersRAWTomzMLConverter {
             
         if(extention.equalsIgnoreCase("raw")) { // && fileToConvert.isDirectory()) {
             try {
-                String tempCommand = getCommand() + " \"" + filepath + "\"" + COMMAND_LINE;
+                String tempCommand = getCommand();
+                boolean isLinux = tempCommand.contains("wine");
+
+                if(isLinux)
+                    tempCommand += " " + filepath;
+                else
+                    tempCommand += " \"" + filepath + "\"";
+
+                tempCommand += COMMAND_LINE;
                 
                 if(centroid)
                     tempCommand +=  " --filter \"peakPicking true 1-\"";
@@ -65,13 +73,26 @@ public class WatersRAWTomzMLConverter {
                 if(!msconvertFilter.isEmpty())
                     tempCommand += " --filter \"" + msconvertFilter + "\"";
                 
-                tempCommand += " -o \"" + outputFilepath + "\"";
+                tempCommand += " -o ";
+
+                if(isLinux)
+                    tempCommand += outputFilepath;
+                else
+                    tempCommand += "\"" + outputFilepath + "\"";
                 
                 System.out.println(tempCommand);
                 Process process = Runtime.getRuntime().exec(tempCommand);
                 
                 // Wait for the conversion to complete
                 process.waitFor();
+
+                BufferedReader br=new BufferedReader(new InputStreamReader(process.getInputStream()));
+                String line;
+
+                while((line = br.readLine()) != null) {
+                    System.out.println(line);
+                }
+
                 
                 // Locate the mzML files that were created
                 File directory = new File(outputFilepath);
