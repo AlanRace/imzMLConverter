@@ -26,6 +26,7 @@ public class WatersRAWTomzMLConverter {
     private static final Logger logger = Logger.getLogger(WatersRAWTomzMLConverter.class.getName());
     
     public static final String CONVERTER_NAME = "ProteoWizard";
+    public static final String WINE_CONVERTER = "wine msconvert";
     public static final String CONVERTER_FILENAME = "msconvert.exe";
     //public static final String CONVERTER_x64_LOCATION = "C:\\Program Files\\ProteoWizard";
     public static final String CONVERTER_LOCATION = "C:\\Program Files\\ProteoWizard";
@@ -143,12 +144,12 @@ public class WatersRAWTomzMLConverter {
     
     public static String getCommand() {
         try {
-            Process process = Runtime.getRuntime().exec(CONVERTER_FILENAME);
+            Process process = Runtime.getRuntime().exec(WINE_CONVERTER);
 
             // Wait for the conversion to complete
             process.waitFor();
 
-            return CONVERTER_FILENAME;
+            return WINE_CONVERTER;
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (IOException e) {
