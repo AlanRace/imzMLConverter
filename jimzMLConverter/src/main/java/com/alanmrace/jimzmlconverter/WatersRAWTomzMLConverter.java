@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.logging.Level;
@@ -141,12 +142,33 @@ public class WatersRAWTomzMLConverter {
     }
     
     public static String getCommand() {
-        File converterFolder = new File(CONVERTER_LOCATION);
-        
+        try {
+            Process process = Runtime.getRuntime().exec(CONVERTER_FILENAME);
+
+            // Wait for the conversion to complete
+            process.waitFor();
+
+            return CONVERTER_FILENAME;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Checking for latest version of ProteoWizard in " + Paths.get(System.getProperty("user.home"), "AppData", "Local", "Apps").toString());
+
+        File converterFolder = new File(Paths.get(System.getProperty("user.home"), "AppData", "Local", "Apps").toString());
+
         File[] subfolders = getSubfolders(converterFolder);
-        
+
+        if(subfolders == null || subfolders.length == 0) {
+            converterFolder = new File(CONVERTER_LOCATION);
+
+            subfolders = getSubfolders(converterFolder);
+        }
+
         // Check the D drive
-        if(subfolders == null) {
+        if(subfolders == null || subfolders.length == 0) {
             converterFolder = new File(CONVERTER_LOCATION.replaceFirst("C", "D"));
             subfolders = getSubfolders(converterFolder);
         }
@@ -171,67 +193,5 @@ public class WatersRAWTomzMLConverter {
         }
         
         return "\"" + converterFolder.getAbsolutePath() + "\\" + CONVERTER_FILENAME + "\"";
-    }
-    
-    
-    public static void main(String[] args) throws IOException, ConversionException {
-        //System.out.println(WatersRAWTomzMLConverter.class.getResource("/DAN.wiff"));
-        
-        final String[] filePaths = {"F:\\CRUK\\2016_07_08_CRUK_48T_s20.raw"};
-                            //"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.raw",
-                            //"F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.raw",
-                            //"F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.raw",
-                            //"F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.raw"};
-        final String[] patternFiles = {"F:\\CRUK\\2016_07_07_cruk_48T_s20.pat"};
-        //{"F:\\AstraZeneca\\Lung\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB\\PLD_12_Aug_2015_Grp8_Grp9_htxDHB_100um.pat",
-        //                    "F:\\AstraZeneca\\Lung\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB\\PLD_13_Aug_2015_Grp6_Grp7_htxDHB_125um.pat",
-         //                   "F:\\AstraZeneca\\Lung\\PLD_18_Aug_2015_Grp3_4_5_manualDHB\\PLD_18_Aug_2015_Grp3_4_5_manualDHB_100um.pat",
-         //                   "F:\\AstraZeneca\\Lung\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3\\PLD_19_Aug_2015_Grp3_4_5_manualDHB_box3_100um.pat"};
-        
-        final long startTime = System.currentTimeMillis();
-        
-//        int i = 1;
-        for(int i = 0; i < filePaths.length; i++) {
-            final int index = i;
-            
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        try {
-                            File[] mzMLFiles = WatersRAWTomzMLConverter.convert(filePaths[index]);
-                            
-                            System.out.println("Conversion of " + filePaths[index] + " to mzML took " + ((System.currentTimeMillis() - startTime) / 1000.0) + " s");
-                        
-                            for(File file : mzMLFiles) {
-                                System.out.println("Found : " + file.getAbsolutePath());
-                            }
-                        } catch (IOException ex) {
-                            Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                               
-                        String[] inputFiles = {filePaths[index].replace(".raw", ".mzML")};//{mzMLFiles[0].getAbsolutePath()};
-                        
-                        //String[] inputFiles = {"D:\\AstraZeneca\\John\\19_May_2016_MCTB1604_100mpk_30mins_DHB_MS_100um.mzML"}; //
-                        
-                        
-                        WatersMzMLToImzMLConverter converter = new WatersMzMLToImzMLConverter(filePaths[index], inputFiles, MzMLToImzMLConverter.FileStorage.oneFile);
-                        
-                        System.out.println("Using .pat file: " + patternFiles[index]);
-                        
-                        converter.setPatternFile(patternFiles[index]);
-                        converter.convert();
-                        
-                        System.out.println("Conversion of " + filePaths[index] + " to imzML took " + ((System.currentTimeMillis() - startTime) / 1000) + " s");
-                    } catch (ConversionException ex) {
-                        Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
-//                    } catch (IOException ex) {
-//                        Logger.getLogger(WatersRAWTomzMLConverter.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }.start();
-        }
-        
-        System.out.println("Total conversion of " + filePaths.length + " files to imzML took " + ((System.currentTimeMillis() - startTime) / 1000) + " s");
     }
 }
