@@ -81,19 +81,5 @@ public class WatersRAWTomzMLConverterTest {
         // TODO review the generated test code and remove the default call to fail.
         fail("The test case is a prototype.");
     }
-
-    /**
-     * Test of main method, of class WatersRAWTomzMLConverter.
-     * @throws java.lang.Exception
-     */
-    @Test
-    @Ignore
-    public void testMain() throws Exception {
-        System.out.println("main");
-        String[] args = null;
-        WatersRAWTomzMLConverter.main(args);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
     
 }
