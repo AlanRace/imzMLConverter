@@ -212,6 +212,14 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
         for (Spectrum spectrum : spectrumList) {
             CVParam scanStartTimeParam = spectrum.getScanList().getScan(0).getCVParam(Scan.SCAN_START_TIME_ID);
+
+            // If there is no scan start time recorded, we cannot determine if there were multiple scans acquried at
+            // the same pixel location
+            if(scanStartTimeParam == null) {
+                numSpectraPerPixel = 1;
+                break;
+            }
+
             double scanStartTime = scanStartTimeParam.getValueAsDouble();
 
             if (originalScanStartTime == -1) {
