@@ -168,12 +168,12 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     coords = line.split("\\s+");
                 }
 
-                int curX = Integer.parseInt(coords[0]);
-                int curY = Integer.parseInt(coords[1]);
+                int curX = Integer.parseInt(coords[0].trim());
+                int curY = Integer.parseInt(coords[1].trim());
                 int curZ = 1;
 
                 if (coords.length == 3) {
-                    curZ = Integer.parseInt(coords[2]);
+                    curZ = Integer.parseInt(coords[2].trim());
                 }
 
                 if (curX > xPixels) {
