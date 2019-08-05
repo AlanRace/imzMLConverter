@@ -9,11 +9,9 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
 	
         <mainClass>com.alanmrace.jimzmlconverter.MainCommand</mainClass>
-        <hdf5Version>1.10.1</hdf5Version>
+        <hdf5Version>1.10.5</hdf5Version>
         <sonar.jacoco.itReportPath>${project.basedir}/../target/jacoco-it.exec</sonar.jacoco.itReportPath>
     </properties>
     
@@ -21,38 +19,53 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.7.8</version>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.7.0</version>
+                    <configuration>
+                        <release>11</release>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.ow2.asm</groupId>
+                            <artifactId>asm</artifactId>
+                            <version>6.2</version> <!-- Use newer version of ASM -->
+                        </dependency>
+                    </dependencies>
                 </plugin>
-            <!--           <execution>
-                            <id>copy-hdf5-dll</id>
-                            <phase>compile</phase>
-                            <goals>
-                                <goal>copy-dependencies</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                <includeScope>system</includeScope>
-                            </configuration>
-                        </execution>
+                <!--    <plugin>
+                       <groupId>org.jacoco</groupId>
+                       <artifactId>jacoco-maven-plugin</artifactId>
+                       <version>0.7.8</version>
+                   </plugin>
+                         <execution>
+                               <id>copy-hdf5-dll</id>
+                               <phase>compile</phase>
+                               <goals>
+                                   <goal>copy-dependencies</goal>
+                               </goals>
+                               <configuration>
+                                   <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                   <includeScope>system</includeScope>
+                               </configuration>
+                           </execution>
 
-                        <execution>
-                            <id>copy-dependencies</id>
-                            <phase>prepare-package</phase>
-                            <goals>
-                                <goal>copy-dependencies</goal>
-                            </goals>
-                            <configuration>
-                                <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                                <overWriteReleases>false</overWriteReleases>
-                                <overWriteSnapshots>false</overWriteSnapshots>
-                                <overWriteIfNewer>true</overWriteIfNewer>
-                                <excludeArtifactIds>junit,hamcrest-core</excludeArtifactIds>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>-->
+                           <execution>
+                               <id>copy-dependencies</id>
+                               <phase>prepare-package</phase>
+                               <goals>
+                                   <goal>copy-dependencies</goal>
+                               </goals>
+                               <configuration>
+                                   <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                                   <overWriteReleases>false</overWriteReleases>
+                                   <overWriteSnapshots>false</overWriteSnapshots>
+                                   <overWriteIfNewer>true</overWriteIfNewer>
+                                   <excludeArtifactIds>junit,hamcrest-core</excludeArtifactIds>
+                               </configuration>
+                           </execution>
+                       </executions>
+                   </plugin>-->
 
                 <plugin>
                     <groupId>com.coderplus.maven.plugins</groupId>
@@ -172,9 +185,15 @@
             <version>1.0.5</version>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.4.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.4.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -216,6 +235,12 @@
             <artifactId>annotations</artifactId>
             <version>13.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- END FOR HDF5 -->

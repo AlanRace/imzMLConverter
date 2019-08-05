@@ -212,8 +212,12 @@ public class PatternDefinition implements Iterable<Region> {
             System.out.println("Mean threshold: " + meanThreshold);
 
             for (int i = 0; i < chromatogramDiff.length; i++) {
+                if(currentLineNum == 0)
+                    System.out.println("Line " + currentLineNum +  ": chromatogramDiff[i] = " + chromatogramDiff[i]);
+
                 if (chromatogramDiff[i] > meanTimeDelay * meanThreshold) // Was 1.0120
                 {
+                    //System.out.println("Line " + currentLineNum +  ": chromatogramDiff[i] = " + chromatogramDiff[i]);
                     currentLineNum++;
                 }
 
@@ -259,8 +263,10 @@ public class PatternDefinition implements Iterable<Region> {
                     int numPixelsOnCurrentLine = numPixelsOnLines.get(currentLineNum); // ((int) Math.round(line.getLength() / laserSizeX)) + 1;
                     int expectedNumberOfPixels = ((int) Math.round(line.getLength() / laserSizeX)) + 1;
 
+                    int numPixelsLeeway = 2;
+
                     // Compare with the chromatogram to see if we have a believable number of pixels
-                    if (!((numPixelsOnCurrentLine - 1) <= expectedNumberOfPixels && expectedNumberOfPixels <= (numPixelsOnCurrentLine + 1))) {
+                    if (!((numPixelsOnCurrentLine - numPixelsLeeway) <= expectedNumberOfPixels && expectedNumberOfPixels <= (numPixelsOnCurrentLine + numPixelsLeeway))) {
                         if (expectedNumberOfPixels > numPixelsOnCurrentLine) {
                             System.out.println("[" + currentLineNum + "] " + "Less on line: " + currentLineNum + ". Found " + numPixelsOnCurrentLine + ". Expected " + expectedNumberOfPixels);
 
@@ -288,7 +294,7 @@ public class PatternDefinition implements Iterable<Region> {
                                     int remainder = numPixelsOnLines.get(currentLineNum) - expectedNumberOfPixels - expectedNumberOfPixelsOnNextLine;
 
                                     System.out.println("[" + currentLineNum + "] " + "Expected on next line: " + expectedNumberOfPixelsOnNextLine + ". Remainder: " + remainder);
-                                    
+
                                     currentLineNum -= 1;
 
                                     if (currentLineNum < 0) {
