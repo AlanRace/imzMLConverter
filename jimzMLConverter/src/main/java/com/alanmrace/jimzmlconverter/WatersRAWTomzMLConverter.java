@@ -170,11 +170,11 @@ public class WatersRAWTomzMLConverter {
             // Wait for the conversion to complete
             process.waitFor();
 
+            Logger.getLogger(WiffTomzMLConverter.class.getName()).log(Level.INFO, "Found wine, so running using wine");
+
             return WINE_CONVERTER;
         } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
         }
 
         System.out.println("Checking for latest version of ProteoWizard in " + Paths.get(System.getProperty("user.home"), "AppData", "Local", "Apps").toString());

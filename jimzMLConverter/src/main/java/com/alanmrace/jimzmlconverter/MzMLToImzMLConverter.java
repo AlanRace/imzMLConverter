@@ -129,6 +129,21 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                     
                     break;
                 case rowPerFile:
+                    int spectraInFile = baseImzML.getRun().getSpectrumList().size();
+                    int numFiles = this.inputFilenames.length;
+
+                    pixelLocations = new PixelLocation[spectraInFile * numFiles * spectraPerPixel];
+
+                    // TODO: When encountering files with different lengths, this will fail. Should determine the number of spectra per file.
+                    for(int y = 0; y < numFiles; y++) {
+                        for(int x = 0; x < spectraInFile; x++) {
+                            for (int k = 0; k < spectraPerPixel; k++) {
+                                pixelLocations[(y * spectraInFile * spectraPerPixel) + (x * spectraPerPixel) + k] = new PixelLocation(x + 1, y + 1, 1);
+                            }
+                        }
+                    }
+
+                    break;
                 default:
                     //                pixelLocations = new PixelLocation[inputFilenames.length][baseImzML.getRun().getSpectrumList().size()];
                     break;

@@ -23,7 +23,12 @@ public class ImzMLConverterCommandArguments {
     
     @Parameter(names = {"--help", "-h"}, help = true)
     protected boolean help;
-  
+
+    public enum SourceType {
+        LESA,
+        DESI
+    }
+
     public class CommonCommands {
         @Parameter(description = "The list of files to convert", required = true)
         protected List<String> files;
@@ -57,7 +62,10 @@ public class ImzMLConverterCommandArguments {
         
         @Parameter(names = {"--sum-scans-with-ppm"}, description = "Sum all scans within a single file with the specified ppm tolerance")
         protected Double sumScansWithPPM = -Double.MAX_VALUE;
-        
+
+        @Parameter(names ={"--source-type"}, description = "Source type, which dictates how a folder full of files is handled")
+        protected SourceType sourceType = null;
+
         @Parameter(names = {"--lesa-step-size"}, description = "LESA step size (um)")
         protected Integer lesaStepSize = 200;
         

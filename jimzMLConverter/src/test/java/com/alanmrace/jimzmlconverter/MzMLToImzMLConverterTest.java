@@ -68,7 +68,10 @@ public class MzMLToImzMLConverterTest {
                 // Check to see if the correct number of files have been converted to continue (i.e. if MS Data Converter (SCIEX) is installed)
                 org.junit.Assume.assumeTrue(mzMLFiles.length == 4);
             } catch (IOException ex) {
-                fail("IOException: " + ex);
+                if(!ex.getLocalizedMessage().contains("run program"))
+                    fail("IOException: " + ex);
+                else
+                    System.out.println("SCIEX MS Data Converter not installed");
             }
         }
     }

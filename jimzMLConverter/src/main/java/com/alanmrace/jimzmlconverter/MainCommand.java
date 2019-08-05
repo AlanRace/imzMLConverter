@@ -113,13 +113,17 @@ public class MainCommand {
                 outputPath = fileName.replace(".raw", "");
             }
         }
-        
-        if (mzMLFiles != null) {
-            inputFilenames = new String[mzMLFiles.length];
 
-            for (int i = 0; i < mzMLFiles.length; i++) {
-                inputFilenames[i] = mzMLFiles[i].getAbsolutePath();
-                mzMLFiles[i].deleteOnExit();
+        if(extension.equalsIgnoreCase("mzML")) {
+            inputFilenames = new String[]{fileName};
+        } else {
+            if (mzMLFiles != null) {
+                inputFilenames = new String[mzMLFiles.length];
+
+                for (int i = 0; i < mzMLFiles.length; i++) {
+                    inputFilenames[i] = mzMLFiles[i].getAbsolutePath();
+                    mzMLFiles[i].deleteOnExit();
+                }
             }
         }
 
@@ -315,17 +319,37 @@ public class MainCommand {
                                 }
                             }
                         } else if(currentFile.isDirectory()) {
-                            logger.log(Level.INFO, "Detected folder of files - LESA data");
-                            
-                            if (outputPath == null || outputPath.isEmpty()) {
-                                outputPath = fileName;
+                            if(commandimzML.sourceType == null){
+                                Logger.getLogger(MainCommand.class.getName()).log(Level.SEVERE, "Found a directory and no source type. Please specify the data type.");
+                            } else {
+                                switch (commandimzML.sourceType) {
+                                    case LESA:
+                                        logger.log(Level.INFO, "Detected folder of files - LESA data");
+
+                                        if (outputPath == null || outputPath.isEmpty()) {
+                                            outputPath = fileName;
+                                        }
+
+                                        converter = new LESAToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.pixelPerFile);
+                                        ((LESAToImzMLConverter) converter).setLESAStepSize(commandimzML.lesaStepSize);
+                                        ((LESAToImzMLConverter) converter).setCSVFile(commandimzML.pixelLocationFile.get(fileIndex));
+
+                                        ((LESAToImzMLConverter) converter).setSumScansPPMTolerance(commandimzML.sumScansWithPPM);
+
+                                        break;
+                                    case DESI:
+                                        logger.log(Level.INFO, "Detected folder of files - DESI data");
+
+                                        if (outputPath == null || outputPath.isEmpty()) {
+                                            outputPath = fileName;
+                                        }
+
+                                        converter = new MzMLToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.rowPerFile);
+                                        break;
+                                    default:
+                                        Logger.getLogger(MainCommand.class.getName()).log(Level.SEVERE, "Found a directory and no source type. Please specify the data type.");
+                                }
                             }
-                            
-                            converter = new LESAToImzMLConverter(outputPath, inputFilenames, MzMLToImzMLConverter.FileStorage.pixelPerFile);
-                            ((LESAToImzMLConverter) converter).setLESAStepSize(commandimzML.lesaStepSize);
-                            ((LESAToImzMLConverter) converter).setCSVFile(commandimzML.pixelLocationFile.get(fileIndex));
-                            
-                            ((LESAToImzMLConverter) converter).setSumScansPPMTolerance(commandimzML.sumScansWithPPM);
                         } else if (extension.equals("imzML")) {
 
                             if (parsedCommand.equals("hdf5")) {
