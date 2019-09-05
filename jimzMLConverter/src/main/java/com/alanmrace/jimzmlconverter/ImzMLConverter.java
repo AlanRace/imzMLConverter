@@ -202,7 +202,7 @@ public abstract class ImzMLConverter implements Converter {
 
     protected abstract String getConversionDescription();
 
-    public abstract void setDirections(MzMLToImzMLConverter.Direction primaryDirection, MzMLToImzMLConverter.Direction secondaryDirection);
+    public void setDirections(MzMLToImzMLConverter.Direction primaryDirection, MzMLToImzMLConverter.Direction secondaryDirection) {}
 
     protected static final OBOTerm getOBOTerm(String cvParamID) {
         if (obo == null) {
