@@ -207,6 +207,11 @@ public class GRDToImzMLConverter extends ImzMLConverter {
     }
 
     @Override
+    public void setDirections(MzMLToImzMLConverter.Direction primaryDirection, MzMLToImzMLConverter.Direction secondaryDirection) {
+
+    }
+
+    @Override
     protected void generatePixelLocations() {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

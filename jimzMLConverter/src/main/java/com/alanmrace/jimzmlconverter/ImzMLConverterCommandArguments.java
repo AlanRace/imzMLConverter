@@ -56,6 +56,12 @@ public class ImzMLConverterCommandArguments {
         
         @Parameter(names = {"--image-dimensions"}, arity = 2, description = "Create rectangular image with dimensions x, y in number of pixels. Not compatible with --pixel-location-file.")
         protected List<Integer> imageDimensions;
+
+        @Parameter(names = {"--primary-direction"}, description = "The primary direction that the stage moves in (the first direction that the stage moves in after acquiring the first spectrum). By default this is left to right.")
+        protected MzMLToImzMLConverter.Direction firstDirection = MzMLToImzMLConverter.Direction.LeftToRight;
+
+        @Parameter(names = {"--secondary-direction"}, description = "The secondary direction that the stage moves in (the direction the stage moves in after acquiring all spectra in primary direction). By default this is top to bottom.")
+        protected MzMLToImzMLConverter.Direction secondDirection = MzMLToImzMLConverter.Direction.TopToBottom;
         
         @Parameter(names = {"--ignore-scans"}, arity = 1, description = "Skip the first x scans when converting. Only compatible with --image-dimensions option.")
         protected Integer ignoreScans = 0;

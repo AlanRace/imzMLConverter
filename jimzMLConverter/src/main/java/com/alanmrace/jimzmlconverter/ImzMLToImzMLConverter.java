@@ -61,6 +61,11 @@ public class ImzMLToImzMLConverter extends ImzMLConverter {
     }
 
     @Override
+    public void setDirections(MzMLToImzMLConverter.Direction primaryDirection, MzMLToImzMLConverter.Direction secondaryDirection) {
+
+    }
+
+    @Override
     protected void generatePixelLocations() {
         if (baseImzML == null) {
             generateBaseImzML();

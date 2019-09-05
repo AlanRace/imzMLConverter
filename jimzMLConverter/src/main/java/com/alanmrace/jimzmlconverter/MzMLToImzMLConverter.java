@@ -8,6 +8,9 @@ package com.alanmrace.jimzmlconverter;
 import static com.alanmrace.jimzmlconverter.ImzMLConverter.getOBOTerm;
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
 import com.alanmrace.jimzmlparser.exceptions.FatalParseException;
+import com.alanmrace.jimzmlparser.exceptions.FatalParseIssue;
+import com.alanmrace.jimzmlparser.exceptions.FatalRuntimeParseException;
+import com.alanmrace.jimzmlparser.exceptions.MzMLParseException;
 import com.alanmrace.jimzmlparser.imzml.ImzML;
 import com.alanmrace.jimzmlparser.imzml.PixelLocation;
 import com.alanmrace.jimzmlparser.mzml.BinaryDataArray;
@@ -51,12 +54,29 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
         pixelPerFile
     }
 
+    public enum Direction {
+        LeftToRight,
+        RightToLeft,
+        TopToBottom,
+        BottomToTop
+    }
+
+    Direction primaryDirection, secondaryDirection;
+
     public MzMLToImzMLConverter(String outputFilename, String[] inputFilenames, FileStorage fileStorage) {
         super(outputFilename, inputFilenames);
 
         this.fileStorage = fileStorage;
 
-        lineScanDirection = new EmptyCVParam(getOBOTerm(ScanSettings.LINE_SCAN_DIRECTION_LEFT_RIGHT_ID));
+        //lineScanDirection = new EmptyCVParam(getOBOTerm(ScanSettings.LINE_SCAN_DIRECTION_LEFT_RIGHT_ID));
+
+    }
+
+    public void setDirections(Direction primaryDirection, Direction secondaryDirection) {
+        this.primaryDirection = primaryDirection;
+        this.secondaryDirection = secondaryDirection;
+
+        // TODO: Set lineScanDirection
     }
 
     public void setCoordsFile(String filename) {
@@ -96,7 +116,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
             }
         } else {
             int spectraPerPixel = getNumberSpectraPerPixel(baseImzML.getRun().getSpectrumList());
-            
+
             switch (fileStorage) {
                 case pixelPerFile:
                     if (x == 0 || y == 0) {
@@ -131,16 +151,49 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 case rowPerFile:
                     int spectraInFile = baseImzML.getRun().getSpectrumList().size();
                     int numFiles = this.inputFilenames.length;
+                    int specrumIndex = 0;
 
                     pixelLocations = new PixelLocation[spectraInFile * numFiles * spectraPerPixel];
 
-                    // TODO: When encountering files with different lengths, this will fail. Should determine the number of spectra per file.
-                    for(int y = 0; y < numFiles; y++) {
-                        for(int x = 0; x < spectraInFile; x++) {
-                            for (int k = 0; k < spectraPerPixel; k++) {
-                                pixelLocations[(y * spectraInFile * spectraPerPixel) + (x * spectraPerPixel) + k] = new PixelLocation(x + 1, y + 1, 1);
-                            }
+                    if((primaryDirection == Direction.LeftToRight || primaryDirection == Direction.RightToLeft) && (secondaryDirection == Direction.TopToBottom || secondaryDirection == Direction.BottomToTop)) {
+                        int startY, endY, startX, endX, yDirection, xDirection;
+
+                        if(secondaryDirection == Direction.TopToBottom) {
+                            startY = 0;
+                            endY = inputFilenames.length;
+                            yDirection = 1;
+                        } else {
+                            startY = inputFilenames.length - 1;
+                            endY = -1;
+                            yDirection = -1;
                         }
+
+                        try {
+                            for (int y = startY; y != endY; y += yDirection) {
+                                MzML mzML = MzMLHeaderHandler.parsemzMLHeader(inputFilenames[y]);
+
+                                if(primaryDirection == Direction.LeftToRight) {
+                                    startX = 0;
+                                    endX = mzML.getRun().getSpectrumList().size();
+                                    xDirection = 1;
+                                } else {
+                                    startX = mzML.getRun().getSpectrumList().size() - 1;
+                                    endX = -1;
+                                    xDirection = -1;
+                                }
+
+                                for (int x = startX; x != endX; x += xDirection) {
+                                    for (int k = 0; k < spectraPerPixel; k++) {
+                                        pixelLocations[specrumIndex++] = new PixelLocation(x + 1, y + 1, 1);
+                                        //(y * spectraInFile * spectraPerPixel) + (x * spectraPerPixel) + k
+                                    }
+                                }
+                            }
+                        } catch (MzMLParseException e) {
+                            throw new FatalRuntimeParseException(new FatalParseIssue(e.getLocalizedMessage()));
+                        }
+                    } else {
+                        throw new UnsupportedOperationException("Unsupported set of directions: " + primaryDirection + ", " + secondaryDirection);
                     }
 
                     break;
@@ -315,12 +368,12 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
                 SpectrumList spectrumList = currentmzML.getRun().getSpectrumList();
                 int numSpectra = spectrumList.size();
 
-                if (fileStorage == FileStorage.rowPerFile) {
+                /*if (fileStorage == FileStorage.rowPerFile) {
                     int xDirection = -1;
                     int startValue = numSpectra;
                     int endValue = -1;
 
-                    if (lineScanDirection.getTerm().getID().equals(ScanSettings.LINE_SCAN_DIRECTION_LEFT_RIGHT_ID)) {
+                    if (ScanSettings.LINE_SCAN_DIRECTION_LEFT_RIGHT_ID.equals(lineScanDirection.getTerm().getID())) {
                         xDirection = 1;
                         startValue = 1;
                         endValue = numSpectra;
@@ -336,7 +389,7 @@ public class MzMLToImzMLConverter extends ImzMLConverter {
 
                     x = 1;
                     y++;
-                }
+                }*/
 
                 for (int i = 0; i < numSpectra; i++) {
                     if (currentPixelLocation >= pixelLocations.length) {

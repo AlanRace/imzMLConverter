@@ -29,7 +29,7 @@ public class WatersRAWTomzMLConverter {
     //public static final String CONVERTER_x64_LOCATION = "C:\\Program Files\\ProteoWizard";
     public static final String CONVERTER_LOCATION = "C:\\Program Files\\ProteoWizard";
     
-    public static final String COMMAND_LINE = " --zlib --simAsSpectra ";
+    public static final String COMMAND_LINE = " --zlib --simAsSpectra --srmAsSpectra ";
 //    public static final String INDEX_COMMAND = " /index";
 
 

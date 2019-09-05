@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.alanmrace.jimzmlconverter;
 
 import com.alanmrace.jimzmlconverter.exceptions.ConversionException;
@@ -426,6 +421,8 @@ public class MainCommand {
                                 if(commandimzML.intensityArrayCompression != null) {
                                     ((ImzMLConverter) converter).setintensityArrayCompressionType(commandimzML.intensityArrayCompression);
                                 }
+
+                                ((ImzMLConverter) converter).setDirections(commandimzML.firstDirection, commandimzML.secondDirection);
                                 
                                 if(commandimzML.imageDimensions != null) {                                    
                                     int numPixels = (commandimzML.imageDimensions.get(0) * commandimzML.imageDimensions.get(1)) + commandimzML.ignoreScans;
