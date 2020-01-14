@@ -37,3 +37,8 @@ To see a full list of options for the converter run the command:
 * Modify the following command:
 
 `java –jar jimzMLConverter-2.0.2.jar imzML "C:\Path\To\Data\my_data.wiff"`
+
+#### Converting AP-SMALDI data
+* Modify the following command:
+
+`java -jar jimzMLConverter-2.0.2.jar imzML -p "C:\Path\To\Data\my_data.udp" "C:\Path\To\Data\my_data.RAW"`
