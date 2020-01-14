@@ -31,3 +31,9 @@ To see a full list of options for the converter run the command:
 * Modify the following command:
 
 `java -jar jimzMLConverter-2.0.2.jar imzML -p "C:\Path\To\Data\my_data.properties.txt" "C:\Path\To\Data\my_data.grd"`
+
+#### Converting SCIEX data
+* Install [MS Data Converter (SCIEX)](https://sciex.com/sw-downloads-form?d=ab_sciex_ms_data_converter_V1.3%20beta.zip&asset=software&softwareProduct=MS%20Data%20Converter%20(Beta%20Version%201.3))
+* Modify the following command:
+
+`java –jar jimzMLConverter-2.0.2.jar imzML "C:\Path\To\Data\my_data.wiff"`
