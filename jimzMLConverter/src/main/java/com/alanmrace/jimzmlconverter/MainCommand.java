@@ -347,7 +347,7 @@ public class MainCommand {
                             }
                         } else if (extension.equals("imzML")) {
 
-                            if (parsedCommand.equals("hdf5")) {
+                            /*if (parsedCommand.equals("hdf5")) {
                                 try {
                                     inputFilenames = new String[]{fileName};
 
@@ -365,12 +365,12 @@ public class MainCommand {
 
                                     converter = null;
                                 }
-                            } else {
+                            } else {*/
                                 converter = new ImzMLToImzMLConverter(outputPath, inputFilenames);
-                            }
+                            //}
                         }
 
-                        if (parsedCommand.equals("hdf5")) {
+                        /*if (parsedCommand.equals("hdf5")) {
                             HDF5Converter hdf5Converter = (HDF5Converter) converter;
 
                             if (hdf5Converter != null) {
@@ -396,7 +396,7 @@ public class MainCommand {
                                     hdf5Converter.setChunkCacheSize(chunkCache);
                                 }
                             }
-                        }
+                        }*/
 
                         if (parsedCommand.equals("imzML")) {
                             if (converter instanceof ImzMLConverter) {

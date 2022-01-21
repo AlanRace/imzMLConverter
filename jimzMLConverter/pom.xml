@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.alanmrace</groupId>
     <artifactId>jimzMLConverter</artifactId>
-    <version>2.1.0</version>
+    <version>2.1.1</version>
     <packaging>jar</packaging>
     
     
@@ -182,7 +182,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>jimzmlparser</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.7</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -207,13 +207,17 @@
         SET HDF5VERSION=1.10.1
         mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\%HDF5VERSION%\lib\hdf5_java.dll" -DgroupId=org.hdfgroup -DartifactId=jhdf5 -Dversion=%HDF5VERSION% -Dpackaging=dll
         mvn install:install-file -Dfile="C:\Program Files\HDF_Group\HDF5\%HDF5VERSION%\lib\jarhdf5-%HDF5VERSION%.jar" -DgroupId=org.hdfgroup -DartifactId=jarhdf5 -Dversion=%HDF5VERSION% -Dpackaging=jar
-        -->
+
+
+                       <scope>system</scope>
+            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>
+                      <scope>system</scope>
+            <type>dll</type>
+            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jhdf5.dll</systemPath>
         <dependency>
             <groupId>org.hdfgroup</groupId>
             <artifactId>jarhdf5</artifactId>
             <version>${hdf5Version}</version>
-            <!--            <scope>system</scope>
-            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jarhdf5-2.11.0.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>org.hdfgroup</groupId>
@@ -221,10 +225,8 @@
             <version>${hdf5Version}</version>
             <scope>runtime</scope>
             <type>dll</type>
-            <!--           <scope>system</scope>
-            <type>dll</type>
-            <systemPath>C:/Program Files/HDF_Group/HDFView/2.11.0/lib/jhdf5.dll</systemPath>-->
         </dependency>
+        -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
